@@ -4,7 +4,6 @@ export interface IFinancialAccount {
     _id: string;
     name: string;
     code: string;
-    accountType: string;
 }
 
 export class FinancialAccount {
@@ -13,13 +12,11 @@ export class FinancialAccount {
         this._id = data._id;
         this.name = data.name;
         this.code = data.code;
-        this.type = this.getAccountType(data.accountType);
     }
 
     _id: string;
     name: string;
     code: string;
-    type: FinancialAccountType;
 
     private getAccountType(typeAsString: string): FinancialAccountType {
         switch (typeAsString) {

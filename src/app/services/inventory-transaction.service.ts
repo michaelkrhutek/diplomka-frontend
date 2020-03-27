@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
 import { Observable, of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { IInventoryTransaction } from '../models/inventory-transaction';
 import { InventoryTransactionType } from '../models/inventory-transaction-type';
 
@@ -26,6 +26,13 @@ export class InventoryTransactionService {
       })
     );
   }
+
+  getAllInventoryTransactionTypes(): InventoryTransactionType[] {
+    return [
+      InventoryTransactionType.Increment,
+      InventoryTransactionType.Decrement
+    ];
+  };
 
   getTransactionTypeDescription(type: InventoryTransactionType): string {
     switch (type) {

@@ -2,13 +2,22 @@ import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
 import { FinancialAccount, IFinancialAccount } from '../models/financial-account';
 import { switchMap, catchError, map, filter, finalize, shareReplay, tap } from 'rxjs/operators';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
 import { IFinancialPeriod, FinancialPeriod } from '../models/financial-period';
 import { SnackbarType } from '../models/snackbar-data';
 import { InventoryItemsGroup, IInventoryItemsGroup } from '../models/inventory-items-group';
-import { InventoryItem, IInventoryItem } from '../models/inventory-item';
+import { InventoryItem, IInventoryItem, IInventoryItemPopulated } from '../models/inventory-item';
 import { StockDecrementType } from '../models/stock';
+import { InventoryTransactionType } from '../models/inventory-transaction-type';
+import { INewInventoryTransactionRequestData, IIncrementInventoryTransactionSpecificData, IDecrementInventoryTransactionSpecificData } from '../models/inventory-transaction';
+import { InventoryItemService } from './inventory-item.service';
+import { FinancialPeriodService } from './financial-period.service';
+import { FinancialAccountService } from './financial-account.service';
+import { InventoryItemsGroupService } from './inventory-items-group.service';
+import { InventoryTransactionService } from './inventory-transaction.service';
+import { FinancialTransactionService } from './financial-transaction.service';
+import { InventoryTransactionTemplateService } from './inventory-transaction-template.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +27,14 @@ export class FinancialUnitDetailsService {
   constructor(
     @Inject('BASE_URL') private baseUrl: string,
     private http: HttpClient,
-    private popUpsService: PopUpsService
+    private popUpsService: PopUpsService,
+    private financialPeriodService: FinancialPeriodService,
+    private financialAccountService: FinancialAccountService,
+    private inventoryGroupService: InventoryItemsGroupService,
+    private inventoryItemService: InventoryItemService,
+    private inventoryTransactionTemplateService: InventoryTransactionTemplateService,
+    private inventoryTransactionService: InventoryTransactionService,
+    private financialTransactionService: FinancialTransactionService
   ) { }
 
   /*
@@ -51,21 +67,9 @@ export class FinancialUnitDetailsService {
   reloadFinancialAccounts$: Observable<void> = this.reloadFinancialAccountsSource.asObservable();
 
   financialAccounts$: Observable<FinancialAccount[]> = combineLatest(this.financialUnitId$, this.reloadFinancialAccounts$).pipe(
-    switchMap(([financialUnitId]) => financialUnitId ? this.getFinancialAccounts$(financialUnitId) : of([])),
+    switchMap(([financialUnitId]) => financialUnitId ? this.financialAccountService.getFinancialAccounts$(financialUnitId) : of([])),
     shareReplay(1)
   );
-
-  getFinancialAccounts$(financialUnitId: string): Observable<FinancialAccount[]> {
-    const params: HttpParams = new HttpParams().append('financialUnitId', financialUnitId);
-    return this.http.get<IFinancialAccount[]>(`${this.baseUrl}api/financial-account/get-all-financial-accounts`, { params }).pipe(
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of([]);
-      }),
-      map((accounts: IFinancialAccount[]) => accounts.map(account => new FinancialAccount(account))),
-      tap(v => console.log(v))
-    );
-  }
 
   createFinancialAccount(name: string, code: string): void {
     const financialUnitId: string = this.getFinancialUnitId();
@@ -100,23 +104,27 @@ export class FinancialUnitDetailsService {
   );
 
   financialPeriods$: Observable<FinancialPeriod[]> = combineLatest(this.financialUnitId$, this.reloadFinancialPeriods$).pipe(
-    switchMap(([financialUnitId]) => financialUnitId ? this.getFinancialPeriods$(financialUnitId) : of([])),
+    switchMap(([financialUnitId]) => financialUnitId ? this.financialPeriodService.getFinancialPeriods$(financialUnitId) : of([])),
     shareReplay(1)
   );
 
-  getFinancialPeriods$(financialUnitId: string): Observable<FinancialPeriod[]> {
-    const params: HttpParams = new HttpParams().append('financialUnitId', financialUnitId);
-    return this.http.get<IFinancialPeriod[]>(`${this.baseUrl}api/financial-period/get-all-financial-periods`, { params }).pipe(
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of([]);
-      }),
-      map((financialPeriods: IFinancialPeriod[]) => {
-        const unsortedFinancialPeriods: IFinancialPeriod[] = financialPeriods.map(financialPeriod => new FinancialPeriod(financialPeriod));
-        return unsortedFinancialPeriods.sort((a, b) => a.startDate.getMilliseconds() - b.startDate.getMilliseconds());
-      })
-    );
-  }
+  firstPeriodStartDate$: Observable<Date | null> = this.financialPeriods$.pipe(
+    map((periods) => {
+      if (periods.length == 0) {
+        return null;
+      }
+      return periods[0].startDate;
+    })
+  );
+
+  lastPeriodEndDate$: Observable<Date | null> = this.financialPeriods$.pipe(
+    map((periods) => {
+      if (periods.length == 0) {
+        return null;
+      }
+      return periods[periods.length - 1].endDate;
+    })
+  );
 
   createFinancialPeriod(startDate: Date, endDate: Date): void {
     const financialUnitId: string = this.getFinancialUnitId();
@@ -149,30 +157,9 @@ export class FinancialUnitDetailsService {
   reloadInventoryItemsGroups$: Observable<void> = this.reloadInventoryItemsGroupsSource.asObservable();
 
   inventoryItemsGroups$: Observable<InventoryItemsGroup[]> = combineLatest(this.financialUnitId$, this.reloadInventoryItemsGroups$).pipe(
-    switchMap(([financialUnitId]) => financialUnitId ? this.getInventoryItemsGroups$(financialUnitId) : of([])),
+    switchMap(([financialUnitId]) => financialUnitId ? this.inventoryGroupService.getInventoryItemsGroups$(financialUnitId) : of([])),
     shareReplay(1)
   );
-
-  getInventoryItemsGroups$(financialUnitId: string): Observable<InventoryItemsGroup[]> {
-    const params: HttpParams = new HttpParams().append('financialUnitId', financialUnitId);
-    return this.http.get<IInventoryItemsGroup[]>(`${this.baseUrl}api/inventory-group/get-all-inventory-groups`, { params }).pipe(
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of([]);
-      }),
-      map((groups: IInventoryItemsGroup[]) => groups.map(group => new InventoryItemsGroup(group))),
-      tap(v => console.log(v))
-    );
-  }
-
-  getInventoryItemGroupName$(groupId: string): Observable<string> {
-    return this.inventoryItemsGroups$.pipe(
-      map((groups: InventoryItemsGroup[]) => {
-        const group: InventoryItemsGroup = groups.find(group => group._id == groupId);
-        return group ? group.name : 'N/A';
-      })
-    );
-  }
 
   createInventoryItemsGroup(name: string, defaultStockDecrementType: StockDecrementType): void {
     const financialUnitId: string = this.getFinancialUnitId();
@@ -204,21 +191,10 @@ export class FinancialUnitDetailsService {
   reloadInventoryItemsSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
   reloadInventoryItems$: Observable<void> = this.reloadInventoryItemsSource.asObservable();
 
-  inventoryItems$: Observable<InventoryItem[]> = combineLatest(this.financialUnitId$, this.reloadInventoryItems$).pipe(
-    switchMap(([financialUnitId]) => financialUnitId ? this.getInventoryItems$(financialUnitId) : of([])),
+  inventoryItems$: Observable<IInventoryItemPopulated[]> = combineLatest(this.financialUnitId$, this.reloadInventoryItems$).pipe(
+    switchMap(([financialUnitId]) => financialUnitId ? this.inventoryItemService.getInventoryItems$(financialUnitId) : of([])),
     shareReplay(1)
   );
-
-  getInventoryItems$(financialUnitId: string): Observable<InventoryItem[]> {
-    const params: HttpParams = new HttpParams().append('financialUnitId', financialUnitId);
-    return this.http.get<IInventoryItem[]>(`${this.baseUrl}api/inventory-item/get-all-inventory-items`, { params }).pipe(
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of([]);
-      }),
-      map((groups: IInventoryItem[]) => groups.map(group => new InventoryItem(group))),
-    );
-  }
 
   createInventoryItem(name: string, inventoryGroupId: string): void {
     const financialUnitId: string = this.getFinancialUnitId();
@@ -244,6 +220,41 @@ export class FinancialUnitDetailsService {
   }
 
 
-  private reloadInventoryTransactionsSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
-  reloadInventoryTransactions$: Observable<void> = this.reloadInventoryTransactionsSource.asObservable();
+
+  private reloadTransactionsSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
+  reloadTransactions$: Observable<void> = this.reloadTransactionsSource.asObservable();
+
+  private getCreateInventoryTransaction$(
+    transactionType: InventoryTransactionType,
+    requestData: INewInventoryTransactionRequestData<any>
+  ): Observable<any> {
+    this.popUpsService.openLoadingModal({ message: 'Vytvářím transakci' });
+    const headers: HttpHeaders = new HttpHeaders().append('Content-Type', 'application/json');
+    const params: HttpParams = new HttpParams().append('type', transactionType);
+    return this.http.post<any>(
+      `${this.baseUrl}api/inventory-transaction/create-inventory-transaction`, JSON.stringify(requestData),
+      { headers, params }
+    ).pipe(
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    );
+  }
+
+  createIncrementInventoryTransaction(requestData: INewInventoryTransactionRequestData<IIncrementInventoryTransactionSpecificData>): void {
+    this.getCreateInventoryTransaction$(InventoryTransactionType.Increment, requestData).subscribe(() => {
+      this.reloadTransactionsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Transakce byla vytvořena', type: SnackbarType.Success });
+    });
+  }
+
+  createDecrementInventoryTransaction(requestData: INewInventoryTransactionRequestData<IDecrementInventoryTransactionSpecificData>): void {
+    this.getCreateInventoryTransaction$(InventoryTransactionType.Decrement, requestData).subscribe(() => {
+      this.reloadTransactionsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Transakce byla vytvořena', type: SnackbarType.Success });
+    });
+  }
 }

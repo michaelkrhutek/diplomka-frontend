@@ -1,6 +1,7 @@
 import { InventoryTransactionType } from './inventory-transaction-type';
-import { IStockBatch, IStock } from './stock';
+import { IStock } from './stock';
 import { IInventoryItem } from './inventory-item';
+import { IFinancialAccount } from './financial-account';
 
 export interface IIncrementInventoryTransactionSpecificData {
     quantity: number;
@@ -24,17 +25,17 @@ export interface INewInventoryTransactionRequestData<SpecificData> {
 export interface IInventoryTransaction<SpecificData> {
     _id: string;
     type: InventoryTransactionType;
-    inventoryItemId: IInventoryItem;
+    inventoryItem: IInventoryItem;
     description: string;
     effectiveDate: Date;
-    debitAccountId: string;
-    creditAccountId: string;
+    debitAccount: IFinancialAccount;
+    creditAccount: IFinancialAccount;
     specificData: SpecificData;
     totalTransactionAmount: number;
     stock: IStock;
-    financialUnitId: string;
+    financialUnit: string;
     inventoryItemTransactionIndex: number;
     isDerivedTransaction: boolean;
-    transactionIdForcingDerivation: string | null;
+    transactionForcingDerivation: string | null;
     isActive?: boolean;
 }
