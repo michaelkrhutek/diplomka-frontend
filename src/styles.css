@@ -1,1 +1,144 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+    --font-color-light-theme: black;
+    --font-color-light-theme-values: 0,0,0;
+    --font-color-dark-theme: white;
+    --font-color-dark-theme-values: 255,255,255;
+    --box-shadow: 0 0.25rem 0.5rem -0.25rem var(--box-shadow-color), 0 0 0.5rem -0.25rem var(--box-shadow-color);
+    --box-shadow-big: 0 0.5rem 1rem -0.5rem var(--box-shadow-color), 0 0 1rem -0.5rem var(--box-shadow-color);
+    --navigation-bar-height: 3rem;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-weight: 500;
+    color: var(--font-color);
+}
+
+[color-theme="light"] {
+    --primary-color: red;
+    --secondary-color: darkorange;
+    --navbar-background-color: rgb(230, 230, 230);
+    --font-color: var(--font-color-light-theme);
+    --font-color-values: var(--font-color-light-theme-values);
+    --font-color-light: grey;
+    --font-color-inverse: var(--font-color-dark-theme);
+    --background-color: white;
+    --background-color-dark: white;
+    --border-color: rgb(182, 182, 182);
+    --border-color-light: rgb(230, 230, 230);
+    --box-shadow-color: rgba(0,0,0,0.2);
+    --success-color: rgb(23, 92, 44);
+    --error-color: rgb(224, 48, 30);
+    --warning-color: rgb(225, 182, 0);
+}
+
+[color-theme="dark"] {
+    --primary-color: red;
+    --secondary-color: darkorange;
+    --navbar-background-color: rgb(20, 20, 20);
+    --font-color: var(--font-color-dark-theme);
+    --font-color-values: var(--font-color-dark-theme-values);
+    --font-color-light: darkgrey;
+    --font-color-inverse: var(--font-color-light-theme);
+    --background-color: rgb(30, 30, 30);
+    --background-color-dark: rgb(10, 10, 10);
+    --border-color: rgb(182, 182, 182);
+    --border-color-light: rgb(230, 230, 230);
+    --box-shadow-color: rgba(0,0,0,1);
+    --success-color: rgb(111, 255, 111);
+    --error-color: rgb(255, 80, 80);
+    --warning-color: rgb(225, 182, 0);
+}
+
+html,
+body,
+app-root {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background-color: var(--background-color-dark);
+  overflow: hidden;
+}
+
+.modal-container {
+    overflow: hidden;
+    background-color: rgba(0,0,0,0.6);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    max-width: calc(100vw - 2rem);
+    height: fit-content;
+    max-height: calc(100vh - 2rem);
+    overflow: hidden;
+    background-color: var(--background-color);
+}
+
+.modal > * {
+    padding: 2rem 2rem 0 2rem;
+}
+
+.modal > *:last-child {
+    padding-bottom: 2rem;
+}
+
+.modal-header {
+    font-size: 2rem;
+    color: var(--font-color-light);
+    font-weight: lighter;
+    text-align: center;
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex-shrink: 1;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.modal-actions > button {
+    margin-right: 1rem;
+}
+
+.modal-actions > button:last-child {
+    margin-right: 0;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(var(--font-color-values),0.05);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(var(--font-color-values),0.1);
+  }
+  
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(var(--font-color-values),0.3);
+    }
+
+.view-container {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

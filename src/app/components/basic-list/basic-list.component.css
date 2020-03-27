@@ -1,0 +1,24 @@
+.basic-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-list-icon-button {
+    align-self: center;
+    margin-bottom: 1rem;
+}
+
+.list-items-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.list-items-container > * {
+    margin-top: 0.75rem;
+}
+
+.list-items-container > *:first-child {
+    margin-top: 0;
+}

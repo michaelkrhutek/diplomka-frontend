@@ -1,0 +1,10 @@
+<div *ngIf="(data$ | async) as data" class="modal-container">
+    <div class="modal">
+        <div class="modal-content">
+            <div class="spinner-container">
+                <mat-spinner></mat-spinner>
+            </div>
+            <div>{{ data.message }}</div>
+        </div>
+    </div>   
+</div>

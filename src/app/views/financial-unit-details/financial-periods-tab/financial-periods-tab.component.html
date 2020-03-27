@@ -1,0 +1,4 @@
+<app-basic-list [listItems]="listItems$ | async" [iconItem]="openNewFinancialPeriodModalIconItem"></app-basic-list>
+
+<app-new-financial-period-modal *ngIf="isNewFinancialPeriodModalOpened" (close)="closeNewFinancialPeriodModal()">
+</app-new-financial-period-modal>

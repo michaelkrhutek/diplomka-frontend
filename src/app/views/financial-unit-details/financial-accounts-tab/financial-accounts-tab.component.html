@@ -1,0 +1,3 @@
+<app-basic-list [listItems]="listItems$ | async" [iconItem]="openNewFinancialAccountModalIconItem"></app-basic-list>
+
+<app-new-financial-account-modal *ngIf="isNewFinancialAccountModalOpened" (close)="closeNewFinancialAccountModal()"></app-new-financial-account-modal>

@@ -1,0 +1,30 @@
+.snackbar-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+.snackbar {
+    width: 100%;
+    max-width: 24rem;
+    margin-bottom: 1rem;
+}
+
+.success {
+    background-color: var(--success-color);
+    color: var(--font-color-inverse);
+    padding: 1rem;
+}
+
+.error {
+    background-color: var(--error-color);
+    color: var(--font-color-inverse);
+    padding: 1rem;
+}

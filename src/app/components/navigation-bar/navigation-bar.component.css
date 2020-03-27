@@ -1,0 +1,21 @@
+[color-theme="light"] {
+    --navbar-background-color: rgb(40, 40, 40);
+}
+
+[color-theme="dark"] {
+    --navbar-background-color: rgb(230, 230, 230);
+}
+
+.navigation-bar {
+    height: 3rem;
+    width: 100vw;
+    background-color: var(--navbar-background-color);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.navigation-link {
+    padding: 0 1rem;
+    cursor: pointer;
+}

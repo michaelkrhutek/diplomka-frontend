@@ -1,0 +1,82 @@
+@import "~@angular/material/theming";
+// @import "../node_modules//@angular//material//theming";
+@include mat-core();
+
+$violet: (
+    50 : #e9e4ee,
+    100 : #c7bbd5,
+    200 : #a28dba,
+    300 : #7c5f9e,
+    400 : #603d89,
+    500 : #441b74,
+    600 : #3e186c,
+    700 : #351461,
+    800 : #2d1057,
+    900 : #1f0844,
+    A100 : #a57aff,
+    A200 : #8247ff,
+    A400 : #5f14ff,
+    A700 : #5000fa,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #ffffff,
+        400 : #ffffff,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #ffffff,
+        A400 : #ffffff,
+        A700 : #ffffff,
+    )
+);
+
+
+$pink: (
+    50 : #f8f2ff,
+    100 : #eee0ff,
+    200 : #e3cbff,
+    300 : #d7b6ff,
+    400 : #cfa6ff,
+    500 : #c696ff,
+    600 : #c08eff,
+    700 : #b983ff,
+    800 : #b179ff,
+    900 : #a468ff,
+    A100 : #ffffff,
+    A200 : #ffffff,
+    A400 : #ffffff,
+    A700 : #f6f1ff,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #000000,
+        600 : #000000,
+        700 : #000000,
+        800 : #000000,
+        900 : #000000,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+
+$primary-color: mat-palette($pink);
+$accent-color: mat-palette($violet);
+$warn-color: mat-palette($mat-red);
+$light-theme: mat-light-theme($accent-color, $accent-color, $warn-color);
+$dark-theme: mat-dark-theme($primary-color, $primary-color, $warn-color);
+
+@include angular-material-theme($light-theme);
+.dark-theme {
+  @include angular-material-theme($dark-theme);
+}

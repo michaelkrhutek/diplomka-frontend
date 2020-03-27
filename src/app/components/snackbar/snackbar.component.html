@@ -1,0 +1,5 @@
+<div class="snackbar-container">
+    <div *ngIf="(data$ | async) as data" [ngClass]="getCssClassName(data.type)">
+        <div class="message">{{ data.message }}</div>
+    </div>
+</div>

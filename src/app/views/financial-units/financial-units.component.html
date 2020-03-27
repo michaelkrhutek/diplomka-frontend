@@ -1,0 +1,5 @@
+<div class="view-container">
+    <app-basic-list [listItems]="listItems$ | async" [iconItem]="openNewFinancialUnitModalIconItem" [isLoadingData]="isLoadingData"></app-basic-list>
+</div>
+
+<app-new-financial-unit-modal *ngIf="isNewFinancialUnitModalOpened" (close)="closeNewFinancialUnitModal()"></app-new-financial-unit-modal>

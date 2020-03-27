@@ -1,0 +1,17 @@
+<div class="list-item" [class.box-shadow]="isBoxShadowVisible">
+    <div *ngIf="data.iconItemsStartContainerWidth" class="icon-items-container"
+        [style.width]="data.iconItemsStartContainerWidth * 3 + 'rem'" style="justify-content: flex-start;">
+        <app-icon-item *ngFor="let iconItem of (data.iconItemsStart$ | async)" [data]="iconItem"></app-icon-item>
+    </div>
+    <div class="text-items-container">
+        <div *ngFor="let textItem of data.textItems" class="text-item" [style.width]="textItem.width + 'rem'"
+            [style.max-width]="textItem.width + 'rem'">
+            <div class="label-text">{{ textItem.label }}</div>
+            <div class="value-text">{{ textItem.value$ | async }}</div>
+        </div>
+    </div>
+    <div *ngIf="data.iconItemsEndContainerWidth" class="icon-items-container"
+        [style.width]="data.iconItemsEndContainerWidth * 3 + 'rem'" style="justify-content: flex-end">
+        <app-icon-item *ngFor="let iconItem of (data.iconItemsEnd$ | async)" [data]="iconItem"></app-icon-item>
+    </div>
+</div>

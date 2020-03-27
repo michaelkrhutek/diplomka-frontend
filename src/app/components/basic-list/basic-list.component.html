@@ -1,0 +1,16 @@
+<div class="basic-list">
+    <div *ngIf="isLoadingData; else dataLoaded" class="loading-spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+    <ng-template #dataLoaded>
+        <button *ngIf="iconItem" class="top-list-icon-button" mat-mini-fab [matTooltip]="iconItem.description" (click)="iconItem.action()">
+            <mat-icon>{{ iconItem.iconName }}</mat-icon>
+          </button>
+        <div *ngIf="listItems && listItems.length > 0; else noData" class="list-items-container">
+            <app-list-item *ngFor="let item of listItems" [data]="item"></app-list-item>
+        </div>
+        <ng-template #noData>
+            <div class="no-record-message-container">{{ noRecordMessage }}</div>
+        </ng-template>
+    </ng-template>
+</div>

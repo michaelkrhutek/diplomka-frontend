@@ -1,0 +1,4 @@
+<app-basic-list [listItems]="listItems$ | async" [iconItem]="openNewInventoryItemsGroupModalIconItem"></app-basic-list>
+
+<app-new-inventory-items-group-modal *ngIf="isNewInventoryItemsGroupModalOpened"
+    (close)="closeNewInventoryItemsGroupModal()"></app-new-inventory-items-group-modal>
