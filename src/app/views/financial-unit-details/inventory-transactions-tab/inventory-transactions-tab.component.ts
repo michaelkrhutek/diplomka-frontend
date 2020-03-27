@@ -1,10 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { IIconItem } from 'src/app/models/icon-item';
 import { Observable, combineLatest } from 'rxjs';
 import { ListItem, IListItem } from 'src/app/models/list-item';
 import { map, switchMap } from 'rxjs/operators';
-import { IInventoryTransaction } from 'src/app/models/inventory-transaction';
+import { IInventoryTransactionPopulated } from 'src/app/models/inventory-transaction';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
 import { FormatterService } from 'src/app/services/formatter.service';
 
@@ -30,22 +30,22 @@ export class InventoryTransactionsTabComponent {
     action: () => this.openNewInventoryTransactionModal()
   };
 
-  inventoryTransactions$: Observable<IInventoryTransaction<any>[]> = combineLatest(
+  inventoryTransactions$: Observable<IInventoryTransactionPopulated<any>[]> = combineLatest(
     this.financialUnitDetailsService.financialUnitId$,
-    this.financialUnitDetailsService.reloadInventoryTransactions$
+    this.financialUnitDetailsService.reloadTransactions$
   ).pipe(
     switchMap(([financialUnitId]) => this.inventoryTransactionService.getInventoryTransactions$(financialUnitId))
   );
 
   listItems$: Observable<ListItem[]> = this.inventoryTransactions$.pipe(
-    map((transactions: IInventoryTransaction<any>[]) => transactions.map(transaction => this.getListItemFromInventoryTransaction(transaction)))
+    map((transactions: IInventoryTransactionPopulated<any>[]) => transactions.map(transaction => this.getListItemFromInventoryTransaction(transaction)))
   );
 
-  private getListItemFromInventoryTransaction(transaction: IInventoryTransaction<any>): ListItem {
+  private getListItemFromInventoryTransaction(transaction: IInventoryTransactionPopulated<any>): ListItem {
     const data: IListItem = {
       textItems: [
         { label: 'Datum', value: this.formatterService.getDayMonthYearString(transaction.effectiveDate), width: 8 },
-        { label: 'Položka', value: transaction.inventoryItemId.name, width: 12 },
+        { label: 'Položka', value: transaction.inventoryItem.name, width: 12 },
         { label: 'Druh transakce', value: this.inventoryTransactionService.getTransactionTypeDescription(transaction.type), width: 8 },
         { label: 'Popisek', value: transaction.description, width: 16 },
         { label: 'Množství', value: (transaction.specificData['quantity'] as number).toString(), width: 8 },

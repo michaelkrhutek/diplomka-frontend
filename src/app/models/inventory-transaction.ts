@@ -22,14 +22,14 @@ export interface INewInventoryTransactionRequestData<SpecificData> {
     specificData: SpecificData;
 }
 
-export interface IInventoryTransaction<SpecificData> {
+export interface IInventoryTransactionPopulated<SpecificData> {
     _id: string;
     type: InventoryTransactionType;
     inventoryItem: IInventoryItem;
     description: string;
     effectiveDate: Date;
-    debitAccount: IFinancialAccount;
-    creditAccount: IFinancialAccount;
+    debitAccount: string;
+    creditAccount: string;
     specificData: SpecificData;
     totalTransactionAmount: number;
     stock: IStock;

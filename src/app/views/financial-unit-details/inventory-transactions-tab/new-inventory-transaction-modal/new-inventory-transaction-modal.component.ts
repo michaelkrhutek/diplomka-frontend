@@ -4,7 +4,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, of, combineLatest, Subscription } from 'rxjs';
 import { startWith, switchMap, map, tap } from 'rxjs/operators';
 import { IInventoryItem, IInventoryItemPopulated } from 'src/app/models/inventory-item';
-import { IInventoryTransactionTemplate, IInventoryTransactionTemplatePopulated } from 'src/app/models/inventory-transaction-template';
+import { IInventoryTransactionTemplatePopulated } from 'src/app/models/inventory-transaction-template';
 import { InventoryTransactionTemplateService } from 'src/app/services/inventory-transaction-template.service';
 import { InventoryTransactionType } from 'src/app/models/inventory-transaction-type';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
@@ -37,9 +37,11 @@ export class NewInventoryTransactionModalComponent {
   );
 
   inventoryTransactionTemplates$: Observable<IInventoryTransactionTemplatePopulated[]> = this.selectedInventoryItem$.pipe(
-    switchMap((inventoryItem: IInventoryItemPopulated) => this.inventoryTransactionTemplateService.getInventoryGroupTransactionTemplates$(
-      inventoryItem.inventoryGroup._id
-    ))
+    switchMap((inventoryItem: IInventoryItemPopulated) => {
+      return inventoryItem ? 
+        this.inventoryTransactionTemplateService.getInventoryGroupTransactionTemplates$(inventoryItem.inventoryGroup._id) :
+        of([]);
+    })
   );
   inventoryTransactionTemplateFC: FormControl = new FormControl(null);
   selectedInventoryTransactionTemplate$: Observable<IInventoryTransactionTemplatePopulated> = this.inventoryTransactionTemplateFC.valueChanges.pipe(
@@ -61,17 +63,19 @@ export class NewInventoryTransactionModalComponent {
         description: this.inventoryTransactionService.getTransactionTypeDescription(type)
       };
     });
-  transactionTypeFC: FormControl = new FormControl(
-    this.transactionTypeOptions.length > 0 ? this.transactionTypeOptions[0].type : null
-  );
+  transactionTypeFC: FormControl = new FormControl(null);
   selectedTransactionType$: Observable<InventoryTransactionType> = this.transactionTypeFC.valueChanges.pipe(
-    startWith(this.transactionTypeFC)
+    startWith(this.transactionTypeFC.value)
   );
 
   descriptionFC: FormControl = new FormControl(null);
 
   minimalEffectiveDate$: Observable<Date | null> = this.financialUnitDetailsService.firstPeriodStartDate$;
   maximalEffectiveDate$: Observable<Date | null> = this.financialUnitDetailsService.lastPeriodEndDate$;
+  isEffectiveDateDisabled$: Observable<boolean> = combineLatest(
+    this.minimalEffectiveDate$, this.maximalEffectiveDate$).pipe(
+      map(([minDate, maxDate]) => !(minDate && maxDate))
+  );
   effectiveDateFC: FormControl = new FormControl(null);
 
   financialAccounts$: Observable<IFinancialAccount[]> = this.financialUnitDetailsService.financialAccounts$;
@@ -127,13 +131,17 @@ export class NewInventoryTransactionModalComponent {
     })
   )
 
+  isEffectiveDateDisabledSubscription: Subscription;
   selectedTemplateSubscription: Subscription;
 
   ngOnInit(): void {
+    this.isEffectiveDateDisabledSubscription = this.isEffectiveDateDisabled$
+      .subscribe((isDisabled) => isDisabled ? this.effectiveDateFC.disable() : this.effectiveDateFC.enable());
     this.selectedTemplateSubscription = this.selectedInventoryTransactionTemplate$.subscribe();
   }
 
   ngOnDestroy(): void {
+    this.isEffectiveDateDisabledSubscription && this.isEffectiveDateDisabledSubscription.unsubscribe();
     this.selectedTemplateSubscription && this.selectedTemplateSubscription.unsubscribe();    
   }
 
@@ -171,6 +179,7 @@ export class NewInventoryTransactionModalComponent {
   }
 
   areInventoryTransactionFormDataValid(formData: INewInventoryTransactionFormData): boolean {
+    console.log(formData)
     if (
       !formData.inventoryItem ||
       !formData.description ||
@@ -183,6 +192,7 @@ export class NewInventoryTransactionModalComponent {
   }
 
   areSpecificDataValid(type: InventoryTransactionType, specificData: any): boolean {
+    console.log(type, specificData)
     if (!type) {
       return false;
     }
