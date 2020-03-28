@@ -1,4 +1,5 @@
-<app-basic-list [listItems]="listItems$ | async" [iconItem]="openNewInventoryTransactionModalIconItem"></app-basic-list>
+<app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"
+    [iconItem]="openNewInventoryTransactionModalIconItem"></app-basic-list>
 
 <app-new-inventory-transaction-modal *ngIf="isNewInventoryTransactionModalOpened"
     (close)="closeNewInventoryTransactionModal()"></app-new-inventory-transaction-modal>

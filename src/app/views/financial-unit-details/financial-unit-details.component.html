@@ -1,28 +1,47 @@
 <div class="view-container">
     <mat-tab-group>
-        <mat-tab label="Obecné">
+        <!-- <mat-tab label="Obecné">
 
-        </mat-tab>
+        </mat-tab> -->
         <mat-tab label="Účetní období">
-            <app-financial-periods-tab></app-financial-periods-tab>
+            <ng-template matTabContent>
+                <app-financial-periods-tab></app-financial-periods-tab>
+            </ng-template>
         </mat-tab>
         <mat-tab label="Finanční účty">
-            <app-financial-accounts-tab></app-financial-accounts-tab>
+            <ng-template matTabContent>
+                <app-financial-accounts-tab></app-financial-accounts-tab>
+            </ng-template>
         </mat-tab>
-        <mat-tab label="Skladové skupiny">
-            <app-inventory-items-groups-tab></app-inventory-items-groups-tab>
+        <mat-tab label="Skupiny zásob">
+            <ng-template matTabContent>
+                <app-inventory-items-groups-tab></app-inventory-items-groups-tab>
+            </ng-template>
         </mat-tab>
-        <mat-tab label="Skladové položky">
-            <app-inventory-items-tab></app-inventory-items-tab>
+        <mat-tab label="Položky zásob">
+            <ng-template matTabContent>
+                <app-inventory-items-tab></app-inventory-items-tab>
+            </ng-template>
         </mat-tab>
-        <mat-tab label="Skladové transakce">
-            <app-inventory-transactions-tab></app-inventory-transactions-tab>
+        <mat-tab label="Stav zásob">
+            <ng-template matTabContent>
+                <app-stocks-tab></app-stocks-tab>
+            </ng-template>
+        </mat-tab>
+        <mat-tab label="Transakce">
+            <ng-template matTabContent>
+                <app-inventory-transactions-tab></app-inventory-transactions-tab>
+            </ng-template>
         </mat-tab>
         <mat-tab label="Účetní zápisy">
-
+            <ng-template matTabContent>
+                <app-financial-transactions-tab></app-financial-transactions-tab>
+            </ng-template>
         </mat-tab>
         <mat-tab label="Obratová předvaha">
-
+            <ng-template matTabContent>
+                <app-trial-balance-tab></app-trial-balance-tab>
+            </ng-template>
         </mat-tab>
     </mat-tab-group>
 </div>

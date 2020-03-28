@@ -1,0 +1,25 @@
+<div class="filters-container" [formGroup]="filteringCriteriaFG">
+    <mat-form-field>
+        <mat-label>Účet</mat-label>
+        <mat-select formControlName="accountId">
+            <mat-option [value]="null"></mat-option>
+          <mat-option *ngFor="let account of (financialAccounts$ | async)" [value]="account._id">
+            {{ account.code }} - {{ account.name }}
+          </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+        <input matInput [matDatepicker]="dateFrom" placeholder="Ode dne"
+            formControlName="dateFrom" readonly>
+        <mat-datepicker-toggle matSuffix [for]="dateFrom"></mat-datepicker-toggle>
+        <mat-datepicker #dateFrom></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field>
+        <input matInput [matDatepicker]="dateTo" placeholder="Do dne"
+            formControlName="dateTo" readonly>
+        <mat-datepicker-toggle matSuffix [for]="dateTo"></mat-datepicker-toggle>
+        <mat-datepicker #dateTo></mat-datepicker>
+    </mat-form-field>
+</div>
+
+<app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"></app-basic-list>

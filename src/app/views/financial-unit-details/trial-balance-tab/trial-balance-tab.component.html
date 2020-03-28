@@ -1,0 +1,8 @@
+<mat-form-field>
+    <mat-label>Účetní období</mat-label>
+    <mat-select [formControl]="financialPeriodIdFC">
+      <mat-option *ngFor="let option of (financialPeriodOptions$ | async)" [value]="option.id">{{ option.description }}</mat-option>
+    </mat-select>
+</mat-form-field>
+
+<app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"></app-basic-list>

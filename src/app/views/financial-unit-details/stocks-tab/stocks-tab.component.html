@@ -1,0 +1,8 @@
+<mat-form-field>
+    <input matInput [matDatepicker]="effectiveDate" placeholder="Stav k datu"
+        [formControl]="effectiveDateFC" readonly>
+    <mat-datepicker-toggle matSuffix [for]="effectiveDate"></mat-datepicker-toggle>
+    <mat-datepicker #effectiveDate></mat-datepicker>
+</mat-form-field>
+
+<app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"></app-basic-list>

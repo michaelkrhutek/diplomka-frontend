@@ -126,9 +126,14 @@ export class NewInventoryTransactionModalComponent {
     this.newInventoryTransactionData$,
     this.transactionSpecificData$
   ).pipe(
+    tap(v => console.log(v)),
     map(([transactionType, transactionData, specificData]) => {
-      return !(this.areInventoryTransactionFormDataValid(transactionData) && this.areSpecificDataValid(transactionType, specificData));
-    })
+      const areInventoryTransactionFormDataValid: boolean = this.getAreInventoryTransactionFormDataValid(transactionData);
+      const areSpecificDataValid: boolean = this.getAreSpecificDataValid(transactionType, specificData);
+      console.log(areInventoryTransactionFormDataValid, areSpecificDataValid);
+      return !(areInventoryTransactionFormDataValid && areSpecificDataValid);
+    }),
+    tap(v => console.log(v))
   )
 
   isEffectiveDateDisabledSubscription: Subscription;
@@ -178,7 +183,7 @@ export class NewInventoryTransactionModalComponent {
     this.closeModal();
   }
 
-  areInventoryTransactionFormDataValid(formData: INewInventoryTransactionFormData): boolean {
+  private getAreInventoryTransactionFormDataValid(formData: INewInventoryTransactionFormData): boolean {
     console.log(formData)
     if (
       !formData.inventoryItem ||
@@ -189,22 +194,23 @@ export class NewInventoryTransactionModalComponent {
     ) {
       return false;
     }
+    return true;
   }
 
-  areSpecificDataValid(type: InventoryTransactionType, specificData: any): boolean {
+  private getAreSpecificDataValid(type: InventoryTransactionType, specificData: any): boolean {
     console.log(type, specificData)
-    if (!type) {
+    if (!type || !specificData) {
       return false;
     }
     if (type == InventoryTransactionType.Increment) {
       const data: IIncrementInventoryTransactionSpecificData = specificData;
-      if (!data.quantity || !(data.quantity <= 0) || !data.costPerUnit || !(data.costPerUnit <= 0)) {
+      if (!data.quantity || (data.quantity <= 0) || !data.costPerUnit || (data.costPerUnit <= 0)) {
         return false;
       }
     }
     if (type == InventoryTransactionType.Decrement) {
       const data: IDecrementInventoryTransactionSpecificData = specificData;
-      if (!data.quantity || !(data.quantity <= 0)) {
+      if (!data.quantity || (data.quantity <= 0)) {
         return false;
       }
     }

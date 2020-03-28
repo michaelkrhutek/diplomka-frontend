@@ -3,8 +3,8 @@ import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-det
 import { IIconItem } from 'src/app/models/icon-item';
 import { Observable, combineLatest } from 'rxjs';
 import { ListItem, IListItem } from 'src/app/models/list-item';
-import { map, switchMap } from 'rxjs/operators';
-import { IInventoryTransactionPopulated } from 'src/app/models/inventory-transaction';
+import { map, switchMap, tap } from 'rxjs/operators';
+import { IInventoryTransactionPopulated, InventoryTransactionPopulated } from 'src/app/models/inventory-transaction';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
 import { FormatterService } from 'src/app/services/formatter.service';
 
@@ -22,6 +22,7 @@ export class InventoryTransactionsTabComponent {
     private formatterService: FormatterService
   ) { }
 
+  isLoadingData: boolean = false;
   isNewInventoryTransactionModalOpened: boolean = false;
 
   openNewInventoryTransactionModalIconItem: IIconItem = {
@@ -30,20 +31,23 @@ export class InventoryTransactionsTabComponent {
     action: () => this.openNewInventoryTransactionModal()
   };
 
-  inventoryTransactions$: Observable<IInventoryTransactionPopulated<any>[]> = combineLatest(
+  inventoryTransactions$: Observable<InventoryTransactionPopulated<any>[]> = combineLatest(
     this.financialUnitDetailsService.financialUnitId$,
     this.financialUnitDetailsService.reloadTransactions$
   ).pipe(
-    switchMap(([financialUnitId]) => this.inventoryTransactionService.getInventoryTransactions$(financialUnitId))
+    tap(() => (this.isLoadingData = true)),
+    switchMap(([financialUnitId]) => this.inventoryTransactionService.getInventoryTransactions$(financialUnitId)),
   );
 
   listItems$: Observable<ListItem[]> = this.inventoryTransactions$.pipe(
-    map((transactions: IInventoryTransactionPopulated<any>[]) => transactions.map(transaction => this.getListItemFromInventoryTransaction(transaction)))
+    map((transactions: InventoryTransactionPopulated<any>[]) => transactions.map(transaction => this.getListItemFromInventoryTransaction(transaction))),
+    tap(() => (this.isLoadingData = false)),
   );
 
-  private getListItemFromInventoryTransaction(transaction: IInventoryTransactionPopulated<any>): ListItem {
+  private getListItemFromInventoryTransaction(transaction: InventoryTransactionPopulated<any>): ListItem {
     const data: IListItem = {
       textItems: [
+        { label: 'ID transakce', value: transaction._id, width: 14 },
         { label: 'Datum', value: this.formatterService.getDayMonthYearString(transaction.effectiveDate), width: 8 },
         { label: 'Položka', value: transaction.inventoryItem.name, width: 12 },
         { label: 'Druh transakce', value: this.inventoryTransactionService.getTransactionTypeDescription(transaction.type), width: 8 },

@@ -7,20 +7,21 @@ export class FormatterService {
 
   constructor() { }
 
-  defaultDateSeparator: string = '.';
+  private defaultDateSeparator: string = '.';
+  private defaultNumberSeparator: string = ' ';
 
   getRoundedNumberString(n: number): string {
     if (isNaN(n)) {
       return 'N/A';
     }
-    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, this.defaultNumberSeparator);
   }
 
   getPercentageString(n: number): string {
     if (isNaN(n)) {
       return 'N/A';
     }
-    return Math.round(100 * n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '%';
+    return Math.round(100 * n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, this.defaultNumberSeparator) + '%';
   }
 
   getDayMonthYearString(date: Date, options?: { separator?: string, addZeroDigit?: boolean }): string {

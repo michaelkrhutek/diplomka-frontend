@@ -3,6 +3,7 @@ import { IFinancialAccount } from './financial-account';
 import { IInventoryItemsGroup } from './inventory-items-group';
 
 export interface IInventoryTransactionTemplate {
+    _id: string;
     description: string;
     transactionType: InventoryTransactionType;
     financialUnit: string;
@@ -12,6 +13,7 @@ export interface IInventoryTransactionTemplate {
 }
 
 export interface IInventoryTransactionTemplatePopulated {
+    _id: string;
     description: string;
     transactionType: InventoryTransactionType;
     financialUnit: string;

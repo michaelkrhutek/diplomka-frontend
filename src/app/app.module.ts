@@ -46,6 +46,9 @@ import { InventoryItemsTabComponent } from './views/financial-unit-details/inven
 import { NewInventoryItemModalComponent } from './views/financial-unit-details/inventory-items-tab/new-inventory-item-modal/new-inventory-item-modal.component';
 import { InventoryTransactionsTabComponent } from './views/financial-unit-details/inventory-transactions-tab/inventory-transactions-tab.component';
 import { NewInventoryTransactionModalComponent } from './views/financial-unit-details/inventory-transactions-tab/new-inventory-transaction-modal/new-inventory-transaction-modal.component';
+import { FinancialTransactionsTabComponent } from './views/financial-unit-details/financial-transactions-tab/financial-transactions-tab.component';
+import { TrialBalanceTabComponent } from './views/financial-unit-details/trial-balance-tab/trial-balance-tab.component';
+import { StocksTabComponent } from './views/financial-unit-details/stocks-tab/stocks-tab.component';
 
 export const getBaseUrl = () => {
   if (environment.production) {
@@ -79,7 +82,10 @@ export const getBaseUrl = () => {
     InventoryItemsTabComponent,
     NewInventoryItemModalComponent,
     InventoryTransactionsTabComponent,
-    NewInventoryTransactionModalComponent
+    NewInventoryTransactionModalComponent,
+    FinancialTransactionsTabComponent,
+    TrialBalanceTabComponent,
+    StocksTabComponent
   ],
   imports: [
     BrowserModule,
