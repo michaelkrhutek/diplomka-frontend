@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-navigation-bar',
@@ -8,5 +9,9 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 })
 export class NavigationBarComponent {
 
-  constructor() { }
+  constructor(
+    private authService: AuthService
+  ) {
+    this.authService.user$.subscribe();
+  }
 }

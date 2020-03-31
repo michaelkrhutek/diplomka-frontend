@@ -28,7 +28,7 @@ import { ListItemComponent } from './components/list-item/list-item.component';
 import { IconItemComponent } from './components/icon-item/icon-item.component';
 import { CommonModule } from '@angular/common';
 import { NoopAnimationsModule, BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FinancialUnitsComponent } from './views/financial-units/financial-units.component';
 import { environment } from 'src/environments/environment';
@@ -49,13 +49,16 @@ import { NewInventoryTransactionModalComponent } from './views/financial-unit-de
 import { FinancialTransactionsTabComponent } from './views/financial-unit-details/financial-transactions-tab/financial-transactions-tab.component';
 import { TrialBalanceTabComponent } from './views/financial-unit-details/trial-balance-tab/trial-balance-tab.component';
 import { StocksTabComponent } from './views/financial-unit-details/stocks-tab/stocks-tab.component';
+import { HttpWithCredentialsInterceptor } from './interceptors/http-with-credentials.inverceptor';
+import { LoginComponent } from './views/login/login.component';
+import { SignUpComponent } from './views/sign-up/sign-up.component';
 
 export const getBaseUrl = () => {
   if (environment.production) {
     console.log(document.getElementsByTagName('base')[0].href);
     return document.getElementsByTagName('base')[0].href;
   } else {
-    return 'http://localhost:3000/';
+    return 'https://localhost:3000/';
   }
 }
 
@@ -85,7 +88,9 @@ export const getBaseUrl = () => {
     NewInventoryTransactionModalComponent,
     FinancialTransactionsTabComponent,
     TrialBalanceTabComponent,
-    StocksTabComponent
+    StocksTabComponent,
+    LoginComponent,
+    SignUpComponent
   ],
   imports: [
     BrowserModule,
@@ -110,7 +115,12 @@ export const getBaseUrl = () => {
     BrowserAnimationsModule
   ],
   providers: [
-    { provide: 'BASE_URL', useFactory: getBaseUrl, deps: [] }
+    { provide: 'BASE_URL', useFactory: getBaseUrl, deps: [] },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpWithCredentialsInterceptor,
+      multi: true
+      }
   ],
   bootstrap: [AppComponent]
 })

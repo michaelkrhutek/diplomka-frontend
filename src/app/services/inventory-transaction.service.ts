@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { IInventoryTransactionPopulated, InventoryTransactionPopulated } from '../models/inventory-transaction';
 import { InventoryTransactionType } from '../models/inventory-transaction-type';
+import { IInventoryTransactionFilteringCriteria } from '../models/inventory-transaction-filtering-criteria';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,32 @@ export class InventoryTransactionService {
 
   getInventoryTransactions$(financialUnitId: string): Observable<InventoryTransactionPopulated<any>[]> {
     const params: HttpParams = new HttpParams().append('financialUnitId', financialUnitId);
-    return this.http.get<IInventoryTransactionPopulated<any>[]>(`${this.baseUrl}api/inventory-transaction/get-inventory-transactions`, { params }).pipe(
+    return this.http.get<IInventoryTransactionPopulated<any>[]>(
+      `${this.baseUrl}api/inventory-transaction/get-inventory-transactions`,
+      { params }
+    ).pipe(
+      map((transactions) => transactions.map((transaction) => new InventoryTransactionPopulated<any>(transaction))),
+      catchError((err) => {
+        this.popUpsService.handleApiError(err);
+        return of([]);
+      })
+    );
+  }
+
+  getFiltredInventoryTransactions$(
+    financialUnitId: string,
+    filteringCriteria: IInventoryTransactionFilteringCriteria
+  ): Observable<InventoryTransactionPopulated<any>[]> {
+    const params: HttpParams = new HttpParams()
+      .append('financialUnitId', financialUnitId)
+      .append('inventoryItemId', filteringCriteria.inventoryItemId || '')
+      .append('transactionType', filteringCriteria.transactionType || '')
+      .append('dateFrom', filteringCriteria.dateFrom ? filteringCriteria.dateFrom.toDateString() : '')
+      .append('dateTo', filteringCriteria.dateTo ? filteringCriteria.dateTo.toDateString() : '');
+    return this.http.get<IInventoryTransactionPopulated<any>[]>(
+      `${this.baseUrl}api/inventory-transaction/get-filtred-inventory-transactions`,
+      { params }
+    ).pipe(
       map((transactions) => transactions.map((transaction) => new InventoryTransactionPopulated<any>(transaction))),
       catchError((err) => {
         this.popUpsService.handleApiError(err);

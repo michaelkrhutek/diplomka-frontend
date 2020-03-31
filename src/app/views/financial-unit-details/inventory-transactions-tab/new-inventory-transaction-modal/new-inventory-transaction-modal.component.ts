@@ -126,14 +126,11 @@ export class NewInventoryTransactionModalComponent {
     this.newInventoryTransactionData$,
     this.transactionSpecificData$
   ).pipe(
-    tap(v => console.log(v)),
     map(([transactionType, transactionData, specificData]) => {
       const areInventoryTransactionFormDataValid: boolean = this.getAreInventoryTransactionFormDataValid(transactionData);
       const areSpecificDataValid: boolean = this.getAreSpecificDataValid(transactionType, specificData);
-      console.log(areInventoryTransactionFormDataValid, areSpecificDataValid);
       return !(areInventoryTransactionFormDataValid && areSpecificDataValid);
     }),
-    tap(v => console.log(v))
   )
 
   isEffectiveDateDisabledSubscription: Subscription;

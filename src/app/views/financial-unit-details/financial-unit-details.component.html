@@ -1,8 +1,17 @@
-<div class="view-container">
-    <mat-tab-group>
-        <!-- <mat-tab label="Obecné">
+<div class="financial-unit-details-view">
+    <div class="side-navigation-panel">
+        <div class="side-navigation-item" [class.active-side-navigation-item]="item.tab == activeTab" *ngFor="let item of sideNavigationBarItems" (click)="setActiveTab(item.tab)">{{ item.description }}</div>
+    </div>
+    <div [ngSwitch]="activeTab" class="tab-container">
+        <app-financial-periods-tab *ngSwitchCase="'financial-periods'"></app-financial-periods-tab>
+        <app-inventory-transactions-tab *ngSwitchCase="'inventory-transactions'"></app-inventory-transactions-tab>
+        <app-financial-transactions-tab *ngSwitchCase="'financial-transactions'"></app-financial-transactions-tab>
+    </div>
+</div>
 
-        </mat-tab> -->
+<!-- <div class="view-container">
+    <mat-tab-group>
+
         <mat-tab label="Účetní období">
             <ng-template matTabContent>
                 <app-financial-periods-tab></app-financial-periods-tab>
@@ -44,4 +53,4 @@
             </ng-template>
         </mat-tab>
     </mat-tab-group>
-</div>
+</div> -->

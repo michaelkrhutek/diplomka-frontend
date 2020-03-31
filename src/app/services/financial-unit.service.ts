@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { catchError, filter, finalize } from 'rxjs/operators';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
 import { SnackbarType } from '../models/snackbar-data';
 
@@ -20,7 +20,7 @@ export class FinancialUnitService {
   reloadFinancialUnits$: Observable<void> = this.reloadFinancialUnitsSource.asObservable();
 
   getFinancialUnits$(): Observable<IFinancialUnit[]> {
-    return this.http.get<IFinancialUnit[]>(`${this.baseUrl}api/financial-unit/get-all-financial-units`).pipe(
+    return this.http.get<IFinancialUnit[]>(`${this.baseUrl}api/financial-unit/get-all-financial-units`, { withCredentials: true }).pipe(
       catchError(() => {
         return of([]);
       })
@@ -29,6 +29,7 @@ export class FinancialUnitService {
 
   getFinancialUnit$(id: string): Observable<IFinancialUnit> {
     const params: HttpParams = new HttpParams().append('id', id);
+    const headers: HttpHeaders = new HttpHeaders()
     return this.http.get<IFinancialUnit[]>(`${this.baseUrl}api/financial-unit/get-financial-unit`, { params }).pipe(
       catchError(() => {
         return of(null);

@@ -66,9 +66,9 @@ export class TrialBalanceTabComponent {
         { label: 'Kód účtu', value: account.account.code, width: 6 },
         { label: 'Název účtu', value: account.account.name, width: 12 },
         { label: 'Počet debetních zápisů', value: this.formatterService.getRoundedNumberString(account.debitEntriesCount), width: 8 },
-        { label: 'Debetní obrat', value: this.formatterService.getRoundedNumberString(account.debitAmount), width: 8 },
+        { label: 'Debetní obrat', value: this.formatterService.getRoundedNumberString(account.debitAmount, 2), width: 8 },
         { label: 'Počet kreditních zápisů', value: this.formatterService.getRoundedNumberString(account.creditEntriesCount), width: 8 },
-        { label: 'Kreditní obrat', value: this.formatterService.getRoundedNumberString(account.creditAmount), width: 8 }
+        { label: 'Kreditní obrat', value: this.formatterService.getRoundedNumberString(account.creditAmount, 2), width: 8 }
       ]
     };
     return new ListItem(data);
@@ -80,9 +80,9 @@ export class TrialBalanceTabComponent {
         { label: '', value: 'Celkem', width: 6 },
         { label: '', value: '', width: 12 },
         { label: 'Počet debetních zápisů', value: this.formatterService.getRoundedNumberString(trialBalance.totalDebitEntries), width: 8 },
-        { label: 'Debetní obrat', value: this.formatterService.getRoundedNumberString(trialBalance.totalDebitAmount), width: 8 },
+        { label: 'Debetní obrat', value: this.formatterService.getRoundedNumberString(trialBalance.totalDebitAmount, 2), width: 8 },
         { label: 'Počet kreditních zápisů', value: this.formatterService.getRoundedNumberString(trialBalance.totalCreditEntries), width: 8 },
-        { label: 'Kreditní obrat', value: this.formatterService.getRoundedNumberString(trialBalance.totalCreditAmount), width: 8 }
+        { label: 'Kreditní obrat', value: this.formatterService.getRoundedNumberString(trialBalance.totalCreditAmount, 2), width: 8 }
       ]
     };
     return new ListItem(data);

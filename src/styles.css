@@ -60,6 +60,9 @@ app-root {
   overflow: hidden;
 }
 
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
 .modal-container {
     overflow: hidden;
     background-color: rgba(0,0,0,0.6);
@@ -141,5 +144,17 @@ app-root {
     overflow-x: hidden;
     overflow-y: auto;
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.filters-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.filters-container > * {
+    margin-right: 1rem;
+}
+
+.filters-container > *:last-child {
+    margin-right: 0;
+}

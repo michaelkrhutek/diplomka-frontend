@@ -4,7 +4,7 @@ import { FinancialTransactionService } from 'src/app/services/financial-transact
 import { FormatterService } from 'src/app/services/formatter.service';
 import { Observable, combineLatest } from 'rxjs';
 import { FinancialTransactionPopulated } from 'src/app/models/financial-transaction';
-import { switchMap, tap, map, startWith, take } from 'rxjs/operators';
+import { switchMap, tap, map, startWith, take, debounceTime } from 'rxjs/operators';
 import { ListItem, IListItem } from 'src/app/models/list-item';
 import { FormGroup, FormControl } from '@angular/forms';
 import { IFinancialTransactionsFilteringCriteria } from 'src/app/models/financial-transactions-filtering-criteria';
@@ -35,8 +35,9 @@ export class FinancialTransactionsTabComponent {
   });
 
   private filteringCriteria$: Observable<IFinancialTransactionsFilteringCriteria> = this.filteringCriteriaFG.valueChanges.pipe(
-    startWith(this.filteringCriteriaFG.value)
-  )
+    startWith(this.filteringCriteriaFG.value),
+    debounceTime(100)
+  );
 
   financialTransactions$: Observable<FinancialTransactionPopulated[]> = combineLatest(
     this.financialUnitDetailsService.financialUnitId$,
@@ -75,7 +76,7 @@ export class FinancialTransactionsTabComponent {
         { label: 'Název debitního účtu', value: transaction.debitAccount.name, width: 10 },
         { label: 'Kreditní účet', value: transaction.creditAccount.code, width: 6 },
         { label: 'Název kreditního účtu', value: transaction.creditAccount.name, width: 10 },
-        { label: 'Částka', value: this.formatterService.getRoundedNumberString(transaction.amount), width: 8 }
+        { label: 'Částka', value: this.formatterService.getRoundedNumberString(transaction.amount, 2), width: 8 }
       ]
     };
     return new ListItem(data);

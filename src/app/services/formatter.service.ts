@@ -9,12 +9,29 @@ export class FormatterService {
 
   private defaultDateSeparator: string = '.';
   private defaultNumberSeparator: string = ' ';
+  private defaultDecimalSeparator: string = ',';
 
-  getRoundedNumberString(n: number): string {
+  private addZeroesToStringToMatchLength(s: string, minimalLength: number, end: boolean = false): string {
+    const validatedString: string = s || '';
+    if (minimalLength <= 0 || validatedString.length >= minimalLength) {
+      return validatedString;
+    }
+    const numberOfCharacterMissing: number = minimalLength - validatedString.length;
+    const zeroesString: string = new Array(numberOfCharacterMissing).fill(0).join('');
+    return end ? `${validatedString}${zeroesString}` : `${zeroesString}${validatedString}`;
+  }
+
+  getRoundedNumberString(n: number, precision = 0): string {
     if (isNaN(n)) {
       return 'N/A';
     }
-    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, this.defaultNumberSeparator);
+    
+    const roundedNumber: number = Math.round(n * (10 ** precision)) / (10 ** precision);
+    const beforeDecimal: string = roundedNumber.toString().split('.')[0].replace(/\B(?=(\d{3})+(?!\d))/g, this.defaultNumberSeparator);
+    const afterDecimal: string = roundedNumber.toString().split('.')[1] || '';
+    const updatedAfterDecimal: string = this.addZeroesToStringToMatchLength(afterDecimal, precision);
+    console.log(n, roundedNumber, beforeDecimal, afterDecimal, updatedAfterDecimal);
+    return `${beforeDecimal}${updatedAfterDecimal ? this.defaultDecimalSeparator + updatedAfterDecimal : ''}`;
   }
 
   getPercentageString(n: number): string {

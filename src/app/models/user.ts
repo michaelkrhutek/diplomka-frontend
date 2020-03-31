@@ -1,0 +1,3 @@
+interface IUser {
+    displayName: string;
+}
