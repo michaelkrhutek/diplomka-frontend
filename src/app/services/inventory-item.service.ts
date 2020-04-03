@@ -28,7 +28,6 @@ export class InventoryItemService {
   }
 
   getInventoryItemsWithStock$(financialUnitId: string, effectiveDate: Date): Observable<IInventoryItemStock[]> {
-    console.log(financialUnitId, effectiveDate);
     const params: HttpParams = new HttpParams()
       .append('financialUnitId', financialUnitId)
       .append('effectiveDate', effectiveDate.toDateString());

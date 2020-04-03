@@ -1,3 +1,12 @@
-<app-basic-list [listItems]="listItems$ | async" [iconItem]="openNewFinancialAccountModalIconItem"></app-basic-list>
+<div class="tab-container">
+    <div class="filters-container">
+        <mat-form-field>
+            <mat-label>Hledat finanční účet</mat-label>
+            <input matInput [formControl]="filterTextFC">
+        </mat-form-field>
+    </div>
+    <app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"
+    [iconItem]="openNewFinancialAccountModalIconItem"></app-basic-list>
+</div>
 
 <app-new-financial-account-modal *ngIf="isNewFinancialAccountModalOpened" (close)="closeNewFinancialAccountModal()"></app-new-financial-account-modal>

@@ -1,11 +1,12 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { IIconItem } from 'src/app/models/icon-item';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { ListItem, IListItem } from 'src/app/models/list-item';
-import { map } from 'rxjs/operators';
+import { map, startWith, tap } from 'rxjs/operators';
 import { FinancialAccountService } from 'src/app/services/financial-account.service';
 import { FinancialAccount } from 'src/app/models/financial-account';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-financial-accounts-tab',
@@ -20,6 +21,7 @@ export class FinancialAccountsTabComponent {
     private financialAccountService: FinancialAccountService
   ) { }
 
+  isLoadingData: boolean = true;
   isNewFinancialAccountModalOpened: boolean = false;
 
   openNewFinancialAccountModalIconItem: IIconItem = {
@@ -28,8 +30,20 @@ export class FinancialAccountsTabComponent {
     action: () => this.openNewFinancialAccountModal()
   };
 
-  listItems$: Observable<ListItem[]> = this.financialUnitDetailsService.financialAccounts$.pipe(
-    map((accounts: FinancialAccount[]) => accounts.map(account => this.getListItemFromFinancialAccount(account)))
+  filterTextFC: FormControl = new FormControl(null);
+  filterText$: Observable<string> = this.filterTextFC.valueChanges.pipe(
+    startWith(this.filterTextFC.value),
+    map((filterText: string) => filterText || '')
+  );
+
+  listItems$: Observable<ListItem[]> = combineLatest(
+    this.financialUnitDetailsService.financialAccounts$,
+    this.filterText$
+  ).pipe(
+    tap(() => (this.isLoadingData = true)),
+    map(([accounts, filterText]) => this.getFilteredFinancialAccounts(accounts, filterText)),
+    map((accounts: FinancialAccount[]) => accounts.map(account => this.getListItemFromFinancialAccount(account))),
+    tap(() => (this.isLoadingData = false)),
   );
 
   private getListItemFromFinancialAccount(account: FinancialAccount): ListItem {
@@ -48,5 +62,15 @@ export class FinancialAccountsTabComponent {
 
   closeNewFinancialAccountModal(): void {
     this.isNewFinancialAccountModalOpened = false;
+  }
+
+  private getFilteredFinancialAccounts(
+    accounts: FinancialAccount[],
+    filterText: string
+  ): FinancialAccount[] {
+    return accounts.filter((account) => {
+      return account.name.toLowerCase().includes(filterText.toLowerCase()) ||
+        account.code.toLowerCase().includes(filterText.toLowerCase());
+    });
   }
 }

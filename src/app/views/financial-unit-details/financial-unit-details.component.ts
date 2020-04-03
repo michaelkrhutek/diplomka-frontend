@@ -1,7 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-financial-unit-details',
@@ -21,7 +20,23 @@ export class FinancialUnitDetailsComponent implements OnInit {
   sideNavigationBarItems: ISideNavigationBarItem[] = [
     {
       tab: Tab.FinancialPeriods,
-      description: 'Obdobi'
+      description: 'Účetní období'
+    },
+    {
+      tab: Tab.FinancialAccounts,
+      description: 'Finanční účtu'
+    },
+    {
+      tab: Tab.InventoryGroups,
+      description: 'Skupiny zásob'
+    },
+    {
+      tab: Tab.InventoryItems,
+      description: 'Položky zásob'
+    },
+    {
+      tab: Tab.Stocks,
+      description: 'Stav zásob'
     },
     {
       tab: Tab.InventoryTransactions,
@@ -29,7 +44,11 @@ export class FinancialUnitDetailsComponent implements OnInit {
     },
     {
       tab: Tab.FinancialTransactions,
-      description: 'Zapisy'
+      description: 'Účetní zápisy'
+    },
+    {
+      tab: Tab.TrialBalance,
+      description: 'Obratová předvaha'
     }
   ];
 

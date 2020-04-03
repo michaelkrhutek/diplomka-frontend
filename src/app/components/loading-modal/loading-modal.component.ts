@@ -16,7 +16,5 @@ export class LoadingModalComponent {
     private popUpsService: PopUpsService
   ) { }
 
-  data$: Observable<ILoadingModalData> = this.popUpsService.loadingModalData$.pipe(
-    tap(v => console.log(v))
-  );
+  data$: Observable<ILoadingModalData> = this.popUpsService.loadingModalData$;
 }

@@ -1,4 +1,13 @@
-<app-basic-list [listItems]="listItems$ | async" [iconItem]="openNewInventoryItemModalIconItem"></app-basic-list>
+<div class="tab-container">
+    <div class="filters-container">
+        <mat-form-field>
+            <mat-label>Hledat položku zásob</mat-label>
+            <input matInput [formControl]="filterTextFC">
+        </mat-form-field>
+    </div>
+    <app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"
+    [iconItem]="openNewInventoryItemModalIconItem"></app-basic-list>
+</div>
 
-<app-new-inventory-item-modal *ngIf="isNewInventoryItemModalOpened"
-    (close)="closeNewInventoryItemModal()"></app-new-inventory-item-modal>
+<app-new-inventory-item-modal *ngIf="isNewInventoryItemModalOpened" (close)="closeNewInventoryItemModal()">
+</app-new-inventory-item-modal>

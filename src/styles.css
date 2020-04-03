@@ -12,8 +12,8 @@
 }
 
 [color-theme="light"] {
-    --primary-color: red;
-    --secondary-color: darkorange;
+    --secondary-color: rgb(198, 150, 255);
+    --primary-color: rgb(68, 27, 116);
     --navbar-background-color: rgb(230, 230, 230);
     --font-color: var(--font-color-light-theme);
     --font-color-values: var(--font-color-light-theme-values);
@@ -30,8 +30,8 @@
 }
 
 [color-theme="dark"] {
-    --primary-color: red;
-    --secondary-color: darkorange;
+    --primary-color: rgb(198, 150, 255);
+    --secondary-color: rgb(68, 27, 116);
     --navbar-background-color: rgb(20, 20, 20);
     --font-color: var(--font-color-dark-theme);
     --font-color-values: var(--font-color-dark-theme-values);
@@ -145,16 +145,33 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     overflow-y: auto;
 }
 
+.tab-container {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow-y: auto;
+}
+
 .filters-container {
     display: flex;
     flex-direction: row;
+    justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .filters-container > * {
-    margin-right: 1rem;
+    margin: 0.5rem;
+    width: 14rem;
 }
 
-.filters-container > *:last-child {
+/* .filters-container > *:last-child {
     margin-right: 0;
+} */
+
+.no-record-message-container {
+    padding: 2rem 0;
+    text-align: center;
+    color: var(--font-color-light);
 }

@@ -40,6 +40,10 @@ export class NewInventoryItemModalComponent {
     }))
   );
 
+  isCreateButtonDisabled$: Observable<boolean> = this.inventoryItemFormData$.pipe(
+    map((formData: INewInventoryItemFormData) => !(formData.inventoryItemsGroupId && formData.name))
+  );
+
   closeModal(): void {
     this.close.emit();
   }

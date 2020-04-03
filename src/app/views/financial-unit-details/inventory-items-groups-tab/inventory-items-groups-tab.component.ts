@@ -1,12 +1,12 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { IIconItem } from 'src/app/models/icon-item';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { ListItem, IListItem } from 'src/app/models/list-item';
-import { map } from 'rxjs/operators';
-import { InventoryItemsGroup } from 'src/app/models/inventory-items-group';
-import { group } from '@angular/animations';
+import { map, startWith, tap } from 'rxjs/operators';
+import { InventoryItemsGroup, IInventoryItemsGroup } from 'src/app/models/inventory-items-group';
 import { StockService } from 'src/app/services/stock.service';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-inventory-items-groups-tab',
@@ -21,6 +21,7 @@ export class InventoryItemsGroupsTabComponent {
     private stockService: StockService
   ) { }
 
+  isLoadingData: boolean = true;
   isNewInventoryItemsGroupModalOpened: boolean = false;
 
   openNewInventoryItemsGroupModalIconItem: IIconItem = {
@@ -29,8 +30,20 @@ export class InventoryItemsGroupsTabComponent {
     action: () => this.openNewInventoryItemsGroupModal()
   };
 
-  listItems$: Observable<ListItem[]> = this.financialUnitDetailsService.inventoryItemsGroups$.pipe(
-    map((groups: InventoryItemsGroup[]) => groups.map(group => this.getListItemFromInventoryItemsGroup(group)))
+  filterTextFC: FormControl = new FormControl(null);
+  filterText$: Observable<string> = this.filterTextFC.valueChanges.pipe(
+    startWith(this.filterTextFC.value),
+    map((filterText: string) => filterText || '')
+  );
+
+  listItems$: Observable<ListItem[]> = combineLatest(
+    this.financialUnitDetailsService.inventoryItemsGroups$,
+    this.filterText$
+  ).pipe(
+    tap(() => (this.isLoadingData = true)),
+    map(([groups, filterText]) => this.getFilteredInventoryGroups(groups, filterText)),
+    map((groups: InventoryItemsGroup[]) => groups.map(group => this.getListItemFromInventoryItemsGroup(group))),
+    tap(() => (this.isLoadingData = false)),
   );
 
   private getListItemFromInventoryItemsGroup(group: InventoryItemsGroup): ListItem {
@@ -49,5 +62,12 @@ export class InventoryItemsGroupsTabComponent {
 
   closeNewInventoryItemsGroupModal(): void {
     this.isNewInventoryItemsGroupModalOpened = false;
+  }
+
+  private getFilteredInventoryGroups(
+    inventoryGroups: IInventoryItemsGroup[],
+    filterText: string
+  ): IInventoryItemsGroup[] {
+    return inventoryGroups.filter((item) => item.name.toLowerCase().includes(filterText.toLowerCase()));
   }
 }

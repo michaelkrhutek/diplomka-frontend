@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { FinancialTransactionService } from 'src/app/services/financial-transaction.service';
 import { FormatterService } from 'src/app/services/formatter.service';
@@ -24,7 +24,7 @@ export class FinancialTransactionsTabComponent {
     private formatterService: FormatterService
   ) { }
 
-  isLoadingData: boolean = false;
+  isLoadingData: boolean = true;
 
   financialAccounts$: Observable<IFinancialAccount[]> = this.financialUnitDetailsService.financialAccounts$;
 
@@ -52,7 +52,7 @@ export class FinancialTransactionsTabComponent {
 
   listItems$: Observable<ListItem[]> = this.financialTransactions$.pipe(
     map((transactions: FinancialTransactionPopulated[]) => transactions.map(transaction => this.getListItemFromFinancialTransaction(transaction))),
-    tap(() => (this.isLoadingData = false)),
+    tap(() => (this.isLoadingData = false))
   );
 
   ngOnInit(): void {

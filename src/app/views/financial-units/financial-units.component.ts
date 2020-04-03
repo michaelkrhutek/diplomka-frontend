@@ -33,7 +33,6 @@ export class FinancialUnitsComponent {
   };
 
   financialUnits$: Observable<IFinancialUnit[]> = this.financialUnitService.reloadFinancialUnits$.pipe(
-    tap(() => console.log('reload units')),
     tap(() => (this.isLoadingData = true)),
     switchMap(() => this.financialUnitService.getFinancialUnits$())
   );
@@ -53,7 +52,6 @@ export class FinancialUnitsComponent {
           iconName: 'launch',
           description: 'Otevřít',
           action: () => {
-            console.log(financialUnit._id);
             this.popUpsService.openLoadingModal({ message: 'Načítám účetní jednotku' });
             this.router.navigate(['financial-unit', financialUnit._id]).finally(() => this.popUpsService.closeLoadingModal())
           }

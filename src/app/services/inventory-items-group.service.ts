@@ -23,8 +23,7 @@ export class InventoryItemsGroupService {
         this.popUpsService.handleApiError(err);
         return of([]);
       }),
-      map((groups: IInventoryItemsGroup[]) => groups.map(group => new InventoryItemsGroup(group))),
-      tap(v => console.log(v))
+      map((groups: IInventoryItemsGroup[]) => groups.map(group => new InventoryItemsGroup(group)))
     );
   }
 }

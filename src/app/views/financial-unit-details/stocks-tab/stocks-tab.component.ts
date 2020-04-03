@@ -3,7 +3,7 @@ import { IInventoryItemStock } from 'src/app/models/inventory-item-stock';
 import { InventoryItemService } from 'src/app/services/inventory-item.service';
 import { FormatterService } from 'src/app/services/formatter.service';
 import { Form, FormControl } from '@angular/forms';
-import { startWith, map, switchMap, tap } from 'rxjs/operators';
+import { startWith, map, switchMap, tap, take } from 'rxjs/operators';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { Observable, combineLatest, of } from 'rxjs';
 import { ListItem, IListItem } from 'src/app/models/list-item';
@@ -22,7 +22,7 @@ export class StocksTabComponent {
     private formatterService: FormatterService
   ) { }
 
-  isLoadingData: boolean = false;
+  isLoadingData: boolean = true;
 
   private financialUnitId$: Observable<string> = this.financialUnitDetailsService.financialUnitId$;
 
@@ -42,6 +42,14 @@ export class StocksTabComponent {
     map((item: IInventoryItemStock[]) => item.map(item => this.getListItemFromInventoryItemWithStock(item))),
     tap(() => (this.isLoadingData = false))
   );
+
+  ngOnInit(): void {
+    this.financialUnitDetailsService.lastPeriodEndDate$.pipe(
+      take(1),
+    ).subscribe((lastPeriodEndDate) => {
+      setTimeout(() => this.effectiveDateFC.patchValue(lastPeriodEndDate));
+    })
+  }
 
   private getListItemFromInventoryItemWithStock(item: IInventoryItemStock): ListItem {
     const data: IListItem = {

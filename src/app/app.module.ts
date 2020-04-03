@@ -1,8 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
-
 import {
   MatFormFieldModule,
   MatInputModule,
@@ -18,7 +16,6 @@ import {
   MatDatepickerModule,
   MatNativeDateModule
 } from "@angular/material";
-
 import { AppComponent } from './app.component';
 import { HomeComponent } from './views/home/home.component';
 import { BasicListComponent } from './components/basic-list/basic-list.component';
@@ -27,7 +24,7 @@ import { LoadingModalComponent } from './components/loading-modal/loading-modal.
 import { ListItemComponent } from './components/list-item/list-item.component';
 import { IconItemComponent } from './components/icon-item/icon-item.component';
 import { CommonModule } from '@angular/common';
-import { NoopAnimationsModule, BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FinancialUnitsComponent } from './views/financial-units/financial-units.component';
@@ -52,10 +49,10 @@ import { StocksTabComponent } from './views/financial-unit-details/stocks-tab/st
 import { HttpWithCredentialsInterceptor } from './interceptors/http-with-credentials.inverceptor';
 import { LoginComponent } from './views/login/login.component';
 import { SignUpComponent } from './views/sign-up/sign-up.component';
+import { AuthService } from './services/auth.service';
 
 export const getBaseUrl = () => {
   if (environment.production) {
-    console.log(document.getElementsByTagName('base')[0].href);
     return document.getElementsByTagName('base')[0].href;
   } else {
     return 'https://localhost:3000/';
@@ -115,12 +112,24 @@ export const getBaseUrl = () => {
     BrowserAnimationsModule
   ],
   providers: [
-    { provide: 'BASE_URL', useFactory: getBaseUrl, deps: [] },
+    {
+      provide: 'BASE_URL',
+      useFactory: getBaseUrl,
+      deps: []
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (authService: AuthService) => async () => {
+        return await authService.getUserFromCookie$().toPromise();
+      },
+      multi: true,
+      deps: [AuthService]
+    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpWithCredentialsInterceptor,
       multi: true
-      }
+    }
   ],
   bootstrap: [AppComponent]
 })

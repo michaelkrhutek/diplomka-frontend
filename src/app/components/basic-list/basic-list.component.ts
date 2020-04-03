@@ -14,6 +14,6 @@ export class BasicListComponent {
 
   @Input() listItems: ListItem[] = [];
   @Input() isLoadingData: boolean = false;
-  @Input() noRecordMessage: string = 'No record was found';
+  @Input() noRecordMessage: string = 'Žádný záznam nenalazen';
   @Input() iconItem: IIconItem = null;
 }

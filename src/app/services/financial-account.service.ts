@@ -39,7 +39,6 @@ export class FinancialAccountService {
   }
 
   getFinancialAccountTypeName(type: FinancialAccountType): string {
-    console.log(type);
     switch (type) {
       case FinancialAccountType.Assets:
         return 'Assets';

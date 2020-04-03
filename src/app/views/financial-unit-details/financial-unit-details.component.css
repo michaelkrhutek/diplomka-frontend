@@ -9,7 +9,7 @@
 
 .side-navigation-panel {
     width: 14rem;
-    padding: 1rem;
+    padding: 1rem 0;
     background-color: var(--background-color);
     display: flex;
     flex-direction: column;
@@ -19,12 +19,18 @@
 
 .side-navigation-item {
     color: var(--font-color-light);
-    padding: 0.5rem 0;
+    padding: 1rem;
     cursor: pointer;
+    border-left: 4px solid transparent;
+}
+
+.side-navigation-item:hover {
+    color: var(--font-color);
 }
 
 .active-side-navigation-item {
     color: var(--font-color);
+    border-left-color: var(--primary-color);
 }
 
 .tab-container {

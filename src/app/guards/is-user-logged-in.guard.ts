@@ -20,7 +20,6 @@ export class IsUserLoggedInGuard implements CanActivate {
         const isUserLoggedIn$: Observable<boolean> = this.auth.user$.pipe(
             map(user => !!user),
             tap((isLoggedIn: boolean) => {
-                console.log(isLoggedIn);
                 !isLoggedIn && this.router.navigate(['login']).finally(() => this.popUpsService.closeLoadingModal())
             })
         )

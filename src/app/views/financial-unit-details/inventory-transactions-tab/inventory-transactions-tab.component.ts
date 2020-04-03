@@ -27,7 +27,7 @@ export class InventoryTransactionsTabComponent {
     private formatterService: FormatterService
   ) { }
 
-  isLoadingData: boolean = false;
+  isLoadingData: boolean = true;
   isNewInventoryTransactionModalOpened: boolean = false;
 
   inventoryItems$: Observable<IInventoryItemPopulated[]> = this.financialUnitDetailsService.inventoryItems$;

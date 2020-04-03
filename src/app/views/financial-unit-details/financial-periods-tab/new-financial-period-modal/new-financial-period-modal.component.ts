@@ -47,7 +47,6 @@ export class NewFinancialPeriodModalComponent {
   lastFinancialPeriodStartDate$: Observable<Date> = this.financialUnitDetailsService.financialPeriods$.pipe(
     map((financialPeriods: IFinancialPeriod[]) => {
       const lastFinancialPeriod: IFinancialPeriod = financialPeriods.length > 0 ? financialPeriods[financialPeriods.length - 1] : null;
-      console.log(lastFinancialPeriod);
       if (lastFinancialPeriod) {
         const lastFinancialPeriodEndDate: Date = lastFinancialPeriod.endDate;
         const startDate: Date = new Date(lastFinancialPeriodEndDate);

@@ -14,19 +14,16 @@ export class AuthService {
     @Inject('BASE_URL') private baseUrl: string,
     private http: HttpClient,
     private popUpsService: PopUpsService
-  ) {
-    this.getUserFromCookie();
-  }
+  ) { }
 
   private userSource: BehaviorSubject<IUser> = new BehaviorSubject<IUser>(null);
-  user$: Observable<IUser> = this.userSource.asObservable().pipe(
-    tap(v => console.log(v))
-  );
+  user$: Observable<IUser> = this.userSource.asObservable();
 
-  getUserFromCookie(): void {
-    this.http.get(`${this.baseUrl}auth`).pipe(
-      catchError(() => of(null))
-    ).subscribe((user) => this.userSource.next(user))
+  getUserFromCookie$(): Observable<IUser> {
+    return this.http.get(`${this.baseUrl}auth`).pipe(
+      catchError(() => of(null)),
+      tap((user: IUser | null) => this.userSource.next(user))
+    );
   }
 
   login(loginCredentials: ILoginCredentials): void {
@@ -43,7 +40,6 @@ export class AuthService {
       filter((res: any) => !!res),
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe((user: IUser) => {
-      console.log(user);
       this.userSource.next(user);
     });
   }
@@ -62,7 +58,6 @@ export class AuthService {
       filter((res: any) => !!res),
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe((user: IUser) => {
-      console.log(user);
       this.userSource.next(user);
     });
   }

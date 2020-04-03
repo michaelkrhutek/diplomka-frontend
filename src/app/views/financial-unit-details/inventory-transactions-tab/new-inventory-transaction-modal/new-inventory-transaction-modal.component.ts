@@ -181,7 +181,6 @@ export class NewInventoryTransactionModalComponent {
   }
 
   private getAreInventoryTransactionFormDataValid(formData: INewInventoryTransactionFormData): boolean {
-    console.log(formData)
     if (
       !formData.inventoryItem ||
       !formData.description ||
@@ -195,7 +194,6 @@ export class NewInventoryTransactionModalComponent {
   }
 
   private getAreSpecificDataValid(type: InventoryTransactionType, specificData: any): boolean {
-    console.log(type, specificData)
     if (!type || !specificData) {
       return false;
     }

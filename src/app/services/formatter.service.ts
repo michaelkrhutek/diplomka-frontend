@@ -30,7 +30,6 @@ export class FormatterService {
     const beforeDecimal: string = roundedNumber.toString().split('.')[0].replace(/\B(?=(\d{3})+(?!\d))/g, this.defaultNumberSeparator);
     const afterDecimal: string = roundedNumber.toString().split('.')[1] || '';
     const updatedAfterDecimal: string = this.addZeroesToStringToMatchLength(afterDecimal, precision);
-    console.log(n, roundedNumber, beforeDecimal, afterDecimal, updatedAfterDecimal);
     return `${beforeDecimal}${updatedAfterDecimal ? this.defaultDecimalSeparator + updatedAfterDecimal : ''}`;
   }
 

@@ -3,10 +3,11 @@ import { TrialBalanceService } from 'src/app/services/trial-balance.service';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { FormatterService } from 'src/app/services/formatter.service';
 import { Observable, of, combineLatest } from 'rxjs';
-import { tap, switchMap, map, startWith, combineAll } from 'rxjs/operators';
+import { tap, switchMap, map, startWith, combineAll, take } from 'rxjs/operators';
 import { ListItem, IListItem } from 'src/app/models/list-item';
 import { TrialBalance, ITrialBalanceAccount } from 'src/app/models/trial-balance';
 import { FormControl } from '@angular/forms';
+import { IFinancialPeriod } from 'src/app/models/financial-period';
 
 @Component({
   selector: 'app-trial-balance-tab',
@@ -59,6 +60,16 @@ export class TrialBalanceTabComponent {
     }),
     tap(() => (this.isLoadingData = false)),
   );
+
+    ngOnInit(): void {
+      this.financialUnitDetailsService.financialPeriods$.pipe(
+        map((periods: IFinancialPeriod[]) => {
+          const lastPeriod: IFinancialPeriod = periods.length > 0 ? periods[periods.length - 1] : null;
+          return lastPeriod ? lastPeriod._id : null;
+        }),
+        take(1)
+      ).subscribe((periodId: string) => setTimeout(() => this.financialPeriodIdFC.patchValue(periodId)));
+    }
 
   private getListItemFromTrialBalanceAccount(account: ITrialBalanceAccount): ListItem {
     const data: IListItem = {
