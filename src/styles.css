@@ -39,8 +39,8 @@
     --font-color-inverse: var(--font-color-light-theme);
     --background-color: rgb(30, 30, 30);
     --background-color-dark: rgb(10, 10, 10);
-    --border-color: rgb(182, 182, 182);
-    --border-color-light: rgb(230, 230, 230);
+    --border-color: rgb(105, 105, 105);
+    --border-color-light: rgb(41, 41, 41);
     --box-shadow-color: rgba(0,0,0,1);
     --success-color: rgb(111, 255, 111);
     --error-color: rgb(255, 80, 80);
@@ -174,4 +174,19 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     padding: 2rem 0;
     text-align: center;
     color: var(--font-color-light);
+}
+
+.loading-spinner-container {
+    padding: 2rem 0;
+    align-self: stretch;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.card {
+    background-color: var(--background-color);
+    padding: 1rem;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
 }

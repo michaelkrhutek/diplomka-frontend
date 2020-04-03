@@ -30,9 +30,9 @@
             <mat-datepicker #dateTo></mat-datepicker>
         </mat-form-field>
     </div>
-    
-    <app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"
-        [iconItem]="openNewInventoryTransactionModalIconItem"></app-basic-list>
+    <div class="card">
+        <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
+    </div>
 </div>
 
 <app-new-inventory-transaction-modal *ngIf="isNewInventoryTransactionModalOpened"

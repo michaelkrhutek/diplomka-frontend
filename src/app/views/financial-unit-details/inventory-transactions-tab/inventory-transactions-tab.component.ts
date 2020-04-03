@@ -12,6 +12,7 @@ import { InventoryTransactionType } from 'src/app/models/inventory-transaction-t
 import { FormGroup, FormControl } from '@angular/forms';
 import { IFinancialTransactionsFilteringCriteria } from 'src/app/models/financial-transactions-filtering-criteria';
 import { IInventoryTransactionFilteringCriteria } from 'src/app/models/inventory-transaction-filtering-criteria';
+import { BasicTable, IBasicTableInputData, IBasicTableHeaderInputData, IBasicTableRowInputData, BasicTableRowCellType, BasicTableValueAlign } from 'src/app/models/basic-table-models';
 
 @Component({
   selector: 'app-inventory-transactions-tab',
@@ -76,6 +77,11 @@ export class InventoryTransactionsTabComponent {
     tap(() => (this.isLoadingData = false)),
   );
 
+  tableData$: Observable<BasicTable> = this.inventoryTransactions$.pipe(
+    map((transactions: InventoryTransactionPopulated<any>[]) => this.getTableDataFromInventoryTransactions(transactions)),
+    tap(() => (this.isLoadingData = false)),
+  );
+
   ngOnInit(): void {
     combineLatest(
       this.financialUnitDetailsService.firstPeriodStartDate$,
@@ -113,6 +119,106 @@ export class InventoryTransactionsTabComponent {
       iconItemsEndContainerWidth: 1
     };
     return new ListItem(data);
+  }
+
+  getTableDataFromInventoryTransactions(
+    transactions: IInventoryTransactionPopulated<any>[]
+  ): BasicTable {
+    const header: IBasicTableHeaderInputData = {
+      stickyCells: [
+        {
+          name: 'ID transakce',
+          width: 8,
+          align: BasicTableValueAlign.Left
+        },
+      ],
+      otherCells: [
+        {
+          name: 'Datum transakce',
+          width: 6,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Druh transakce',
+          width: 8,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Položka',
+          width: 8,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Popisek',
+          width: 12,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Množství',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
+          name: 'Hodnota na jednotku',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
+          name: 'Celková hodnota',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        }
+      ]
+    };
+    const rows: IBasicTableRowInputData[] = (transactions || [])
+      .map(t => this.getTableRowDataFromInventoryTransaction(t));
+    const data: IBasicTableInputData = { header, rows };
+    return new BasicTable(data);
+  }
+
+  private getTableRowDataFromInventoryTransaction(
+    transaction: IInventoryTransactionPopulated<any>
+  ): IBasicTableRowInputData {
+    const costPerUnit: number = transaction.totalTransactionAmount / (transaction.specificData['quantity'] as number);
+    const row: IBasicTableRowInputData = {
+      stickyCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: transaction._id
+        }
+      ],
+      otherCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getDayMonthYearString(transaction.effectiveDate)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.inventoryTransactionService.getTransactionTypeDescription(transaction.type)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: transaction.inventoryItem.name
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data:transaction.description
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(transaction.specificData['quantity'] as number)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(costPerUnit, 2)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(transaction.totalTransactionAmount)
+        }
+      ]
+    }
+    return row;
   }
 
   deleteAllTransactions(): void {

@@ -22,11 +22,3 @@
 .list-items-container > *:first-child {
     margin-top: 0;
 }
-
-.loading-spinner-container {
-    padding: 2rem 0;
-    align-self: stretch;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-}

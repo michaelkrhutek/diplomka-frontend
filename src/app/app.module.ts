@@ -46,10 +46,15 @@ import { NewInventoryTransactionModalComponent } from './views/financial-unit-de
 import { FinancialTransactionsTabComponent } from './views/financial-unit-details/financial-transactions-tab/financial-transactions-tab.component';
 import { TrialBalanceTabComponent } from './views/financial-unit-details/trial-balance-tab/trial-balance-tab.component';
 import { StocksTabComponent } from './views/financial-unit-details/stocks-tab/stocks-tab.component';
-import { HttpWithCredentialsInterceptor } from './interceptors/http-with-credentials.inverceptor';
+import { HttpWithCredentialsInterceptor } from './interceptors/http-with-credentials.interceptor';
 import { LoginComponent } from './views/login/login.component';
 import { SignUpComponent } from './views/sign-up/sign-up.component';
 import { AuthService } from './services/auth.service';
+import { InventoryTransactionDetailsModalComponent } from './views/financial-unit-details/inventory-transactions-tab/inventory-transaction-details-modal/inventory-transaction-details-modal.component';
+import { BasicTableComponent } from './components/basic-table/basic-table.component';
+import { BasicTableHeaderComponent } from './components/basic-table/basic-table-header/basic-table-header.component';
+import { BasicTableRow } from './models/basic-table-models';
+import { BasicTableRowComponent } from './components/basic-table/basic-table-row/basic-table-row.component';
 
 export const getBaseUrl = () => {
   if (environment.production) {
@@ -87,7 +92,11 @@ export const getBaseUrl = () => {
     TrialBalanceTabComponent,
     StocksTabComponent,
     LoginComponent,
-    SignUpComponent
+    SignUpComponent,
+    InventoryTransactionDetailsModalComponent,
+    BasicTableComponent,
+    BasicTableHeaderComponent,
+    BasicTableRowComponent
   ],
   imports: [
     BrowserModule,

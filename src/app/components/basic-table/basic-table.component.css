@@ -1,0 +1,11 @@
+.basic-table-container {
+    /* overflow-x: auto; */
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+}
+
+.basic-table {
+    width: fit-content;
+    background-color: var(--background-color);
+}

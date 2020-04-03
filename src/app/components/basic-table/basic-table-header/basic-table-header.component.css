@@ -1,0 +1,19 @@
+.basic-table-row {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: var(--background-color);
+    color: var(--font-color-light);
+    border-top: none !important;
+}
+
+.sticky {
+    z-index: 3;
+}
+
+.action-items-container {
+    background-color: var(--background-color);
+    color: var(--font-color-light);
+    font-size: var(--table-font-size);
+    font-weight: var(--table-font-weight);
+}

@@ -27,8 +27,6 @@
     box-sizing: content-box;
     margin-right: 1rem;
     padding: 0.75rem 0;
-    max-width: 100%;
-    flex-grow: 1;
   }
   
 .text-item:last-child {

@@ -1,0 +1,37 @@
+.basic-table-row {
+    padding: 0.25rem 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: fit-content;
+}
+
+.basic-table-row {
+    border-top: 1px solid var(--border-color-light);
+}
+
+.sticky-cells-container, .other-cells-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.sticky-cells-container {
+    position: sticky;
+    left: 0;
+    align-self: stretch;
+    background-color: var(--background-color);
+}
+
+.cells-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.cell {
+    padding: 0.25rem 1rem;
+    overflow: hidden;
+    font-size: 0.85rem;
+    font-weight: 400;
+}

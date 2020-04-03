@@ -4,8 +4,7 @@
         <app-icon-item *ngFor="let iconItem of (data.iconItemsStart$ | async)" [data]="iconItem"></app-icon-item>
     </div>
     <div class="text-items-container">
-        <div *ngFor="let textItem of data.textItems" class="text-item" [style.width]="textItem.width + 'rem'"
-            [style.max-width]="textItem.width + 'rem'">
+        <div *ngFor="let textItem of data.textItems" class="text-item" [style.width]="textItem.width + 'rem'">
             <div class="label-text">{{ textItem.label }}</div>
             <div class="value-text">{{ textItem.value$ | async }}</div>
         </div>

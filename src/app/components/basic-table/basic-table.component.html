@@ -1,0 +1,16 @@
+<div class="basic-table-container">
+    <ng-container *ngIf="isLoadingData; else dataLoaded">
+        <div class="loading-spinner-container">
+            <mat-spinner></mat-spinner>
+        </div>
+    </ng-container>
+    <ng-template #dataLoaded>
+        <div *ngIf="data && data.rows.length > 0; else noData" class="basic-table">
+            <app-basic-table-header [data]="data.header"></app-basic-table-header>
+            <app-basic-table-row *ngFor="let item of data.rows" [data]="item"></app-basic-table-row>
+        </div>
+        <ng-template #noData>
+            <div class="no-record-message-container">{{ noRecordMessage }}</div>
+        </ng-template>
+    </ng-template>
+</div>

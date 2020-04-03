@@ -1,0 +1,66 @@
+<div class="basic-table-row">
+    <div class="sticky-cells-container">
+        <div *ngIf="data.actionItemsPosition == 'start' && data.actionItemsContainerWidth"
+            class="action-items-container" [ngStyle]="getActionItemsContainerStyle(data)">
+            <app-icon-item *ngFor="let item of (data.actionItems$ | async)" [data]="item"></app-icon-item>
+        </div>
+        <div class="cells-container">
+            <div *ngFor="let item of data.stickyCells" class="cell" [ngStyle]="getCellStyle(item)">
+                <ng-container [ngSwitch]="item.type">
+                    <span class="display-cell" *ngSwitchCase="'display'">{{ item.text$ | async }}</span>
+                    <ng-container *ngSwitchCase="'edit'">
+                        <ng-container *ngIf="item.isNumber; else textInput">
+                            <input type="number" [style.text-align]="item.align" [value]="item.value$ | async"
+                                (change)="item.onChangeAction($event.target.value)">
+                        </ng-container>
+                        <ng-template #textInput>
+                            <input type="text" [value]="item.value$ | async" [style.text-align]="item.align"
+                                (change)="item.onChangeAction($event.target.value)">
+                        </ng-template>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'checkbox'">
+                        <ng-container *ngIf="(item.isEditModeOn$ | async); else checkboxViewMode">
+                            <mat-checkbox [checked]="item.value$ | async"
+                                (change)="item.onChangeAction($event.checked)"></mat-checkbox>
+                        </ng-container>
+                        <ng-template #checkboxViewMode>
+                            <span class="display-cell">{{ item.displayValue$ | async }}</span>
+                        </ng-template>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <div class="other-cells-container">
+        <div class="cells-container">
+            <div *ngFor=" let item of data.otherCells" class="cell" [ngStyle]="getCellStyle(item)">
+                <ng-container [ngSwitch]="item.type">
+                    <span class="display-cell" *ngSwitchCase="'display'">{{ item.text$ | async }}</span>
+                    <ng-container *ngSwitchCase="'edit'">
+                        <ng-container *ngIf="item.isNumber; else textInput">
+                            <input type="number" [style.text-align]="item.align" [value]="item.value$ | async"
+                                (change)="item.onChangeAction($event.target.value)">
+                        </ng-container>
+                        <ng-template #textInput>
+                            <input type="text" [value]="item.value$ | async" [style.text-align]="item.align"
+                                (change)="item.onChangeAction($event.target.value)">
+                        </ng-template>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'checkbox'">
+                        <ng-container *ngIf="(item.isEditModeOn$ | async); else checkboxViewMode">
+                            <mat-checkbox [checked]="item.value$ | async"
+                                (change)="item.onChangeAction($event.checked)"></mat-checkbox>
+                        </ng-container>
+                        <ng-template #checkboxViewMode>
+                            <span class="display-cell">{{ item.displayValue$ | async }}</span>
+                        </ng-template>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+        <div *ngIf="data.actionItemsPosition == 'end' && data.actionItemsContainerWidth" class="action-items-container"
+            [ngStyle]="getActionItemsContainerStyle(data)">
+            <app-icon-item *ngFor="let item of (data.actionItems$ | async)" [data]="item"></app-icon-item>
+        </div>
+    </div>
+</div>

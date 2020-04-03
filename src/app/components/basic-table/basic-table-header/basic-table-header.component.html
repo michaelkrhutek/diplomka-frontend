@@ -1,0 +1,19 @@
+<div class="basic-table-row">
+    <div class="sticky-cells-container">
+        <div *ngIf="data.actionItemsPosition == 'start' && data.actionItemsContainerWidth"
+            class="action-items-container" [ngStyle]="getActionItemsContainerStyle(data)">{{ data.actionItemsName }}
+        </div>
+        <div class="cells-container">
+            <div *ngFor="let item of data.stickyCells" class="cell" [ngStyle]="getStringItemStyle(item)">{{ item.name }}
+            </div>
+        </div>
+    </div>
+    <div class="other-cells-container">
+        <div class="cells-container">
+            <div *ngFor="let item of data.otherCells" class="cell" [ngStyle]="getStringItemStyle(item)">{{ item.name }}
+            </div>
+        </div>
+        <div *ngIf="data.actionItemsPosition == 'end' && data.actionItemsContainerWidth" class="action-items-container"
+            [ngStyle]="getActionItemsContainerStyle(data)">{{ data.actionItemsName }}</div>
+    </div>
+</div>
