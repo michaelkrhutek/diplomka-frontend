@@ -7,6 +7,8 @@
       </mat-select>
     </mat-form-field>
   </div>
-  <app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"></app-basic-list>
+  <div class="card">
+    <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
+  </div>
 </div>
 

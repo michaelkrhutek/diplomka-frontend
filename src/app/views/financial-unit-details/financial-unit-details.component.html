@@ -1,6 +1,11 @@
 <div class="financial-unit-details-view">
     <div class="side-navigation-panel">
-        <div class="side-navigation-item" [class.active-side-navigation-item]="item.tab == activeTab" *ngFor="let item of sideNavigationBarItems" (click)="setActiveTab(item.tab)">{{ item.description }}</div>
+        <div class="side-navigation-item" [class.active-side-navigation-item]="item.tab == activeTab"
+            *ngFor="let item of sideNavigationBarItems" (click)="setActiveTab(item.tab)"
+        >
+            <mat-icon>{{ item.iconName }}</mat-icon>
+            <div>{{ item.description }}</div>
+        </div>
     </div>
     <div [ngSwitch]="activeTab" class="tab-container">
         <app-financial-periods-tab *ngSwitchCase="'financial-periods'"></app-financial-periods-tab>

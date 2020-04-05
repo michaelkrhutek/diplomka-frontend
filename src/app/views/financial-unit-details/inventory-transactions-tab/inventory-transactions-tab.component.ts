@@ -1,18 +1,17 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
-import { IIconItem } from 'src/app/models/icon-item';
 import { Observable, combineLatest, of } from 'rxjs';
-import { ListItem, IListItem } from 'src/app/models/list-item';
 import { map, switchMap, tap, startWith, take, debounceTime } from 'rxjs/operators';
 import { IInventoryTransactionPopulated, InventoryTransactionPopulated } from 'src/app/models/inventory-transaction';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
 import { FormatterService } from 'src/app/services/formatter.service';
-import { IInventoryItemPopulated, IInventoryItem } from 'src/app/models/inventory-item';
+import { IInventoryItemPopulated } from 'src/app/models/inventory-item';
 import { InventoryTransactionType } from 'src/app/models/inventory-transaction-type';
 import { FormGroup, FormControl } from '@angular/forms';
-import { IFinancialTransactionsFilteringCriteria } from 'src/app/models/financial-transactions-filtering-criteria';
 import { IInventoryTransactionFilteringCriteria } from 'src/app/models/inventory-transaction-filtering-criteria';
-import { BasicTable, IBasicTableInputData, IBasicTableHeaderInputData, IBasicTableRowInputData, BasicTableRowCellType, BasicTableValueAlign } from 'src/app/models/basic-table-models';
+import { BasicTable, IBasicTableInputData, IBasicTableHeaderInputData, IBasicTableRowInputData, BasicTableRowCellType, BasicTableValueAlign, BasicTableActionItemsPosition } from 'src/app/models/basic-table-models';
+import { PopUpsService } from 'src/app/services/pop-ups.service';
+import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 
 @Component({
   selector: 'app-inventory-transactions-tab',
@@ -25,11 +24,13 @@ export class InventoryTransactionsTabComponent {
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
     private inventoryTransactionService: InventoryTransactionService,
-    private formatterService: FormatterService
+    private formatterService: FormatterService,
+    private popUpsService: PopUpsService
   ) { }
 
   isLoadingData: boolean = true;
   isNewInventoryTransactionModalOpened: boolean = false;
+  transactionDetailsModalData: IInventoryTransactionPopulated<any> = null;
 
   inventoryItems$: Observable<IInventoryItemPopulated[]> = this.financialUnitDetailsService.inventoryItems$;
 
@@ -53,13 +54,7 @@ export class InventoryTransactionsTabComponent {
     debounceTime(100)
   );
 
-  openNewInventoryTransactionModalIconItem: IIconItem = {
-    description: 'Nová transakce',
-    iconName: 'add',
-    action: () => this.openNewInventoryTransactionModal()
-  };
-
-  inventoryTransactions$: Observable<InventoryTransactionPopulated<any>[]> = combineLatest(
+  private inventoryTransactions$: Observable<InventoryTransactionPopulated<any>[]> = combineLatest(
     this.financialUnitDetailsService.financialUnitId$,
     this.filteringCriteria$,
     this.financialUnitDetailsService.reloadTransactions$
@@ -70,11 +65,6 @@ export class InventoryTransactionsTabComponent {
         this.inventoryTransactionService.getFiltredInventoryTransactions$(financialUnitId, filteringCriteria) :
         of([]);
     }),
-  );
-
-  listItems$: Observable<ListItem[]> = this.inventoryTransactions$.pipe(
-    map((transactions: InventoryTransactionPopulated<any>[]) => transactions.map(transaction => this.getListItemFromInventoryTransaction(transaction))),
-    tap(() => (this.isLoadingData = false)),
   );
 
   tableData$: Observable<BasicTable> = this.inventoryTransactions$.pipe(
@@ -93,38 +83,12 @@ export class InventoryTransactionsTabComponent {
     })
   }
 
-  private getListItemFromInventoryTransaction(transaction: InventoryTransactionPopulated<any>): ListItem {
-    const costPerUnit: number = transaction.totalTransactionAmount / (transaction.specificData['quantity'] as number);
-    const data: IListItem = {
-      textItems: [
-        { label: 'ID transakce', value: transaction._id, width: 14 },
-        { label: 'Datum', value: this.formatterService.getDayMonthYearString(transaction.effectiveDate), width: 8 },
-        { label: 'Položka', value: transaction.inventoryItem.name, width: 10 },
-        { label: 'Druh transakce', value: this.inventoryTransactionService.getTransactionTypeDescription(transaction.type), width: 8 },
-        { label: 'Popisek', value: transaction.description, width: 16 },
-        { label: 'Množství', value: this.formatterService.getRoundedNumberString(transaction.specificData['quantity'] as number), width: 8 },
-        { label: 'Hodnota na jednotku', value: this.formatterService.getRoundedNumberString(costPerUnit, 2), width: 8 },
-        { label: 'Celková hodnota', value: this.formatterService.getRoundedNumberString(transaction.totalTransactionAmount), width: 8 },
-        // { label: 'Množství po transakci', value: transaction.stock.totalStockQuantity.toString(), width: 6 },
-        // { label: 'Celková hodnota po transakci', value: transaction.stock.totalStockQuantity.toString(), width: 6 },
-        // { label: 'Hodnota na jednotku po transakci', value: transaction.stock.totalStockQuantity.toString(), width: 6 }
-      ],
-      iconItemsEnd: [
-        {
-          iconName: 'delete',
-          description: 'Smazat',
-          action: () => this.financialUnitDetailsService.deleteInventoryTransaction(transaction._id)
-        }
-      ],
-      iconItemsEndContainerWidth: 1
-    };
-    return new ListItem(data);
-  }
-
-  getTableDataFromInventoryTransactions(
+  private getTableDataFromInventoryTransactions(
     transactions: IInventoryTransactionPopulated<any>[]
   ): BasicTable {
     const header: IBasicTableHeaderInputData = {
+      actionItemsPosition: BasicTableActionItemsPosition.Start,
+      actionItemsContainerWidth: 2,
       stickyCells: [
         {
           name: 'ID transakce',
@@ -181,6 +145,18 @@ export class InventoryTransactionsTabComponent {
   ): IBasicTableRowInputData {
     const costPerUnit: number = transaction.totalTransactionAmount / (transaction.specificData['quantity'] as number);
     const row: IBasicTableRowInputData = {
+      actionItems: [
+        {
+          iconName: 'description',
+          description: 'Detaily transakcee',
+          action: () => this.openTransactionDetailsModal(transaction)
+        },
+        {
+          iconName: 'delete',
+          description: 'Smazat',
+          action: () => this.deleteTransaction(transaction._id)
+        }
+      ],
       stickyCells: [
         {
           type: BasicTableRowCellType.Display,
@@ -214,15 +190,27 @@ export class InventoryTransactionsTabComponent {
         },
         {
           type: BasicTableRowCellType.Display,
-          data: this.formatterService.getRoundedNumberString(transaction.totalTransactionAmount)
+          data: this.formatterService.getRoundedNumberString(transaction.totalTransactionAmount, 2)
         }
       ]
     }
     return row;
   }
 
+  deleteTransaction(id: string): void {
+    const data: IConfirmationModalData = {
+      message: 'Opravdu chcete smazat transakci?',
+      action: () => this.financialUnitDetailsService.deleteInventoryTransaction(id)
+    };
+    this.popUpsService.openConfirmationModal(data);
+  }
+
   deleteAllTransactions(): void {
-    this.financialUnitDetailsService.deleteAllTransactions();
+    const data: IConfirmationModalData = {
+      message: 'Opravdu chcete smazat všechny transakce?',
+      action: () => this.financialUnitDetailsService.deleteAllTransactions()
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
   openNewInventoryTransactionModal(): void {
@@ -231,6 +219,14 @@ export class InventoryTransactionsTabComponent {
 
   closeNewInventoryTransactionModal(): void {
     this.isNewInventoryTransactionModalOpened = false;
+  }
+
+  openTransactionDetailsModal(transaction: IInventoryTransactionPopulated<any>): void {
+    this.transactionDetailsModalData = transaction;
+  }
+
+  closeTransactionDetailsModal(): void {
+    this.transactionDetailsModalData = null;
   }
 }
 

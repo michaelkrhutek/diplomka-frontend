@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ILoadingModalData } from '../models/loading-modal-data';
 import { ISnackbarData, SnackbarType } from '../models/snackbar-data';
 import { HttpErrorResponse } from '@angular/common/http';
+import { IConfirmationModalData } from '../models/confirmation-modal-data';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,21 @@ export class PopUpsService {
   closeLoadingModal(): void {
     this.loadingModalDataSource.next(null);
   }
+
+  /*
+  Confirmation modal
+  */
+
+ private confirmationModalDataSource: BehaviorSubject<IConfirmationModalData> = new BehaviorSubject<IConfirmationModalData>(null);
+ confirmationModalData$: Observable<IConfirmationModalData> = this.confirmationModalDataSource.asObservable();
+
+ openConfirmationModal(data: IConfirmationModalData): void {
+   this.confirmationModalDataSource.next(data);
+ }
+
+ closeConfirmationModal(): void {
+   this.confirmationModalDataSource.next(null);
+ }
 
   /*
   Snackbar

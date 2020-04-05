@@ -1,6 +1,5 @@
 <div class="tab-container">
     <div class="filters-container" [formGroup]="filteringCriteriaFG">
-        <mat-icon color="primary" (click)="deleteAllTransactions()" matTooltip="Smazat všechny transakce">delete</mat-icon>
         <mat-form-field>
             <mat-label>Položka zásob</mat-label>
             <mat-select formControlName="inventoryItemId">
@@ -31,9 +30,21 @@
         </mat-form-field>
     </div>
     <div class="card">
+        <div class="flex-container">
+            <button mat-flat-button color="primary" (click)="openNewInventoryTransactionModal()">
+                Nová transakce
+            </button>
+            <button mat-flat-button color="primary" (click)="deleteAllTransactions()">
+                Smazat všechny transakce
+            </button>
+        </div>
         <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
     </div>
 </div>
 
 <app-new-inventory-transaction-modal *ngIf="isNewInventoryTransactionModalOpened"
-(close)="closeNewInventoryTransactionModal()"></app-new-inventory-transaction-modal>
+    (close)="closeNewInventoryTransactionModal()"></app-new-inventory-transaction-modal>
+    
+<app-inventory-transaction-details-modal *ngIf="transactionDetailsModalData as transaction" [transaction]="transaction"
+    (close)="closeTransactionDetailsModal()">
+</app-inventory-transaction-details-modal>

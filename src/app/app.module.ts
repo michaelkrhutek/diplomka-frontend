@@ -55,6 +55,7 @@ import { BasicTableComponent } from './components/basic-table/basic-table.compon
 import { BasicTableHeaderComponent } from './components/basic-table/basic-table-header/basic-table-header.component';
 import { BasicTableRow } from './models/basic-table-models';
 import { BasicTableRowComponent } from './components/basic-table/basic-table-row/basic-table-row.component';
+import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
 
 export const getBaseUrl = () => {
   if (environment.production) {
@@ -96,7 +97,8 @@ export const getBaseUrl = () => {
     InventoryTransactionDetailsModalComponent,
     BasicTableComponent,
     BasicTableHeaderComponent,
-    BasicTableRowComponent
+    BasicTableRowComponent,
+    ConfirmationModalComponent
   ],
   imports: [
     BrowserModule,

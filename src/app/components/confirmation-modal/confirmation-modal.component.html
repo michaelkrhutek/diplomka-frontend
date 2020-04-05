@@ -1,0 +1,11 @@
+<div *ngIf="(data$ | async) as data" class="modal-container">
+    <div class="modal">
+        <div class="modal-content">
+            <div class="message">{{ data.message }}</div>   
+        </div>
+        <div class="modal-actions">
+            <button mat-button (click)="closeModal()">Zavřít</button>
+            <button mat-flat-button color="primary" (click)="actionConfirmed(data.action)">Potvrdit</button>
+        </div>
+    </div>   
+</div>

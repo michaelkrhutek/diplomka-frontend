@@ -1,8 +1,6 @@
 import { InventoryTransactionType } from './inventory-transaction-type';
 import { IStock } from './stock';
 import { IInventoryItem } from './inventory-item';
-import { IFinancialAccount } from './financial-account';
-import { transformAll } from '@angular/compiler/src/render3/r3_ast';
 
 export interface IIncrementInventoryTransactionSpecificData {
     quantity: number;
@@ -33,7 +31,8 @@ export interface IInventoryTransactionPopulated<SpecificData> {
     creditAccount: string;
     specificData: SpecificData;
     totalTransactionAmount: number;
-    stock: IStock;
+    stockBeforeTransaction: IStock;
+    stockAfterTransaction: IStock;
     financialUnit: string;
     inventoryItemTransactionIndex: number;
     isDerivedTransaction: boolean;
@@ -46,6 +45,12 @@ export class InventoryTransactionPopulated<SpecificData> {
     constructor(transaction: IInventoryTransactionPopulated<any>) {
         Object.keys(transaction).forEach((key) => (this[key] = transaction[key]));
         this.effectiveDate = new Date(transaction.effectiveDate);
+        this.stockBeforeTransaction.batches.forEach((batch) => {
+            batch.added = new Date(batch.added);
+        });
+        this.stockAfterTransaction.batches.forEach((batch) => {
+            batch.added = new Date(batch.added);
+        });
     }
 
     _id: string;
@@ -57,7 +62,8 @@ export class InventoryTransactionPopulated<SpecificData> {
     creditAccount: string;
     specificData: SpecificData;
     totalTransactionAmount: number;
-    stock: IStock;
+    stockBeforeTransaction: IStock;
+    stockAfterTransaction: IStock;
     financialUnit: string;
     inventoryItemTransactionIndex: number;
     isDerivedTransaction: boolean;

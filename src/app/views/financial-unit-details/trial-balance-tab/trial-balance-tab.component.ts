@@ -8,6 +8,7 @@ import { ListItem, IListItem } from 'src/app/models/list-item';
 import { TrialBalance, ITrialBalanceAccount } from 'src/app/models/trial-balance';
 import { FormControl } from '@angular/forms';
 import { IFinancialPeriod } from 'src/app/models/financial-period';
+import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, BasicTableRowCellType, IBasicTableInputData } from 'src/app/models/basic-table-models';
 
 @Component({
   selector: 'app-trial-balance-tab',
@@ -48,55 +49,124 @@ export class TrialBalanceTabComponent {
     switchMap((financialPeriodId) => financialPeriodId ? this.trialBalanceService.getFinancialPeriodTrialBalance$(financialPeriodId) : of(null)),
   );
 
-  listItems$: Observable<ListItem[]> = this.trialBalance$.pipe(
-    map((trialBalance: TrialBalance) => {
-      if (!trialBalance) {
-        return [];
-      } 
-      return [
-        this.getListItemFromTotalValues(trialBalance),
-        ...trialBalance.accounts.map((acc) => this.getListItemFromTrialBalanceAccount(acc))
-      ];
-    }),
-    tap(() => (this.isLoadingData = false)),
+  tableData$: Observable<BasicTable> = this.trialBalance$.pipe(
+    map((trialBalance) => trialBalance ? this.getTableDataFromTrialBalance(trialBalance) : null),
+    tap(() => (this.isLoadingData = false))
   );
 
-    ngOnInit(): void {
-      this.financialUnitDetailsService.financialPeriods$.pipe(
-        map((periods: IFinancialPeriod[]) => {
-          const lastPeriod: IFinancialPeriod = periods.length > 0 ? periods[periods.length - 1] : null;
-          return lastPeriod ? lastPeriod._id : null;
-        }),
-        take(1)
-      ).subscribe((periodId: string) => setTimeout(() => this.financialPeriodIdFC.patchValue(periodId)));
-    }
-
-  private getListItemFromTrialBalanceAccount(account: ITrialBalanceAccount): ListItem {
-    const data: IListItem = {
-      textItems: [
-        { label: 'Kód účtu', value: account.account.code, width: 6 },
-        { label: 'Název účtu', value: account.account.name, width: 12 },
-        { label: 'Počet debetních zápisů', value: this.formatterService.getRoundedNumberString(account.debitEntriesCount), width: 8 },
-        { label: 'Debetní obrat', value: this.formatterService.getRoundedNumberString(account.debitAmount, 2), width: 8 },
-        { label: 'Počet kreditních zápisů', value: this.formatterService.getRoundedNumberString(account.creditEntriesCount), width: 8 },
-        { label: 'Kreditní obrat', value: this.formatterService.getRoundedNumberString(account.creditAmount, 2), width: 8 }
-      ]
-    };
-    return new ListItem(data);
+  ngOnInit(): void {
+    this.financialUnitDetailsService.financialPeriods$.pipe(
+      map((periods: IFinancialPeriod[]) => {
+        const lastPeriod: IFinancialPeriod = periods.length > 0 ? periods[periods.length - 1] : null;
+        return lastPeriod ? lastPeriod._id : null;
+      }),
+      take(1)
+    ).subscribe((periodId: string) => setTimeout(() => this.financialPeriodIdFC.patchValue(periodId)));
   }
 
-  private getListItemFromTotalValues(trialBalance: TrialBalance): ListItem {
-    const data: IListItem = {
-      textItems: [
-        { label: '', value: 'Celkem', width: 6 },
-        { label: '', value: '', width: 12 },
-        { label: 'Počet debetních zápisů', value: this.formatterService.getRoundedNumberString(trialBalance.totalDebitEntries), width: 8 },
-        { label: 'Debetní obrat', value: this.formatterService.getRoundedNumberString(trialBalance.totalDebitAmount, 2), width: 8 },
-        { label: 'Počet kreditních zápisů', value: this.formatterService.getRoundedNumberString(trialBalance.totalCreditEntries), width: 8 },
-        { label: 'Kreditní obrat', value: this.formatterService.getRoundedNumberString(trialBalance.totalCreditAmount, 2), width: 8 }
+  private getTableDataFromTrialBalance(
+    trialBalance: TrialBalance
+  ): BasicTable {
+    const header: IBasicTableHeaderInputData = {
+      otherCells: [
+        {
+          name: 'Kód účtu',
+          width: 8,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Název účtu',
+          width: 12,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Debetní zápisy',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
+          name: 'Debetní obrat',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
+          name: 'Kreditní zápisy',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
+          name: 'Kreditní obrat',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
       ]
     };
-    return new ListItem(data);
+    const rows: IBasicTableRowInputData[] = (trialBalance.accounts || [])
+      .map(account => this.getTableRowDataFromTrialBalanceAccount(account));
+    const totalRow: IBasicTableRowInputData = {
+      otherCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: 'Celkem'
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: ''
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(trialBalance.totalDebitEntries)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(trialBalance.totalDebitAmount, 2)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(trialBalance.totalCreditEntries)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(trialBalance.totalCreditAmount, 2)
+        }
+      ]
+    };
+    const data: IBasicTableInputData = { header, rows: [...rows, totalRow] };
+    return new BasicTable(data);
+  }
+
+  private getTableRowDataFromTrialBalanceAccount(
+    account: ITrialBalanceAccount
+  ): IBasicTableRowInputData {
+    const row: IBasicTableRowInputData = {
+      otherCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: account.account.code
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: account.account.name
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(account.debitEntriesCount)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(account.debitAmount, 2)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(account.creditEntriesCount)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(account.creditAmount, 2)
+        }
+      ]
+    }
+    return row;
   }
 }
 

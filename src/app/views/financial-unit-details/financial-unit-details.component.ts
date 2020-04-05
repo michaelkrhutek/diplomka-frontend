@@ -19,34 +19,42 @@ export class FinancialUnitDetailsComponent implements OnInit {
 
   sideNavigationBarItems: ISideNavigationBarItem[] = [
     {
+      iconName: 'date_range',
       tab: Tab.FinancialPeriods,
       description: 'Účetní období'
     },
     {
+      iconName: 'all_inbox',
       tab: Tab.FinancialAccounts,
       description: 'Finanční účtu'
     },
     {
+      iconName: 'shopping_cart',
       tab: Tab.InventoryGroups,
       description: 'Skupiny zásob'
     },
     {
+      iconName: 'shopping_basket',
       tab: Tab.InventoryItems,
       description: 'Položky zásob'
     },
     {
+      iconName: 'store',
       tab: Tab.Stocks,
       description: 'Stav zásob'
     },
     {
+      iconName: 'local_shipping',
       tab: Tab.InventoryTransactions,
       description: 'Transakce'
     },
     {
+      iconName: 'account_balance_wallet',
       tab: Tab.FinancialTransactions,
       description: 'Účetní zápisy'
     },
     {
+      iconName: 'account_balance',
       tab: Tab.TrialBalance,
       description: 'Obratová předvaha'
     }
@@ -67,8 +75,9 @@ export class FinancialUnitDetailsComponent implements OnInit {
 }
 
 interface ISideNavigationBarItem {
-  tab: Tab,
-  description: string
+  tab: Tab;
+  iconName: string;
+  description: string;
 }
 
 enum Tab {

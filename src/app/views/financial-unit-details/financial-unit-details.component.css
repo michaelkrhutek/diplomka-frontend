@@ -22,6 +22,13 @@
     padding: 1rem;
     cursor: pointer;
     border-left: 4px solid transparent;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.side-navigation-item > mat-icon {
+    margin-right: 0.5rem;
 }
 
 .side-navigation-item:hover {
@@ -33,6 +40,20 @@
     border-left-color: var(--primary-color);
 }
 
+.active-side-navigation-item > mat-icon {
+    color: var(--primary-color);
+}
+
 .tab-container {
     flex: 1;
+}
+
+@media only screen and (max-width: 800px) {
+    .side-navigation-panel {
+        width: 4rem;
+    }
+
+    .side-navigation-item > div {
+        visibility: hidden;
+    }
 }

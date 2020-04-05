@@ -4,7 +4,12 @@
             Detaily transakce
         </div>
         <div class="modal-content">
-            <
+            <h2>Stav před transakcí</h2>
+            <app-basic-table [data]="stockBeforeTransactionTableData"></app-basic-table>
+            <h2>Transakce</h2>
+            <app-basic-table [data]="transactionTableData"></app-basic-table>
+            <h2>Stav po transakci</h2>
+            <app-basic-table [data]="stockAfterTransactionTableData"></app-basic-table>
         </div>
         <div class="modal-actions">
             <button mat-button color="primary" (click)="closeModal()">Zavřít</button>
