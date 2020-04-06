@@ -5,6 +5,8 @@ import { IFinancialPeriod } from 'src/app/models/financial-period';
 import { map } from 'rxjs/operators';
 import { FormatterService } from 'src/app/services/formatter.service';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType, BasicTableActionItemsPosition } from 'src/app/models/basic-table-models';
+import { PopUpsService } from 'src/app/services/pop-ups.service';
+import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 
 @Component({
   selector: 'app-financial-periods-tab',
@@ -16,7 +18,8 @@ export class FinancialPeriodsTabComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
-    private formatterService: FormatterService
+    private formatterService: FormatterService,
+    private popUpsService: PopUpsService
   ) { }
 
   isNewFinancialPeriodModalOpened: boolean = false;
@@ -45,22 +48,23 @@ export class FinancialPeriodsTabComponent {
       ]
     };
     const rows: IBasicTableRowInputData[] = (periods || [])
-      .map(period => this.getTableRowDataFromInventoryPeriod(period));
+      .map((period, i, a) => this.getTableRowDataFromInventoryPeriod(period, i == a.length - 1));
     const data: IBasicTableInputData = { header, rows };
     return new BasicTable(data);
   }
 
   private getTableRowDataFromInventoryPeriod(
-    period: IFinancialPeriod
+    period: IFinancialPeriod,
+    isLast: boolean
   ): IBasicTableRowInputData {
     const row: IBasicTableRowInputData = {
-      actionItems: [
+      actionItems: isLast ? [
         {
           iconName: 'delete',
           description: 'Smazat',
-          action: () => this.deletePeriod(period)
+          action: () => this.deleteLastPeriod()
         }
-      ],
+      ] : [],
       otherCells: [
         {
           type: BasicTableRowCellType.Display,
@@ -75,12 +79,20 @@ export class FinancialPeriodsTabComponent {
     return row;
   }
 
-  deletePeriod(period: IFinancialPeriod): void {
-
+  deleteLastPeriod(): void {
+    const data: IConfirmationModalData = {
+      message: 'Smazáním období se i smažou všechny jeho transakce a účetní zápisy. Opravdu chcete smazat období?',
+      action: () => this.financialUnitDetailsService.deleteLastFinancialPeriod()
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
   deleteAllPeriods(): void {
-
+    const data: IConfirmationModalData = {
+      message: 'Smazáním všech období se i smažou všechny transakce a účetní zápisy. Opravdu chcete smazat všechna období?',
+      action: () => this.financialUnitDetailsService.deleteAllFinancialPeriods()
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
   openNewFinancialPeriodModal(): void {

@@ -8,6 +8,8 @@ import { FinancialAccountService } from 'src/app/services/financial-account.serv
 import { FinancialAccount, IFinancialAccount } from 'src/app/models/financial-account';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
+import { PopUpsService } from 'src/app/services/pop-ups.service';
+import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 
 @Component({
   selector: 'app-financial-accounts-tab',
@@ -19,7 +21,8 @@ export class FinancialAccountsTabComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
-    private financialAccountService: FinancialAccountService
+    private financialAccountService: FinancialAccountService,
+    private popUpsService: PopUpsService
   ) { }
 
   isLoadingData: boolean = true;
@@ -74,7 +77,7 @@ export class FinancialAccountsTabComponent {
         {
           iconName: 'delete',
           description: 'Smazat',
-          action: () => this.deleteAccount()
+          action: () => this.deleteAccount(account)
         }
       ],
       otherCells: [
@@ -91,12 +94,20 @@ export class FinancialAccountsTabComponent {
     return row;
   }
 
-  deleteAccount(): void {
-    // TODO
+  deleteAccount(account: IFinancialAccount): void {
+    const data: IConfirmationModalData = {
+      message: 'Smazáním účtu se i smažou všechny jeho transakce a účetní zápisy. Opravdu chcete smazat účet?',
+      action: () => this.financialUnitDetailsService.deleteFinancialAccount(account._id)
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
   deleteAllAccounts(): void {
-    // TODO
+    const data: IConfirmationModalData = {
+      message: 'Smazáním všech účtů se i smažou všechny transakce a účetní zápisy. Opravdu chcete smazat všechny účty?',
+      action: () => this.financialUnitDetailsService.deleteAllFinancialAccounts()
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
   openNewFinancialAccountModal(): void {

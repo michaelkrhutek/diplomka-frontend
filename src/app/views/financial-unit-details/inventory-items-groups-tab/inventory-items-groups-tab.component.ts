@@ -7,6 +7,8 @@ import { StockService } from 'src/app/services/stock.service';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 import { StockDecrementType } from 'src/app/models/stock';
+import { PopUpsService } from 'src/app/services/pop-ups.service';
+import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 
 @Component({
   selector: 'app-inventory-items-groups-tab',
@@ -18,7 +20,8 @@ export class InventoryItemsGroupsTabComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
-    private stockService: StockService
+    private stockService: StockService,
+    private popUpsService: PopUpsService
   ) { }
 
   isLoadingData: boolean = true;
@@ -41,7 +44,7 @@ export class InventoryItemsGroupsTabComponent {
   );
 
   private getTableDataFromInventoryGroups(
-    groups: IInventoryItemsGroup[]
+    groups: InventoryItemsGroup[]
   ): BasicTable {
     const header: IBasicTableHeaderInputData = {
       actionItemsPosition: BasicTableActionItemsPosition.Start,
@@ -60,20 +63,20 @@ export class InventoryItemsGroupsTabComponent {
       ]
     };
     const rows: IBasicTableRowInputData[] = (groups || [])
-      .map(t => this.getTableRowDataFromInventoryGroup(t));
+      .map(group => this.getTableRowDataFromInventoryGroup(group));
     const data: IBasicTableInputData = { header, rows };
     return new BasicTable(data);
   }
 
   private getTableRowDataFromInventoryGroup(
-    group: IInventoryItemsGroup
+    group: InventoryItemsGroup
   ): IBasicTableRowInputData {
     const row: IBasicTableRowInputData = {
       actionItems: [
         {
           iconName: 'delete',
           description: 'Smazat',
-          action: () => this.deleteGroup()
+          action: () => this.deleteGroup(group)
         }
       ],
       otherCells: [
@@ -98,10 +101,21 @@ export class InventoryItemsGroupsTabComponent {
     this.isNewInventoryItemsGroupModalOpened = false;
   }
 
-  private deleteGroup(): void {
-    // TODO
+  deleteGroup(account: InventoryItemsGroup): void {
+    const data: IConfirmationModalData = {
+      message: 'Smazáním skupiny se i smažou všechny její, položky, transakce a účetní zápisy. Opravdu chcete smazat skupinu?',
+      action: () => this.financialUnitDetailsService.deleteInventoryItemsGroup(account._id)
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
+  deleteAllGroups(): void {
+    const data: IConfirmationModalData = {
+      message: 'Smazáním všech skupin se i smažou všechny položky, transakce a účetní zápisy. Opravdu chcete smazat všechny skupiny?',
+      action: () => this.financialUnitDetailsService.deleteAllInventoryItemsGroups()
+    };
+    this.popUpsService.openConfirmationModal(data);
+  }
 
   private getFilteredInventoryGroups(
     inventoryGroups: IInventoryItemsGroup[],

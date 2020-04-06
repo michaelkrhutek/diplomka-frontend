@@ -7,6 +7,8 @@ import { switchMap, startWith, map, tap } from 'rxjs/operators';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
+import { PopUpsService } from 'src/app/services/pop-ups.service';
+import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 
 @Component({
   selector: 'app-inventory-transaction-template',
@@ -19,7 +21,8 @@ export class InventoryTransactionTemplateComponent {
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
     private inventoryTransactionTemplateService: InventoryTransactionTemplateService,
-    private inventoryTransactionService: InventoryTransactionService
+    private inventoryTransactionService: InventoryTransactionService,
+    private popUpsService: PopUpsService
   ) { }
 
   isLoadingData: boolean = true;
@@ -136,11 +139,19 @@ export class InventoryTransactionTemplateComponent {
   }
 
   deleteTemplate(template: IInventoryTransactionTemplatePopulated): void {
-    // TODO
+    const data: IConfirmationModalData = {
+      message: 'Opravdu chcete smazat šablonu?',
+      action: () => this.financialUnitDetailsService.deleteTransactionTemplate(template._id)
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
   deleteAllTemplates(): void {
-    // TODO
+    const data: IConfirmationModalData = {
+      message: 'Opravdu chcete smazat všechny šablony?',
+      action: () => this.financialUnitDetailsService.deleteAllTransactionTemplates()
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
   private getFilteredTemplates(

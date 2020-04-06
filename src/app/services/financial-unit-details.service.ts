@@ -95,6 +95,40 @@ export class FinancialUnitDetailsService {
     });
   }
 
+  deleteFinancialAccount(id: string): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji účet' });
+    const params: HttpParams = new HttpParams().append('id', id);
+    this.http.delete<any>(`${this.baseUrl}api/financial-account/delete-financial-account`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadTransactionsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Účet byl odstraněn', type: SnackbarType.Success });
+    });
+  }
+
+  deleteAllFinancialAccounts(): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji účty' });
+    const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
+    this.http.delete<any>(`${this.baseUrl}api/financial-account/delete-all-financial-accounts`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadTransactionsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Účty byly odstraněny', type: SnackbarType.Success });
+    });
+  }
+
   /*
   Financial periods
   */
@@ -150,6 +184,40 @@ export class FinancialUnitDetailsService {
     });
   }
 
+  deleteLastFinancialPeriod(): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji položku' });
+    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
+    this.http.delete<any>(`${this.baseUrl}api/financial-period/delete-last-financial-period`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadFinancialPeriodsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Položka byla odstraněna', type: SnackbarType.Success });
+    });
+  }
+
+  deleteAllFinancialPeriods(): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji položky' });
+    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
+    this.http.delete<any>(`${this.baseUrl}api/financial-period/delete-all-financial-periods`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadFinancialPeriodsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Položky byly odstraněny', type: SnackbarType.Success });
+    });
+  }
+
   /*
   Inventory groups
   */
@@ -182,6 +250,40 @@ export class FinancialUnitDetailsService {
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Skupina zásob byla vytvořena', type: SnackbarType.Success });
       this.reloadInventoryItemsGroupsSource.next();
+    });
+  }
+
+  deleteInventoryItemsGroup(id: string): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji skupinu' });
+    const params: HttpParams = new HttpParams().append('id', id);
+    this.http.delete<any>(`${this.baseUrl}api/inventory-group/delete-inventory-group`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadInventoryItemsGroupsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Skupina byla odstraněna', type: SnackbarType.Success });
+    });
+  }
+
+  deleteAllInventoryItemsGroups(): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji skupinu' });
+    const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
+    this.http.delete<any>(`${this.baseUrl}api/inventory-group/delete-all-inventory-groups`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadInventoryItemsGroupsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Skupiny byly odstraněny', type: SnackbarType.Success });
     });
   }
 
@@ -220,6 +322,40 @@ export class FinancialUnitDetailsService {
     });
   }
 
+  deleteInventoryItem(id: string): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji položku' });
+    const params: HttpParams = new HttpParams().append('id', id);
+    this.http.delete<any>(`${this.baseUrl}api/inventory-item/delete-inventory-item`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadInventoryItemsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Položka byla odstraněna', type: SnackbarType.Success });
+    });
+  }
+
+  deleteAllInventoryItems(): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji položky' });
+    const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
+    this.http.delete<any>(`${this.baseUrl}api/inventory-item/delete-all-inventory-items`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadInventoryItemsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Položky byly odstraněny', type: SnackbarType.Success });
+    });
+  }
+
   /*
  Transaction templates
  */
@@ -248,6 +384,40 @@ export class FinancialUnitDetailsService {
     ).subscribe(() => {
       this.reloadTransactionTemplatesSource.next();
       this.popUpsService.showSnackbar({ message: 'Šablona byla vytvořena', type: SnackbarType.Success });
+    });
+  }
+
+  deleteTransactionTemplate(id: string): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji šablonu' });
+    const params: HttpParams = new HttpParams().append('id', id);
+    this.http.delete<any>(`${this.baseUrl}api/inventory-transaction-template/delete-inventory-transaction-template`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadTransactionTemplatesSource.next();
+      this.popUpsService.showSnackbar({ message: 'Šablona byla odstraněna', type: SnackbarType.Success });
+    });
+  }
+
+  deleteAllTransactionTemplates(): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji šablony' });
+    const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
+    this.http.delete<any>(`${this.baseUrl}api/inventory-transaction-template/delete-all-inventory-transaction-templates`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadTransactionTemplatesSource.next();
+      this.popUpsService.showSnackbar({ message: 'Šablony byly odstraněny', type: SnackbarType.Success });
     });
   }
 
@@ -310,6 +480,7 @@ export class FinancialUnitDetailsService {
   }
 
   deleteAllTransactions(): void {
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji transakce' });
     const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
     this.http.delete<any>(`${this.baseUrl}api/financial-unit/delete-all-transactions`, { params }).pipe(
       map(() => 'OK'),

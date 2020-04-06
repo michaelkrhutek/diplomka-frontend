@@ -7,6 +7,8 @@ import { map, startWith, tap } from 'rxjs/operators';
 import { InventoryItem, IInventoryItemPopulated } from 'src/app/models/inventory-item';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
+import { PopUpsService } from 'src/app/services/pop-ups.service';
+import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 
 @Component({
   selector: 'app-inventory-items-tab',
@@ -18,16 +20,11 @@ export class InventoryItemsTabComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
+    private popUpsService: PopUpsService
   ) { }
 
   isLoadingData: boolean = true;
   isNewInventoryItemModalOpened: boolean = false;
-
-  openNewInventoryItemModalIconItem: IIconItem = {
-    description: 'Nová položka zásob',
-    iconName: 'add',
-    action: () => this.openNewInventoryItemModal()
-  };
 
   filterTextFC: FormControl = new FormControl(null);
   filterText$: Observable<string> = this.filterTextFC.valueChanges.pipe(
@@ -104,11 +101,19 @@ export class InventoryItemsTabComponent {
   }
 
   deleteItem(item: IInventoryItemPopulated): void {
-    // TODO
+    const data: IConfirmationModalData = {
+      message: 'Smazáním položky se i smažou všechny její transakce a účetní zápisy. Opravdu chcete smazat položku?',
+      action: () => this.financialUnitDetailsService.deleteInventoryItem(item._id)
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
   deleteAllItems(): void {
-    // TODO
+    const data: IConfirmationModalData = {
+      message: 'Smazáním všech položek se i smažou všechny transakce a účetní zápisy. Opravdu chcete smazat všechny položky?',
+      action: () => this.financialUnitDetailsService.deleteAllInventoryItems()
+    };
+    this.popUpsService.openConfirmationModal(data);
   }
 
   private getFilteredInventoryItems(
