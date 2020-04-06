@@ -43,8 +43,8 @@ export class InventoryTransactionsTabComponent {
     });
 
   filteringCriteriaFG: FormGroup = new FormGroup({
-    inventoryItemId: new FormControl(null),
-    transactionType: new FormControl(null),
+    inventoryItemId: new FormControl(0),
+    transactionType: new FormControl(0),
     dateFrom: new FormControl(null),
     dateTo: new FormControl(null)
   });

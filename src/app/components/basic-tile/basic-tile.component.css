@@ -3,12 +3,13 @@
 }
 
 .tile {
-    padding: 3rem 1rem;
+    padding: 1rem;
     box-sizing: content-box;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     background-color: var(--background-color);
     color: var(--font-color);
     box-shadow: var(--box-shadow);
@@ -29,9 +30,11 @@
 }
 
 div.title-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    font-size: 1rem;
-    text-align: center;
+    font-size: 1.25rem;
     overflow: hidden;
 }
 

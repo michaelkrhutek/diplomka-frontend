@@ -30,7 +30,7 @@ export class FinancialTransactionsTabComponent {
   financialAccounts$: Observable<IFinancialAccount[]> = this.financialUnitDetailsService.financialAccounts$;
 
   filteringCriteriaFG: FormGroup = new FormGroup({
-    accountId: new FormControl(null),
+    accountId: new FormControl(0),
     dateFrom: new FormControl(null),
     dateTo: new FormControl(null)
   });

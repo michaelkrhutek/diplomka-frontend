@@ -25,7 +25,7 @@ export class FinancialUnitsComponent {
   ) { }
 
   readonly tileWidth: number = 12;
-  readonly tileHeight: number = 4;
+  readonly tileHeight: number = 8;
 
   isNewFinancialUnitModalOpened: boolean = false;
   isLoadingData: boolean = true;

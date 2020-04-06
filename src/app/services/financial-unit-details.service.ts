@@ -197,7 +197,7 @@ export class FinancialUnitDetailsService {
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.reloadFinancialPeriodsSource.next();
-      this.popUpsService.showSnackbar({ message: 'Položka byla odstraněna', type: SnackbarType.Success });
+      this.popUpsService.showSnackbar({ message: 'Období bylo odstraněno', type: SnackbarType.Success });
     });
   }
 
@@ -214,7 +214,7 @@ export class FinancialUnitDetailsService {
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.reloadFinancialPeriodsSource.next();
-      this.popUpsService.showSnackbar({ message: 'Položky byly odstraněny', type: SnackbarType.Success });
+      this.popUpsService.showSnackbar({ message: 'Období byly odstraněny', type: SnackbarType.Success });
     });
   }
 

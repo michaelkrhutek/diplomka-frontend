@@ -13,12 +13,12 @@ export class ClickableTileComponent {
 
   @Input() data: ClickableTile;
 
-  geTileStyles(data: ClickableTile): Object {
+  getTileStyles(data: ClickableTile): Object {
     return {
       'width': `${data.width}rem`,
       'max-width': `${data.width}rem`,
-      'height': `${data.height + 2}rem`,
-      'max-height': `${data.height + 2}rem`,
+      'height': `${data.height}rem`,
+      'max-height': `${data.height}rem`,
     };
   } 
 }

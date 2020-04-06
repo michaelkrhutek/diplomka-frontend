@@ -1,4 +1,4 @@
-<div class="tile" [ngStyle]="geTileStyles(data)" (click)="data.action()">
+<div class="tile" [ngStyle]="getTileStyles(data)" (click)="data.action()">
     <mat-icon color="primary">{{ data.iconName }}</mat-icon>
     <div class="title-text">{{ data.titleText }}</div>
 </div>

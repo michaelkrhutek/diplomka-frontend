@@ -4,7 +4,7 @@
         <mat-form-field>
             <mat-label>Položka zásob</mat-label>
             <mat-select formControlName="inventoryItemId">
-                <mat-option [value]="null"></mat-option>
+                <mat-option [value]="0">Všechny</mat-option>
                 <mat-option *ngFor="let item of (inventoryItems$ | async)" [value]="item._id">
                     {{ item.name }}
                 </mat-option>
@@ -13,7 +13,7 @@
         <mat-form-field>
             <mat-label>Typ transakce</mat-label>
             <mat-select formControlName="transactionType">
-                <mat-option [value]="null"></mat-option>
+                <mat-option [value]="0">Všechny</mat-option>
                 <mat-option *ngFor="let option of transactionTypeOptions" [value]="option.type">
                     {{ option.description }}
                 </mat-option>
