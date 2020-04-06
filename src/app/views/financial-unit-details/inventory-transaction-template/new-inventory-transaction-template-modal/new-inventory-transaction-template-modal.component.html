@@ -1,0 +1,49 @@
+<div class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            Nová šablona transakce
+        </div>
+        <div class="modal-content" [formGroup]="transactionTemplateFG">
+            <mat-form-field>
+                <mat-label>Název šablony</mat-label>
+                <input matInput formControlName="description">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Skupina zásob</mat-label>
+                <mat-select formControlName="inventoryGroupId">
+                  <mat-option *ngFor="let group of (inventoryGroups$ | async)" [value]="group._id">
+                    {{ group.name }}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Typ transakce</mat-label>
+                <mat-select formControlName="transactionType">
+                  <mat-option *ngFor="let option of transactionTypeOptions" [value]="option.type">
+                    {{ option.description }}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Debetní účet</mat-label>
+                <mat-select formControlName="debitAccountId">
+                  <mat-option *ngFor="let account of (financialAccounts$ | async)" [value]="account._id">
+                    {{ account.code }} - {{ account.name }}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Kreditní účet</mat-label>
+                <mat-select formControlName="creditAccountId">
+                  <mat-option *ngFor="let account of (financialAccounts$ | async)" [value]="account._id">
+                    {{ account.code }} - {{ account.name }}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="modal-actions">
+            <button mat-button color="primary" (click)="closeModal()">Zavřít</button>
+            <button mat-flat-button color="primary" (click)="createTransactionTemplate()" [disabled]="isCreateButtonDisabled$ | async">Vytvořit</button>
+        </div>
+    </div>   
+</div>

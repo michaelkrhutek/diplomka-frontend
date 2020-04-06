@@ -18,6 +18,7 @@ import { InventoryItemsGroupService } from './inventory-items-group.service';
 import { InventoryTransactionService } from './inventory-transaction.service';
 import { FinancialTransactionService } from './financial-transaction.service';
 import { InventoryTransactionTemplateService } from './inventory-transaction-template.service';
+import { INewInventoryTransactionTemplateRequestData } from '../models/inventory-transaction-template';
 
 @Injectable({
   providedIn: 'root'
@@ -150,7 +151,7 @@ export class FinancialUnitDetailsService {
   }
 
   /*
-  Inventory items groups
+  Inventory groups
   */
 
   reloadInventoryItemsGroupsSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
@@ -185,7 +186,7 @@ export class FinancialUnitDetailsService {
   }
 
   /*
- Inventory items groups
+ Inventory items
  */
 
   reloadInventoryItemsSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
@@ -219,7 +220,40 @@ export class FinancialUnitDetailsService {
     });
   }
 
+  /*
+ Transaction templates
+ */
 
+  private reloadTransactionTemplatesSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
+  reloadTransactionTemplates$: Observable<void> = this.reloadTransactionTemplatesSource.asObservable();
+
+  createTransactionTemplate(requestData: INewInventoryTransactionTemplateRequestData): void {
+    const financialUnitId: string = this.getFinancialUnitId();
+    if (!financialUnitId) {
+      return null;
+    }
+    this.popUpsService.openLoadingModal({ message: 'Vytvářím šablonu transakce' });
+    const headers: HttpHeaders = new HttpHeaders().append('Content-Type', 'application/json');
+    const params: HttpParams = new HttpParams().append('financialUnitId', financialUnitId)
+    this.http.post<any>(
+      `${this.baseUrl}api/inventory-transaction-template/create-inventory-transaction-template`, JSON.stringify(requestData),
+      { headers, params }
+    ).pipe(
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadTransactionTemplatesSource.next();
+      this.popUpsService.showSnackbar({ message: 'Šablona byla vytvořena', type: SnackbarType.Success });
+    });
+  }
+
+  /*
+  Inventory transactions
+  */
 
   private reloadTransactionsSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
   reloadTransactions$: Observable<void> = this.reloadTransactionsSource.asObservable();
@@ -261,7 +295,7 @@ export class FinancialUnitDetailsService {
   deleteInventoryTransaction(id: string): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji transakci' });
     const params: HttpParams = new HttpParams().append('id', id);
-    this.http.delete<any>(`${this.baseUrl}api/inventory-transaction/delete-inventory-transaction`, { params } ).pipe(
+    this.http.delete<any>(`${this.baseUrl}api/inventory-transaction/delete-inventory-transaction`, { params }).pipe(
       map(() => 'OK'),
       catchError((err: HttpErrorResponse) => {
         this.popUpsService.handleApiError(err);
@@ -277,7 +311,7 @@ export class FinancialUnitDetailsService {
 
   deleteAllTransactions(): void {
     const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
-    this.http.delete<any>(`${this.baseUrl}api/financial-unit/delete-all-transactions`, { params } ).pipe(
+    this.http.delete<any>(`${this.baseUrl}api/financial-unit/delete-all-transactions`, { params }).pipe(
       map(() => 'OK'),
       catchError((err: HttpErrorResponse) => {
         this.popUpsService.handleApiError(err);

@@ -1,8 +1,12 @@
 <div *ngIf="(user$ | async) as user" class="navigation-bar">
     <div class="left-side">
-        <button mat-icon-button [routerLink]="['']">
-            <mat-icon>home</mat-icon>
+        <button mat-icon-button matTooltip="Domovská obrazovka" [routerLink]="['']">
+            <mat-icon color="primary">home</mat-icon>
         </button>
+        <div *ngIf="(financialUnit$ | async) as activeUnit" class="financial-unit-container">
+            <span>/</span>
+            <span matTooltip="Aktivní účetní jednotka">{{ activeUnit.name }}</span>
+        </div>
     </div>
     <div class="right-side">
         <div class="user-container" [matMenuTriggerFor]="userMenu">

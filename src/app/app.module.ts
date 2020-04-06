@@ -58,6 +58,12 @@ import { BasicTableRow } from './models/basic-table-models';
 import { BasicTableRowComponent } from './components/basic-table/basic-table-row/basic-table-row.component';
 import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
 import { StockDetailsModalComponent } from './views/financial-unit-details/stocks-tab/stock-details-modal/stock-details-modal.component';
+import { TilesListComponent } from './components/tiles-list/tiles-list.component';
+import { BasicTileComponent } from './components/basic-tile/basic-tile.component';
+import { ClickableTileComponent } from './components/clickable-tile/clickable-tile.component';
+import { HeadingComponent } from './components/heading/heading.component';
+import { InventoryTransactionTemplateComponent } from './views/financial-unit-details/inventory-transaction-template/inventory-transaction-template.component';
+import { NewInventoryTransactionTemplateModalComponent } from './views/financial-unit-details/inventory-transaction-template/new-inventory-transaction-template-modal/new-inventory-transaction-template-modal.component';
 
 export const getBaseUrl = () => {
   if (environment.production) {
@@ -101,7 +107,13 @@ export const getBaseUrl = () => {
     BasicTableHeaderComponent,
     BasicTableRowComponent,
     ConfirmationModalComponent,
-    StockDetailsModalComponent
+    StockDetailsModalComponent,
+    TilesListComponent,
+    BasicTileComponent,
+    ClickableTileComponent,
+    HeadingComponent,
+    InventoryTransactionTemplateComponent,
+    NewInventoryTransactionTemplateModalComponent
   ],
   imports: [
     BrowserModule,

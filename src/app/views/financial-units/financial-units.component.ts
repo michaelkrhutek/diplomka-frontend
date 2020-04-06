@@ -1,12 +1,14 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitService } from 'src/app/services/financial-unit.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ListItem, IListItem } from 'src/app/models/list-item';
 import { map, tap, switchMap } from 'rxjs/operators';
 import { IIconItem } from 'src/app/models/icon-item';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { SnackbarType } from 'src/app/models/snackbar-data';
 import { Router } from '@angular/router';
+import { BasicTile, IBasicTile, TileType, ClickableTile, IClickableTile } from 'src/app/models/tiles-models';
+import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 
 @Component({
   selector: 'app-financial-units',
@@ -22,49 +24,64 @@ export class FinancialUnitsComponent {
     private router: Router
   ) { }
 
+  readonly tileWidth: number = 12;
+  readonly tileHeight: number = 4;
+
   isNewFinancialUnitModalOpened: boolean = false;
-
   isLoadingData: boolean = true;
-
-  openNewFinancialUnitModalIconItem: IIconItem = {
-    description: 'Nová účetní jednotka',
-    iconName: 'add',
-    action: () => this.openNewFinancialUnitModal()
-  };
 
   financialUnits$: Observable<IFinancialUnit[]> = this.financialUnitService.reloadFinancialUnits$.pipe(
     tap(() => (this.isLoadingData = true)),
+    tap(v => console.log(v)),
     switchMap(() => this.financialUnitService.getFinancialUnits$())
   );
 
-  listItems$: Observable<ListItem[]> = this.financialUnits$.pipe(
-    map((financialUnits: IFinancialUnit[]) => financialUnits.map((unit) => this.getListItemFromFinancialUnit(unit))),
+  tileItems$: Observable<(BasicTile | ClickableTile)[]> = this.financialUnits$.pipe(
+    tap(v => console.log(v)),
+    map((units: IFinancialUnit[]) => units.map((unit) => this.getTileItemFromUnit(unit))),
+    tap(v => console.log(v)),
+    map((tiles: BasicTile[]) => {
+      const data: IClickableTile = {
+        type: TileType.Clickable,
+        iconName: 'add_circle',
+        titleText: 'Nová jednotka',
+        action: () => this.openNewFinancialUnitModal(),
+        width: this.tileWidth,
+        height: this.tileHeight
+      };
+      const newUnitTile: ClickableTile = new ClickableTile(data);
+      return [newUnitTile, ...tiles];
+    }),
     tap(() => (this.isLoadingData = false))
   );
 
-  private getListItemFromFinancialUnit(financialUnit: IFinancialUnit): ListItem {
-    const data: IListItem = {
-      textItems: [
-        { label: 'Název účetní jednotky', value: financialUnit.name, width: 12 }
-      ],
-      iconItemsEnd: [
-        {
-          iconName: 'launch',
-          description: 'Otevřít',
-          action: () => {
-            this.popUpsService.openLoadingModal({ message: 'Načítám účetní jednotku' });
-            this.router.navigate(['financial-unit', financialUnit._id]).finally(() => this.popUpsService.closeLoadingModal())
-          }
-        },
+  private getTileItemFromUnit(unit: IFinancialUnit): BasicTile {
+    const data: IBasicTile = {
+      type: TileType.Basic,
+      titleText: unit.name,
+      width: this.tileWidth,
+      height: this.tileHeight,
+      mainAction: () => {
+        this.popUpsService.openLoadingModal({ message: 'Načítám účetní jednotku' });
+        this.router.navigate(['financial-unit', unit._id]).finally(() => this.popUpsService.closeLoadingModal())
+      },
+      topRightActionItems$: of([
         {
           iconName: 'delete',
           description: 'Smazat',
-          action: () => this.financialUnitService.deleteFinancialUnit(financialUnit._id)
+          action: () => this.deleteUnit(unit)
         }
-      ],
-      iconItemsEndContainerWidth: 2
+      ])
     };
-    return new ListItem(data);
+    return new BasicTile(data);
+  }
+
+  deleteUnit(unit: IFinancialUnit): void {
+    const data: IConfirmationModalData = {
+      message: `Opravdu chcete smazat účetní jednotku ${unit.name}?`,
+      action: () => this.financialUnitService.deleteFinancialUnit(unit._id)
+    }
+    this.popUpsService.openConfirmationModal(data);
   }
 
   openNewFinancialUnitModal(): void {

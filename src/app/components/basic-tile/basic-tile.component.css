@@ -1,0 +1,75 @@
+:host {
+    --action-items-container-position-length: 0.25rem;
+}
+
+.tile {
+    padding: 3rem 1rem;
+    box-sizing: content-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--background-color);
+    color: var(--font-color);
+    box-shadow: var(--box-shadow);
+    position: relative;
+    border-radius: 0.25rem;
+}
+
+.basic-tile-action-icons-container {
+    position: absolute;
+    flex-direction: row;
+    align-items: center;
+    max-width: 50%;
+    flex-wrap: wrap;
+}
+
+.basic-tile-action-icons-container > mat-icon {
+    margin: 0.25rem;
+}
+
+div.title-text {
+    width: 100%;
+    font-size: 1rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+div.other-text {
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    opacity: 0.6;
+}
+
+.top-left {
+    top: var(--action-items-container-position-length);
+    left: var(--action-items-container-position-length);
+}
+
+.top-right {
+    top: var(--action-items-container-position-length);
+    right: var(--action-items-container-position-length);
+}
+
+.bottom-left {
+    bottom: var(--action-items-container-position-length);
+    left: var(--action-items-container-position-length);
+}
+
+.bottom-right {
+    bottom: var(--action-items-container-position-length);
+    right: var(--action-items-container-position-length);
+}
+
+.clickable-icon {
+    cursor: pointer;
+}
+
+.main-action {
+    cursor: pointer;
+}

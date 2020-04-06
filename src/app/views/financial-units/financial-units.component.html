@@ -1,5 +1,6 @@
 <div class="view-container">
-    <app-basic-list [listItems]="listItems$ | async" [iconItem]="openNewFinancialUnitModalIconItem" [isLoadingData]="isLoadingData"></app-basic-list>
+    <app-heading headingText="Účetní jednotky" iconName="work"></app-heading>
+    <app-tiles-list [items]="tileItems$ | async" [isLoadingData]="isLoadingData"></app-tiles-list>
 </div>
 
 <app-new-financial-unit-modal *ngIf="isNewFinancialUnitModalOpened" (close)="closeNewFinancialUnitModal()"></app-new-financial-unit-modal>

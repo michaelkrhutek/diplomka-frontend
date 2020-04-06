@@ -1,0 +1,26 @@
+.tile {
+    padding: 2rem 1rem;
+    box-sizing: content-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: var(--background-color);
+    color: var(--font-color);
+    box-shadow: var(--box-shadow);
+    position: relative;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+div.title-text {
+    width: 100%;
+    font-size: 1rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+mat-icon {
+    transform: scale(2);
+    margin: 0 auto 2rem auto;
+}

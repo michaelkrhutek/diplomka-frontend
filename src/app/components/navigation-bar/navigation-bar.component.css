@@ -38,3 +38,17 @@
 .user-container > mat-icon {
     margin-right: 0.75rem;
 }
+
+.financial-unit-container {
+    color: var(--font-color-light);
+    margin-left: 0.5rem;
+    cursor: default;
+}
+
+.financial-unit-container > * {
+    margin: 0 0.75rem;
+}
+
+.financial-unit-container > *:last-child {
+    margin-right: 0rem;
+}

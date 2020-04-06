@@ -1,0 +1,18 @@
+<div class="tiles-list">
+    <div *ngIf="isLoadingData; else dataLoaded" class="loading-spinner-container">
+        <mat-spinner></mat-spinner>
+    </div>
+    <ng-template #dataLoaded>
+        <ng-container *ngIf="items && items.length > 0; else noItem">
+            <ng-container *ngFor="let item of items">
+                <ng-container [ngSwitch]="item.type">
+                    <app-basic-tile *ngSwitchCase="'basic'" [data]="item"></app-basic-tile>
+                    <app-clickable-tile *ngSwitchCase="'clickable'" [data]="item"></app-clickable-tile>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+        <ng-template #noItem>
+            <div class="no-record-message-container">{{ noRecordMessage }}</div>
+        </ng-template>
+    </ng-template>
+</div>

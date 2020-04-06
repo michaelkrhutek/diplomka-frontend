@@ -1,0 +1,23 @@
+<div class="tab-container">
+    <app-heading headingText="Šablony transakcí" iconName="file_copy"></app-heading>
+    <div class="filters-container">
+        <mat-form-field>
+            <mat-label>Hledat šablonu</mat-label>
+            <input matInput [formControl]="filterTextFC">
+        </mat-form-field>
+    </div>
+    <div class="card">
+        <div class="flex-container">
+            <button mat-flat-button color="primary" (click)="openNewTransactionTemplateModal()">
+                Nová šablona
+            </button>
+            <button mat-flat-button color="primary" (click)="deleteAllTemplates()">
+                Smazat všechny šablony
+            </button>
+        </div>
+        <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
+    </div>
+</div>
+
+<app-new-inventory-transaction-template-modal *ngIf="isNewTransactionTemplateModalOpened"
+    (close)="closeNewTransactionTemplateModal()"></app-new-inventory-transaction-template-modal>
