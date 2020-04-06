@@ -14,13 +14,13 @@
 [color-theme="light"] {
     --secondary-color: rgb(198, 150, 255);
     --primary-color: rgb(68, 27, 116);
-    --navbar-background-color: rgb(230, 230, 230);
+    --navbar-background-color: rgb(245, 245, 245);
     --font-color: var(--font-color-light-theme);
     --font-color-values: var(--font-color-light-theme-values);
     --font-color-light: grey;
     --font-color-inverse: var(--font-color-dark-theme);
     --background-color: white;
-    --background-color-dark: white;
+    --background-color-dark: rgb(252, 252, 252);
     --border-color: rgb(182, 182, 182);
     --border-color-light: rgb(230, 230, 230);
     --box-shadow-color: rgba(0,0,0,0.2);
@@ -155,11 +155,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .tab-container {
-    padding: 1rem;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .filters-container {
@@ -210,4 +211,18 @@ h1, h2, h3, h4, h5, h6 {
 
 .flex-container > * {
     margin: 0 1rem 1rem 0 !important;
+}
+
+.link {
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: lighter;
+    margin: 1rem 0 2rem 0;
+}
+
+@media only screen and (max-width: 800px) {
+    .tab-container {
+        padding: 1rem;
+    }
 }

@@ -27,7 +27,7 @@ export class AuthService {
   }
 
   login(loginCredentials: ILoginCredentials): void {
-    this.popUpsService.openLoadingModal({ message: 'Prihlasuji' });
+    this.popUpsService.openLoadingModal({ message: 'Přihlašuji' });
     const headers: HttpHeaders = new HttpHeaders().append('Content-Type', 'application/json');
     this.http.post<any>(
       `${this.baseUrl}auth/login`, JSON.stringify(loginCredentials),
@@ -45,7 +45,7 @@ export class AuthService {
   }
 
   signUp(signUpCredentials: ISignUpCredentials): void {
-    this.popUpsService.openLoadingModal({ message: 'Vytvářím ucet' });
+    this.popUpsService.openLoadingModal({ message: 'Vytvářím účet' });
     const headers: HttpHeaders = new HttpHeaders().append('Content-Type', 'application/json');
     this.http.post<any>(
       `${this.baseUrl}auth/sign-up`, JSON.stringify(signUpCredentials),
@@ -60,5 +60,10 @@ export class AuthService {
     ).subscribe((user: IUser) => {
       this.userSource.next(user);
     });
+  }
+
+  logout(): void {
+    this.userSource.next(null);
+    this.http.post<any>(`${this.baseUrl}auth/logout`, null).subscribe();
   }
 }

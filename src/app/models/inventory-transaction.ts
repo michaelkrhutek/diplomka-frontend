@@ -1,5 +1,5 @@
 import { InventoryTransactionType } from './inventory-transaction-type';
-import { IStock } from './stock';
+import { IStock, Stock } from './stock';
 import { IInventoryItem } from './inventory-item';
 
 export interface IIncrementInventoryTransactionSpecificData {
@@ -45,12 +45,8 @@ export class InventoryTransactionPopulated<SpecificData> {
     constructor(transaction: IInventoryTransactionPopulated<any>) {
         Object.keys(transaction).forEach((key) => (this[key] = transaction[key]));
         this.effectiveDate = new Date(transaction.effectiveDate);
-        this.stockBeforeTransaction.batches.forEach((batch) => {
-            batch.added = new Date(batch.added);
-        });
-        this.stockAfterTransaction.batches.forEach((batch) => {
-            batch.added = new Date(batch.added);
-        });
+        this.stockBeforeTransaction = new Stock(transaction.stockBeforeTransaction);
+        this.stockAfterTransaction = new Stock(transaction.stockAfterTransaction);
     }
 
     _id: string;
@@ -62,8 +58,8 @@ export class InventoryTransactionPopulated<SpecificData> {
     creditAccount: string;
     specificData: SpecificData;
     totalTransactionAmount: number;
-    stockBeforeTransaction: IStock;
-    stockAfterTransaction: IStock;
+    stockBeforeTransaction: Stock;
+    stockAfterTransaction: Stock;
     financialUnit: string;
     inventoryItemTransactionIndex: number;
     isDerivedTransaction: boolean;

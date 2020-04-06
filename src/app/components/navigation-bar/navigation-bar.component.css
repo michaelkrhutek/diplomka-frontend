@@ -12,11 +12,29 @@
     background-color: var(--navbar-background-color);
     display: flex;
     flex-direction: row;
-    align-items: center;
+    justify-content: space-between;
+    align-items: stretch;
     padding: 0 2rem;
+    box-sizing: border-box;
 }
 
+.navigation-bar > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
 .navigation-link {
     padding: 0 1rem;
     cursor: pointer;
+}
+
+.user-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
+.user-container > mat-icon {
+    margin-right: 0.75rem;
 }

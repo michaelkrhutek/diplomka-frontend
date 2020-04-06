@@ -14,7 +14,8 @@ import {
   MatTooltipModule,
   MatTabsModule,
   MatDatepickerModule,
-  MatNativeDateModule
+  MatNativeDateModule,
+  MatMenuModule
 } from "@angular/material";
 import { AppComponent } from './app.component';
 import { HomeComponent } from './views/home/home.component';
@@ -56,6 +57,7 @@ import { BasicTableHeaderComponent } from './components/basic-table/basic-table-
 import { BasicTableRow } from './models/basic-table-models';
 import { BasicTableRowComponent } from './components/basic-table/basic-table-row/basic-table-row.component';
 import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
+import { StockDetailsModalComponent } from './views/financial-unit-details/stocks-tab/stock-details-modal/stock-details-modal.component';
 
 export const getBaseUrl = () => {
   if (environment.production) {
@@ -98,7 +100,8 @@ export const getBaseUrl = () => {
     BasicTableComponent,
     BasicTableHeaderComponent,
     BasicTableRowComponent,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    StockDetailsModalComponent
   ],
   imports: [
     BrowserModule,
@@ -120,7 +123,8 @@ export const getBaseUrl = () => {
     MatTabsModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    MatMenuModule
   ],
   providers: [
     {

@@ -6,6 +6,7 @@ import { ListItem, IListItem } from 'src/app/models/list-item';
 import { map, startWith, tap } from 'rxjs/operators';
 import { InventoryItem, IInventoryItemPopulated } from 'src/app/models/inventory-item';
 import { FormControl } from '@angular/forms';
+import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 
 @Component({
   selector: 'app-inventory-items-tab',
@@ -34,24 +35,64 @@ export class InventoryItemsTabComponent {
     map((filterText: string) => filterText || '')
   );
 
-  listItems$: Observable<ListItem[]> = combineLatest(
+  tableData$: Observable<BasicTable> = combineLatest(
     this.financialUnitDetailsService.inventoryItems$,
     this.filterText$
   ).pipe(
     tap(() => (this.isLoadingData = true)),
     map(([items, filterText]) => this.getFilteredInventoryItems(items, filterText)),
-    map((items: IInventoryItemPopulated[]) => items.map(item => this.getListItemFromInventoryItem(item))),
+    map((items: IInventoryItemPopulated[]) => this.getTableDataFromInventoryItems(items)),
     tap(() => (this.isLoadingData = false)),
   );
 
-  private getListItemFromInventoryItem(item: InventoryItem): ListItem {
-    const data: IListItem = {
-      textItems: [
-        { label: 'Název položky', value: item.name, width: 16 },
-        { label: 'Skupina zásob', value: item.inventoryGroup.name, width: 12 }
+  private getTableDataFromInventoryItems(
+    items: IInventoryItemPopulated[]
+  ): BasicTable {
+    const header: IBasicTableHeaderInputData = {
+      actionItemsPosition: BasicTableActionItemsPosition.Start,
+      actionItemsContainerWidth: 1,
+      otherCells: [
+        {
+          name: 'Název položky',
+          width: 12,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Skupina',
+          width: 10,
+          align: BasicTableValueAlign.Left
+        }
       ]
     };
-    return new ListItem(data);
+    const rows: IBasicTableRowInputData[] = (items || [])
+      .map(item => this.getTableRowDataFromInventoryItem(item));
+    const data: IBasicTableInputData = { header, rows };
+    return new BasicTable(data);
+  }
+
+  private getTableRowDataFromInventoryItem(
+    item: IInventoryItemPopulated
+  ): IBasicTableRowInputData {
+    const row: IBasicTableRowInputData = {
+      actionItems: [
+        {
+          iconName: 'delete',
+          description: 'Smazat',
+          action: () => this.deleteItem(item)
+        }
+      ],
+      otherCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: item.name
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: item.inventoryGroup.name
+        }
+      ]
+    }
+    return row;
   }
 
   openNewInventoryItemModal(): void {
@@ -60,6 +101,14 @@ export class InventoryItemsTabComponent {
 
   closeNewInventoryItemModal(): void {
     this.isNewInventoryItemModalOpened = false;
+  }
+
+  deleteItem(item: IInventoryItemPopulated): void {
+    // TODO
+  }
+
+  deleteAllItems(): void {
+    // TODO
   }
 
   private getFilteredInventoryItems(

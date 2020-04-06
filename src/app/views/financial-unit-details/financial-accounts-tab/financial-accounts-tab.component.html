@@ -5,8 +5,17 @@
             <input matInput [formControl]="filterTextFC">
         </mat-form-field>
     </div>
-    <app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"
-    [iconItem]="openNewFinancialAccountModalIconItem"></app-basic-list>
+    <div class="card">
+        <div class="flex-container">
+            <button mat-flat-button color="primary" (click)="openNewFinancialAccountModal()">
+                Nový účet
+            </button>
+            <button mat-flat-button color="primary" (click)="deleteAllAccounts()">
+                Smazat všechny účty
+            </button>
+        </div>
+        <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
+    </div>
 </div>
 
 <app-new-financial-account-modal *ngIf="isNewFinancialAccountModalOpened" (close)="closeNewFinancialAccountModal()"></app-new-financial-account-modal>

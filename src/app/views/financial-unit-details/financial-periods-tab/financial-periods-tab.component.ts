@@ -1,11 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { Observable } from 'rxjs';
 import { IFinancialPeriod } from 'src/app/models/financial-period';
-import { ListItem, IListItem } from 'src/app/models/list-item';
 import { map } from 'rxjs/operators';
 import { FormatterService } from 'src/app/services/formatter.service';
-import { IIconItem } from 'src/app/models/icon-item';
+import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType, BasicTableActionItemsPosition } from 'src/app/models/basic-table-models';
 
 @Component({
   selector: 'app-financial-periods-tab',
@@ -22,24 +21,66 @@ export class FinancialPeriodsTabComponent {
 
   isNewFinancialPeriodModalOpened: boolean = false;
 
-  openNewFinancialPeriodModalIconItem: IIconItem = {
-    description: 'Nové účetní období',
-    iconName: 'add',
-    action: () => this.openNewFinancialPeriodModal()
-  };
-
-  listItems$: Observable<ListItem[]> = this.financialUnitDetailsService.financialPeriods$.pipe(
-    map((financialPeriods: IFinancialPeriod[]) => financialPeriods.map(financialPeriod => this.getListItemFromFinancialPeriod(financialPeriod)))
+  tableData$: Observable<BasicTable> = this.financialUnitDetailsService.financialPeriods$.pipe(
+    map((financialPeriods: IFinancialPeriod[]) => this.getTableDataFromInventoryPeriods(financialPeriods))
   );
 
-  private getListItemFromFinancialPeriod(financialPeriod: IFinancialPeriod): ListItem {
-    const data: IListItem = {
-      textItems: [
-        { label: 'Počateční datum', value: this.formatterService.getDayMonthYearString(financialPeriod.startDate), width: 8 },
-        { label: 'Konenčné datum', value: this.formatterService.getDayMonthYearString(financialPeriod.endDate), width: 8 }
+  private getTableDataFromInventoryPeriods(
+    periods: IFinancialPeriod[]
+  ): BasicTable {
+    const header: IBasicTableHeaderInputData = {
+      actionItemsPosition: BasicTableActionItemsPosition.Start,
+      actionItemsContainerWidth: 1,
+      otherCells: [
+        {
+          name: 'Začátek období',
+          width: 12,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Konec období',
+          width: 10,
+          align: BasicTableValueAlign.Left
+        }
       ]
     };
-    return new ListItem(data);
+    const rows: IBasicTableRowInputData[] = (periods || [])
+      .map(period => this.getTableRowDataFromInventoryPeriod(period));
+    const data: IBasicTableInputData = { header, rows };
+    return new BasicTable(data);
+  }
+
+  private getTableRowDataFromInventoryPeriod(
+    period: IFinancialPeriod
+  ): IBasicTableRowInputData {
+    const row: IBasicTableRowInputData = {
+      actionItems: [
+        {
+          iconName: 'delete',
+          description: 'Smazat',
+          action: () => this.deletePeriod(period)
+        }
+      ],
+      otherCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getDayMonthYearString(period.startDate)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getDayMonthYearString(period.endDate)
+        }
+      ]
+    }
+    return row;
+  }
+
+  deletePeriod(period: IFinancialPeriod): void {
+
+  }
+
+  deleteAllPeriods(): void {
+
   }
 
   openNewFinancialPeriodModal(): void {

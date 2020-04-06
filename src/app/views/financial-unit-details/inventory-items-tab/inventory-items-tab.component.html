@@ -5,8 +5,17 @@
             <input matInput [formControl]="filterTextFC">
         </mat-form-field>
     </div>
-    <app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"
-    [iconItem]="openNewInventoryItemModalIconItem"></app-basic-list>
+    <div class="card">
+        <div class="flex-container">
+            <button mat-flat-button color="primary" (click)="openNewInventoryItemModal()">
+                Nová položka
+            </button>
+            <button mat-flat-button color="primary" (click)="deleteAllItems()">
+                Smazat všechny položky
+            </button>
+        </div>
+        <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
+    </div>
 </div>
 
 <app-new-inventory-item-modal *ngIf="isNewInventoryItemModalOpened" (close)="closeNewInventoryItemModal()">

@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { IInventoryItemStock } from 'src/app/models/inventory-item-stock';
+import { IInventoryItemStock, InventoryItemStock } from 'src/app/models/inventory-item-stock';
 import { InventoryItemService } from 'src/app/services/inventory-item.service';
 import { FormatterService } from 'src/app/services/formatter.service';
 import { Form, FormControl } from '@angular/forms';
@@ -7,6 +7,7 @@ import { startWith, map, switchMap, tap, take } from 'rxjs/operators';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { Observable, combineLatest, of } from 'rxjs';
 import { ListItem, IListItem } from 'src/app/models/list-item';
+import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 
 @Component({
   selector: 'app-stocks-tab',
@@ -23,6 +24,7 @@ export class StocksTabComponent {
   ) { }
 
   isLoadingData: boolean = true;
+  stockDetailsModalData: InventoryItemStock = null;
 
   private financialUnitId$: Observable<string> = this.financialUnitDetailsService.financialUnitId$;
 
@@ -38,8 +40,8 @@ export class StocksTabComponent {
     })
   );
 
-  listItems$: Observable<ListItem[]> = this.inventoryItemsWithStock$.pipe(
-    map((item: IInventoryItemStock[]) => item.map(item => this.getListItemFromInventoryItemWithStock(item))),
+  tableData$: Observable<BasicTable> = this.inventoryItemsWithStock$.pipe(
+    map((items: IInventoryItemStock[]) => items ? this.getTableDataFromInventoryItemsStocks(items) : null),
     tap(() => (this.isLoadingData = false))
   );
 
@@ -51,15 +53,84 @@ export class StocksTabComponent {
     })
   }
 
-  private getListItemFromInventoryItemWithStock(item: IInventoryItemStock): ListItem {
-    const data: IListItem = {
-      textItems: [
-        { label: 'Název položky', value: item.inventoryItem.name, width: 16 },
-        { label: 'Skupina zásob', value: item.inventoryItem.inventoryGroup.name, width: 12 },
-        { label: 'Množství', value: this.formatterService.getRoundedNumberString(item.stock.totalStockQuantity), width: 12 },
-        { label: 'Hodnota', value: this.formatterService.getRoundedNumberString(item.stock.totalStockCost), width: 12 }
+  private getTableDataFromInventoryItemsStocks(
+    items: IInventoryItemStock[]
+  ): BasicTable {
+    const header: IBasicTableHeaderInputData = {
+      actionItemsPosition: BasicTableActionItemsPosition.Start,
+      actionItemsContainerWidth: 1,
+      stickyCells: [
+        {
+          name: 'ID transakce',
+          width: 8,
+          align: BasicTableValueAlign.Left
+        },
+      ],
+      otherCells: [
+        {
+          name: 'Množství',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
+          name: 'Hodnota na jednotku',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
+          name: 'Celková hodnota',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        }
       ]
     };
-    return new ListItem(data);
+    const rows: IBasicTableRowInputData[] = (items || [])
+      .map(item => this.getTableRowDataFromInventoryItemStock(item));
+    const data: IBasicTableInputData = { header, rows };
+    return new BasicTable(data);
+  }
+
+  private getTableRowDataFromInventoryItemStock(
+    item: IInventoryItemStock
+  ): IBasicTableRowInputData {
+    const costPerUnit: number = item.stock.totalStockQuantity ? item.stock.totalStockCost / item.stock.totalStockQuantity : 0;
+    const row: IBasicTableRowInputData = {
+      actionItems: [
+        {
+          iconName: 'description',
+          description: 'Detaily stavu',
+          action: () => this.openStockDetailsModal(item)
+        }
+      ],
+      stickyCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: item.inventoryItem.name
+        }
+      ],
+      otherCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(item.stock.totalStockQuantity)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(costPerUnit, 2)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(item.stock.totalStockCost, 2)
+        }
+      ]
+    }
+    return row;
+  }
+
+  openStockDetailsModal(itemStock: InventoryItemStock): void {
+    this.stockDetailsModalData = itemStock;
+  }
+
+  closeStockDetailsModal(): void {
+    this.stockDetailsModalData = null;
   }
 }

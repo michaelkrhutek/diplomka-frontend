@@ -9,6 +9,7 @@
 
 .side-navigation-panel {
     width: 14rem;
+    min-width: 14rem;
     padding: 1rem 0;
     background-color: var(--background-color);
     display: flex;
@@ -28,7 +29,7 @@
 }
 
 .side-navigation-item > mat-icon {
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
 }
 
 .side-navigation-item:hover {
@@ -44,13 +45,15 @@
     color: var(--primary-color);
 }
 
-.tab-container {
+.tab-content {
     flex: 1;
+    overflow-x: hidden;
 }
 
 @media only screen and (max-width: 800px) {
     .side-navigation-panel {
         width: 4rem;
+        min-width: 4rem;
     }
 
     .side-navigation-item > div {

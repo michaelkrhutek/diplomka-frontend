@@ -1,5 +1,17 @@
-<div class="navigation-bar">
-    <button mat-icon-button [routerLink]="['']">
-        <mat-icon>home</mat-icon>
-    </button>
+<div *ngIf="(user$ | async) as user" class="navigation-bar">
+    <div class="left-side">
+        <button mat-icon-button [routerLink]="['']">
+            <mat-icon>home</mat-icon>
+        </button>
+    </div>
+    <div class="right-side">
+        <div class="user-container" [matMenuTriggerFor]="userMenu">
+            <mat-icon color="primary">account_circle</mat-icon>
+            <span>{{ user.displayName }}</span>
+        </div>
+        <mat-menu #userMenu="matMenu">
+            <button mat-menu-item (click)="toogleThemeMode()">Změnit motiv</button>
+            <button mat-menu-item (click)="logout()">Odhlásit se</button>
+          </mat-menu>
+    </div>
 </div>

@@ -1,12 +1,16 @@
 <div class="tab-container">
     <div class="filters-container">
         <mat-form-field>
-            <input matInput [matDatepicker]="effectiveDate" placeholder="Stav k datu"
-                [formControl]="effectiveDateFC" readonly>
+            <input matInput [matDatepicker]="effectiveDate" placeholder="Stav k datu" [formControl]="effectiveDateFC"
+                readonly>
             <mat-datepicker-toggle matSuffix [for]="effectiveDate"></mat-datepicker-toggle>
             <mat-datepicker #effectiveDate></mat-datepicker>
         </mat-form-field>
     </div>
-    <app-basic-list [listItems]="listItems$ | async" [isLoadingData]="isLoadingData"></app-basic-list>
+    <div class="card">
+        <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
+    </div>
 </div>
 
+<app-stock-details-modal *ngIf="stockDetailsModalData as itemStock" [itemStock]="itemStock"
+    (close)="closeStockDetailsModal()"></app-stock-details-modal>

@@ -1,12 +1,12 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
-import { IIconItem } from 'src/app/models/icon-item';
 import { Observable, combineLatest } from 'rxjs';
-import { ListItem, IListItem } from 'src/app/models/list-item';
 import { map, startWith, tap } from 'rxjs/operators';
 import { InventoryItemsGroup, IInventoryItemsGroup } from 'src/app/models/inventory-items-group';
 import { StockService } from 'src/app/services/stock.service';
 import { FormControl } from '@angular/forms';
+import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
+import { StockDecrementType } from 'src/app/models/stock';
 
 @Component({
   selector: 'app-inventory-items-groups-tab',
@@ -24,36 +24,70 @@ export class InventoryItemsGroupsTabComponent {
   isLoadingData: boolean = true;
   isNewInventoryItemsGroupModalOpened: boolean = false;
 
-  openNewInventoryItemsGroupModalIconItem: IIconItem = {
-    description: 'New inventory items group',
-    iconName: 'add',
-    action: () => this.openNewInventoryItemsGroupModal()
-  };
-
   filterTextFC: FormControl = new FormControl(null);
   filterText$: Observable<string> = this.filterTextFC.valueChanges.pipe(
     startWith(this.filterTextFC.value),
     map((filterText: string) => filterText || '')
   );
 
-  listItems$: Observable<ListItem[]> = combineLatest(
+  tableData$: Observable<BasicTable> = combineLatest(
     this.financialUnitDetailsService.inventoryItemsGroups$,
     this.filterText$
   ).pipe(
     tap(() => (this.isLoadingData = true)),
     map(([groups, filterText]) => this.getFilteredInventoryGroups(groups, filterText)),
-    map((groups: InventoryItemsGroup[]) => groups.map(group => this.getListItemFromInventoryItemsGroup(group))),
+    map((groups: InventoryItemsGroup[]) => this.getTableDataFromInventoryGroups(groups)),
     tap(() => (this.isLoadingData = false)),
   );
 
-  private getListItemFromInventoryItemsGroup(group: InventoryItemsGroup): ListItem {
-    const data: IListItem = {
-      textItems: [
-        { label: 'Název skupiny', value: group.name, width: 16 },
-        { label: 'Metoda oceňování', value: this.stockService.getStockDecrementTypeDescription(group.defaultStockDecrementType), width: 16 },
+  private getTableDataFromInventoryGroups(
+    groups: IInventoryItemsGroup[]
+  ): BasicTable {
+    const header: IBasicTableHeaderInputData = {
+      actionItemsPosition: BasicTableActionItemsPosition.Start,
+      actionItemsContainerWidth: 1,
+      otherCells: [
+        {
+          name: 'Název skupiny',
+          width: 12,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Oceňovací metoda',
+          width: 10,
+          align: BasicTableValueAlign.Left
+        }
       ]
     };
-    return new ListItem(data);
+    const rows: IBasicTableRowInputData[] = (groups || [])
+      .map(t => this.getTableRowDataFromInventoryGroup(t));
+    const data: IBasicTableInputData = { header, rows };
+    return new BasicTable(data);
+  }
+
+  private getTableRowDataFromInventoryGroup(
+    group: IInventoryItemsGroup
+  ): IBasicTableRowInputData {
+    const row: IBasicTableRowInputData = {
+      actionItems: [
+        {
+          iconName: 'delete',
+          description: 'Smazat',
+          action: () => this.deleteGroup()
+        }
+      ],
+      otherCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: group.name
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.stockService.getStockDecrementTypeDescription(group.defaultStockDecrementType as StockDecrementType)
+        }
+      ]
+    }
+    return row;
   }
 
   openNewInventoryItemsGroupModal(): void {
@@ -63,6 +97,11 @@ export class InventoryItemsGroupsTabComponent {
   closeNewInventoryItemsGroupModal(): void {
     this.isNewInventoryItemsGroupModalOpened = false;
   }
+
+  private deleteGroup(): void {
+    // TODO
+  }
+
 
   private getFilteredInventoryGroups(
     inventoryGroups: IInventoryItemsGroup[],

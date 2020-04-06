@@ -3,8 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
 import { Observable, of } from 'rxjs';
 import { IInventoryItemPopulated } from '../models/inventory-item';
-import { catchError } from 'rxjs/operators';
-import { IInventoryItemStock } from '../models/inventory-item-stock';
+import { catchError, map } from 'rxjs/operators';
+import { IInventoryItemStock, InventoryItemStock } from '../models/inventory-item-stock';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +27,7 @@ export class InventoryItemService {
     );
   }
 
-  getInventoryItemsWithStock$(financialUnitId: string, effectiveDate: Date): Observable<IInventoryItemStock[]> {
+  getInventoryItemsWithStock$(financialUnitId: string, effectiveDate: Date): Observable<InventoryItemStock[]> {
     const params: HttpParams = new HttpParams()
       .append('financialUnitId', financialUnitId)
       .append('effectiveDate', effectiveDate.toDateString());
@@ -35,7 +35,8 @@ export class InventoryItemService {
       catchError((err) => {
         this.popUpsService.handleApiError(err);
         return of([]);
-      })
+      }),
+      map((itemsStocks: IInventoryItemStock[]) => itemsStocks.map((itemStock) => new InventoryItemStock(itemStock)))
     );
   }
 }

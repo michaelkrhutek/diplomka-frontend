@@ -9,6 +9,7 @@ import { ListItem, IListItem } from 'src/app/models/list-item';
 import { FormGroup, FormControl } from '@angular/forms';
 import { IFinancialTransactionsFilteringCriteria } from 'src/app/models/financial-transactions-filtering-criteria';
 import { IFinancialAccount } from 'src/app/models/financial-account';
+import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 
 @Component({
   selector: 'app-financial-transactions-tab',
@@ -50,8 +51,8 @@ export class FinancialTransactionsTabComponent {
     }),
   );
 
-  listItems$: Observable<ListItem[]> = this.financialTransactions$.pipe(
-    map((transactions: FinancialTransactionPopulated[]) => transactions.map(transaction => this.getListItemFromFinancialTransaction(transaction))),
+  tableData$: Observable<BasicTable> = this.financialTransactions$.pipe(
+    map((transactions: FinancialTransactionPopulated[]) => this.getTableDataFromFinancialTransactions(transactions)),
     tap(() => (this.isLoadingData = false))
   );
 
@@ -66,19 +67,103 @@ export class FinancialTransactionsTabComponent {
     })
   }
 
-  private getListItemFromFinancialTransaction(transaction: FinancialTransactionPopulated): ListItem {
-    const data: IListItem = {
-      textItems: [
-        { label: 'ID zápisu', value: transaction._id, width: 14 },
-        { label: 'ID transakce', value: transaction.inventoryTransaction, width: 14 },
-        { label: 'Datum', value: this.formatterService.getDayMonthYearString(transaction.effectiveDate), width: 8 },
-        { label: 'Debitní účet', value: transaction.debitAccount.code, width: 6 },
-        { label: 'Název debitního účtu', value: transaction.debitAccount.name, width: 10 },
-        { label: 'Kreditní účet', value: transaction.creditAccount.code, width: 6 },
-        { label: 'Název kreditního účtu', value: transaction.creditAccount.name, width: 10 },
-        { label: 'Částka', value: this.formatterService.getRoundedNumberString(transaction.amount, 2), width: 8 }
+  private getTableDataFromFinancialTransactions(
+    transactions: FinancialTransactionPopulated[]
+  ): BasicTable {
+    const header: IBasicTableHeaderInputData = {
+      stickyCells: [
+
+        {
+          name: 'ID zápisu',
+          width: 6,
+          align: BasicTableValueAlign.Left
+        }
+      ],
+      otherCells: [
+        {
+          name: 'ID transakce',
+          width: 6,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Datum transakce',
+          width: 8,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Kód debetního účtu',
+          width: 6,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Název debetního účtu',
+          width: 10,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Kód debetního účtu',
+          width: 6,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Název debetního účtu',
+          width: 10,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Částka',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        }
       ]
     };
-    return new ListItem(data);
+    const rows: IBasicTableRowInputData[] = (transactions || [])
+      .map(t => this.getTableRowDataFromFinancialTransaction(t));
+    const data: IBasicTableInputData = { header, rows };
+    return new BasicTable(data);
+  }
+
+  private getTableRowDataFromFinancialTransaction(
+    transaction: FinancialTransactionPopulated
+  ): IBasicTableRowInputData {
+    const row: IBasicTableRowInputData = {
+      stickyCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: transaction._id
+        }
+      ],
+      otherCells: [
+        {
+          type: BasicTableRowCellType.Display,
+          data: transaction.inventoryTransaction
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getDayMonthYearString(transaction.effectiveDate)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: transaction.debitAccount.code
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data:transaction.debitAccount.name
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: transaction.creditAccount.code
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: transaction.creditAccount.name
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(transaction.amount, 2)
+        }
+      ]
+    }
+    return row;
   }
 }

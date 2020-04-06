@@ -1,4 +1,16 @@
-<app-basic-list [listItems]="listItems$ | async" [iconItem]="openNewFinancialPeriodModalIconItem"></app-basic-list>
+<div class="tab-container">
+    <div class="card">
+        <div class="flex-container">
+            <button mat-flat-button color="primary" (click)="openNewInventoryItemModal()">
+                Nové období
+            </button>
+            <button mat-flat-button color="primary" (click)="deleteAllItems()">
+                Smazat všechna období
+            </button>
+        </div>
+        <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
+    </div>
+</div>
 
 <app-new-financial-period-modal *ngIf="isNewFinancialPeriodModalOpened" (close)="closeNewFinancialPeriodModal()">
 </app-new-financial-period-modal>

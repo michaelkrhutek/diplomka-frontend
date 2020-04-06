@@ -4,6 +4,7 @@ import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTab
 import { IStockBatch, IStock } from 'src/app/models/stock';
 import { FormatterService } from 'src/app/services/formatter.service';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
+import { StockService } from 'src/app/services/stock.service';
 
 @Component({
   selector: 'app-inventory-transaction-details-modal',
@@ -15,6 +16,7 @@ export class InventoryTransactionDetailsModalComponent implements OnInit {
 
   constructor(
     private inventoryTransactionService: InventoryTransactionService,
+    private stockService: StockService,
     private formatterService: FormatterService
   ) { }
 
@@ -26,94 +28,14 @@ export class InventoryTransactionDetailsModalComponent implements OnInit {
   stockAfterTransactionTableData: BasicTable = null;
 
   ngOnInit() {
-    this.stockBeforeTransactionTableData = this.getTableDataFromStock(this.transaction.stockBeforeTransaction);
+    this.stockBeforeTransactionTableData = this.stockService.getTableDataFromStock(this.transaction.stockBeforeTransaction);
     this.transactionTableData = this.getTableDataFromTransaction(this.transaction);
-    this.stockAfterTransactionTableData = this.getTableDataFromStock(this.transaction.stockAfterTransaction);
+    this.stockAfterTransactionTableData = this.stockService.getTableDataFromStock(this.transaction.stockAfterTransaction);
     console.log(this.stockBeforeTransactionTableData);
   }
 
   closeModal(): void {
     this.close.emit();
-  }
-
-  private getTableDataFromStock(
-    stock: IStock
-  ): BasicTable {
-    const header: IBasicTableHeaderInputData = {
-      otherCells: [
-        {
-          name: 'Datum dávky',
-          width: 8,
-          align: BasicTableValueAlign.Left
-        },
-        {
-          name: 'Množství dávky',
-          width: 6,
-          align: BasicTableValueAlign.Right
-        },
-        {
-          name: 'Hodnota dávky na jednotku',
-          width: 6,
-          align: BasicTableValueAlign.Right
-        },
-        {
-          name: 'Celková hodnota dávky',
-          width: 6,
-          align: BasicTableValueAlign.Right
-        },
-      ]
-    };
-    const rows: IBasicTableRowInputData[] = (stock.batches || [])
-      .map(batch => this.getTableRowDataFromStockBatch(batch));
-    const costPerUnit: number = stock.totalStockQuantity ? stock.totalStockCost / stock.totalStockQuantity : 0;
-    const totalRow: IBasicTableRowInputData = {
-      otherCells: [
-        {
-          type: BasicTableRowCellType.Display,
-          data: 'Celkem'
-        },
-        {
-          type: BasicTableRowCellType.Display,
-          data: this.formatterService.getRoundedNumberString(stock.totalStockQuantity)
-        },
-        {
-          type: BasicTableRowCellType.Display,
-          data: this.formatterService.getRoundedNumberString(costPerUnit, 2)
-        },
-        {
-          type: BasicTableRowCellType.Display,
-          data: this.formatterService.getRoundedNumberString(stock.totalStockCost, 2)
-        }
-      ]
-    };
-    const data: IBasicTableInputData = { header, rows: [...rows, totalRow] };
-    return new BasicTable(data);
-  }
-
-  private getTableRowDataFromStockBatch(
-    stockBatch: IStockBatch
-  ): IBasicTableRowInputData {
-    const row: IBasicTableRowInputData = {
-      otherCells: [
-        {
-          type: BasicTableRowCellType.Display,
-          data: this.formatterService.getDayMonthYearString(stockBatch.added)
-        },
-        {
-          type: BasicTableRowCellType.Display,
-          data: this.formatterService.getRoundedNumberString(stockBatch.quantity)
-        },
-        {
-          type: BasicTableRowCellType.Display,
-          data: this.formatterService.getRoundedNumberString(stockBatch.costPerUnit, 2)
-        },
-        {
-          type: BasicTableRowCellType.Display,
-          data: this.formatterService.getRoundedNumberString(stockBatch.quantity * stockBatch.costPerUnit, 2)
-        }
-      ]
-    }
-    return row;
   }
 
   private getTableDataFromTransaction(

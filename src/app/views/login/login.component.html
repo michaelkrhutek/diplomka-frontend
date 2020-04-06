@@ -1,11 +1,14 @@
 <div class="form-container" [formGroup]="credentialsFG">
-    <mat-form-field class="example-full-width">
-      <mat-label>Username</mat-label>
-      <input matInput type="text" name="username" formControlName="username">
-    </mat-form-field>
-    <mat-form-field class="example-full-width">
-        <mat-label>Password</mat-label>
-        <input matInput type="password" name="password" formControlName="password">
-      </mat-form-field>
-      <button mat-button color="primary" (click)="login()">Prihlasit</button>
+  <mat-form-field class="example-full-width">
+    <mat-label>Přihlašovací jméno</mat-label>
+    <input matInput type="text" name="username" formControlName="username">
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <mat-label>Heslo</mat-label>
+    <input matInput type="password" name="password" formControlName="password">
+  </mat-form-field>
+  <div class="link" [routerLink]="['/sign-up']">
+    Vytvořit účet
+  </div>
+  <button mat-raised-button color="primary" (click)="login()">Přihlásit</button>
 </div>

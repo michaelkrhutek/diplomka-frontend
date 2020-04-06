@@ -26,7 +26,7 @@ export class FinancialUnitDetailsComponent implements OnInit {
     {
       iconName: 'all_inbox',
       tab: Tab.FinancialAccounts,
-      description: 'Finanční účtu'
+      description: 'Finanční účty'
     },
     {
       iconName: 'shopping_cart',
@@ -42,6 +42,11 @@ export class FinancialUnitDetailsComponent implements OnInit {
       iconName: 'store',
       tab: Tab.Stocks,
       description: 'Stav zásob'
+    },
+    {
+      iconName: 'file_copy',
+      tab: Tab.TransactionTemplates,
+      description: 'Šablony transakcí'
     },
     {
       iconName: 'local_shipping',
@@ -86,6 +91,7 @@ enum Tab {
   InventoryGroups = 'inventory-groups',
   InventoryItems = 'inventory-items',
   Stocks = 'stocks',
+  TransactionTemplates = 'transaction-templates',
   InventoryTransactions = 'inventory-transactions',
   FinancialTransactions = 'financial-transactions',
   TrialBalance = 'trial-balance'
