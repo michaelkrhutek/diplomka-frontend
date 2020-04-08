@@ -24,34 +24,35 @@ export class FinancialAccountService {
         this.popUpsService.handleApiError(err);
         return of([]);
       }),
-      map((accounts: IFinancialAccount[]) => accounts.map(account => new FinancialAccount(account)))
+      map((accounts: IFinancialAccount[]) => accounts.map(account => new FinancialAccount(account))),
+      map((accounts: FinancialAccount[]) => accounts.sort((a, b) => a.code > b.code ? 1 : -1)),
     );
   }
 
-  getAllFinancialAccountTypes(): FinancialAccountType[] {
-    return [
-      FinancialAccountType.Assets,
-      FinancialAccountType.Liabilities,
-      FinancialAccountType.Equity,
-      FinancialAccountType.Revenues,
-      FinancialAccountType.Expenses
-    ];
-  }
+  // getAllFinancialAccountTypes(): FinancialAccountType[] {
+  //   return [
+  //     FinancialAccountType.Assets,
+  //     FinancialAccountType.Liabilities,
+  //     FinancialAccountType.Equity,
+  //     FinancialAccountType.Revenues,
+  //     FinancialAccountType.Expenses
+  //   ];
+  // }
 
-  getFinancialAccountTypeName(type: FinancialAccountType): string {
-    switch (type) {
-      case FinancialAccountType.Assets:
-        return 'Assets';
-      case FinancialAccountType.Equity:
-        return 'Equity';
-      case FinancialAccountType.Liabilities:
-        return 'Liabilities';
-      case FinancialAccountType.Revenues:
-        return 'Revenues';
-      case FinancialAccountType.Expenses:
-        return 'Expenses';
-      default:
-        return 'N/A';
-    }
-  }
+  // getFinancialAccountTypeName(type: FinancialAccountType): string {
+  //   switch (type) {
+  //     case FinancialAccountType.Assets:
+  //       return 'Assets';
+  //     case FinancialAccountType.Equity:
+  //       return 'Equity';
+  //     case FinancialAccountType.Liabilities:
+  //       return 'Liabilities';
+  //     case FinancialAccountType.Revenues:
+  //       return 'Revenues';
+  //     case FinancialAccountType.Expenses:
+  //       return 'Expenses';
+  //     default:
+  //       return 'N/A';
+  //   }
+  // }
 }

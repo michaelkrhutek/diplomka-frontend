@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
-import { catchError, filter, finalize } from 'rxjs/operators';
+import { catchError, filter, finalize, map } from 'rxjs/operators';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
 import { SnackbarType } from '../models/snackbar-data';
@@ -23,13 +23,13 @@ export class FinancialUnitService {
     return this.http.get<IFinancialUnit[]>(`${this.baseUrl}api/financial-unit/get-all-financial-units`, { withCredentials: true }).pipe(
       catchError(() => {
         return of([]);
-      })
+      }),
+      map((units: IFinancialUnit[]) => units.sort((a, b) => a.name.localeCompare(b.name)))
     );
   }
 
   getFinancialUnit$(id: string): Observable<IFinancialUnit> {
     const params: HttpParams = new HttpParams().append('id', id);
-    const headers: HttpHeaders = new HttpHeaders()
     return this.http.get<IFinancialUnit[]>(`${this.baseUrl}api/financial-unit/get-financial-unit`, { params }).pipe(
       catchError(() => {
         return of(null);

@@ -62,6 +62,11 @@ export class FinancialUnitDetailsComponent implements OnInit {
       iconName: 'account_balance',
       tab: Tab.TrialBalance,
       description: 'Obratová předvaha'
+    },
+    {
+      iconName: 'people',
+      tab: Tab.Users,
+      description: 'Uživatelé'
     }
   ];
 
@@ -94,5 +99,6 @@ enum Tab {
   TransactionTemplates = 'transaction-templates',
   InventoryTransactions = 'inventory-transactions',
   FinancialTransactions = 'financial-transactions',
-  TrialBalance = 'trial-balance'
+  TrialBalance = 'trial-balance',
+  Users = 'users'
 }

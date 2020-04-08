@@ -1,0 +1,23 @@
+<div class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            Přidat uživatele
+        </div>
+        <div class="modal-content">
+            <mat-form-field>
+                <mat-label>Hledat uživatele</mat-label>
+                <input type="text" matInput [formControl]="userFC" [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUserFn">
+                    <mat-option *ngFor="let user of users$ | async" [value]="user">
+                        {{ user.displayName }}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="modal-actions">
+            <button mat-button color="primary" (click)="closeModal()">Zavřít</button>
+            <button mat-flat-button color="primary" (click)="addUser()"
+                [disabled]="isAddButtonDisabled$ | async">Přidat</button>
+        </div>
+    </div>
+</div>

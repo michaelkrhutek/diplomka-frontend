@@ -23,7 +23,9 @@ export class InventoryItemService {
       catchError((err) => {
         this.popUpsService.handleApiError(err);
         return of([]);
-      })
+      }),
+      map((items: IInventoryItemPopulated[]) => items.sort((a, b) => a.name.localeCompare(b.name)))
+
     );
   }
 
@@ -36,7 +38,8 @@ export class InventoryItemService {
         this.popUpsService.handleApiError(err);
         return of([]);
       }),
-      map((itemsStocks: IInventoryItemStock[]) => itemsStocks.map((itemStock) => new InventoryItemStock(itemStock)))
+      map((itemsStocks: IInventoryItemStock[]) => itemsStocks.map((itemStock) => new InventoryItemStock(itemStock))),
+      map((itemsStocks: IInventoryItemStock[]) => itemsStocks.sort((a, b) => a.inventoryItem.name.localeCompare(b.inventoryItem.name)))
     );
   }
 }

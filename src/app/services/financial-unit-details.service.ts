@@ -114,7 +114,7 @@ export class FinancialUnitDetailsService {
 
   deleteAllFinancialAccounts(): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji účty' });
-    const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
+    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
     this.http.delete<any>(`${this.baseUrl}api/financial-account/delete-all-financial-accounts`, { params }).pipe(
       map(() => 'OK'),
       catchError((err: HttpErrorResponse) => {
@@ -255,7 +255,7 @@ export class FinancialUnitDetailsService {
 
   deleteInventoryItemsGroup(id: string): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji skupinu' });
-    const params: HttpParams = new HttpParams().append('id', id);
+    const params: HttpParams = new HttpParams().append('financialUnitId', id);
     this.http.delete<any>(`${this.baseUrl}api/inventory-group/delete-inventory-group`, { params }).pipe(
       map(() => 'OK'),
       catchError((err: HttpErrorResponse) => {
@@ -272,7 +272,7 @@ export class FinancialUnitDetailsService {
 
   deleteAllInventoryItemsGroups(): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji skupinu' });
-    const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
+    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
     this.http.delete<any>(`${this.baseUrl}api/inventory-group/delete-all-inventory-groups`, { params }).pipe(
       map(() => 'OK'),
       catchError((err: HttpErrorResponse) => {
@@ -341,7 +341,7 @@ export class FinancialUnitDetailsService {
 
   deleteAllInventoryItems(): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji položky' });
-    const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
+    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
     this.http.delete<any>(`${this.baseUrl}api/inventory-item/delete-all-inventory-items`, { params }).pipe(
       map(() => 'OK'),
       catchError((err: HttpErrorResponse) => {
@@ -406,7 +406,7 @@ export class FinancialUnitDetailsService {
 
   deleteAllTransactionTemplates(): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji šablony' });
-    const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
+    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
     this.http.delete<any>(`${this.baseUrl}api/inventory-transaction-template/delete-all-inventory-transaction-templates`, { params }).pipe(
       map(() => 'OK'),
       catchError((err: HttpErrorResponse) => {
@@ -481,7 +481,7 @@ export class FinancialUnitDetailsService {
 
   deleteAllTransactions(): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji transakce' });
-    const params: HttpParams = new HttpParams().append('id', this.getFinancialUnitId());
+    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
     this.http.delete<any>(`${this.baseUrl}api/financial-unit/delete-all-transactions`, { params }).pipe(
       map(() => 'OK'),
       catchError((err: HttpErrorResponse) => {
@@ -493,6 +493,36 @@ export class FinancialUnitDetailsService {
     ).subscribe(() => {
       this.reloadTransactionsSource.next();
       this.popUpsService.showSnackbar({ message: 'Transakce byla odstraněna', type: SnackbarType.Success });
+    });
+  }
+
+  /*
+  User
+  */
+
+  private reloadUsersSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
+  reloadUsers$: Observable<void> = this.reloadUsersSource.asObservable();
+
+  addUser(userId: string): void {
+    const financialUnitId: string = this.getFinancialUnitId();
+    if (!financialUnitId) {
+      return null;
+    }
+    this.popUpsService.openLoadingModal({ message: 'Přidávám uživatele' });
+    const params: HttpParams = new HttpParams()
+      .append('userId', userId)
+      .append('financialUnitId', financialUnitId)
+    this.http.post<any>(`${this.baseUrl}api/financial-unit/add-user`, null, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res),
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.popUpsService.showSnackbar({ message: 'Uživatel byl přidán', type: SnackbarType.Success });
+      this.reloadUsersSource.next();
     });
   }
 }

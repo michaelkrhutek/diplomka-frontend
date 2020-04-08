@@ -23,7 +23,8 @@ export class InventoryItemsGroupService {
         this.popUpsService.handleApiError(err);
         return of([]);
       }),
-      map((groups: IInventoryItemsGroup[]) => groups.map(group => new InventoryItemsGroup(group)))
-    );
+      map((groups: IInventoryItemsGroup[]) => groups.map(group => new InventoryItemsGroup(group)),
+      map((groups: IInventoryItemsGroup[]) => groups.sort((a, b) => a.name.localeCompare(b.name)))
+    ));
   }
 }

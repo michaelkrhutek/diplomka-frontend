@@ -1,25 +1,25 @@
 <div class="modal-container">
     <div class="modal">
         <div class="modal-header">
-            New financial period
+            Nové účetní období
         </div>
         <div class="modal-content">
             <mat-form-field>
-                <input matInput [matDatepicker]="startDate" placeholder="Start date"
+                <input matInput [matDatepicker]="startDate" placeholder="Začátek období"
                     [formControl]="startDateFC" [max]="maximalStartDate$ | async" readonly>
                     <mat-datepicker-toggle *ngIf="canBeStartDateSelected" matSuffix [for]="startDate"></mat-datepicker-toggle>
                     <mat-datepicker #startDate></mat-datepicker>
             </mat-form-field>
             <mat-form-field>
-                <input matInput [matDatepicker]="endDate" placeholder="End date"
+                <input matInput [matDatepicker]="endDate" placeholder="Konec období"
                     [formControl]="endDateFC" [min]="minimalEndDate$ | async" readonly>
                 <mat-datepicker-toggle matSuffix [for]="endDate"></mat-datepicker-toggle>
                 <mat-datepicker #endDate></mat-datepicker>
             </mat-form-field>
         </div>
         <div class="modal-actions">
-            <button mat-button color="primary" (click)="closeModal()">Close</button>
-            <button mat-flat-button color="primary" (click)="createFinancialPeriod()" [disabled]="isCreateButtonDisabled$ | async">Create</button>
+            <button mat-button color="primary" (click)="closeModal()">Zavřít</button>
+            <button mat-flat-button color="primary" (click)="createFinancialPeriod()" [disabled]="isCreateButtonDisabled$ | async">Vytvořit</button>
         </div>
     </div>   
 </div>

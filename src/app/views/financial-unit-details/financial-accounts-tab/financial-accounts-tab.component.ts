@@ -1,10 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
-import { IIconItem } from 'src/app/models/icon-item';
 import { Observable, combineLatest } from 'rxjs';
-import { ListItem, IListItem } from 'src/app/models/list-item';
 import { map, startWith, tap } from 'rxjs/operators';
-import { FinancialAccountService } from 'src/app/services/financial-account.service';
 import { FinancialAccount, IFinancialAccount } from 'src/app/models/financial-account';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
@@ -21,7 +18,6 @@ export class FinancialAccountsTabComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
-    private financialAccountService: FinancialAccountService,
     private popUpsService: PopUpsService
   ) { }
 

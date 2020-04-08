@@ -25,7 +25,7 @@ export class InventoryTransactionTemplateService {
         this.popUpsService.handleApiError(err);
         return of([]);
       }),
-      map((templates: IInventoryTransactionTemplatePopulated[]) => templates.sort((a, b) => a.inventoryGroup.name > b.inventoryGroup.name ? 1 : -1))
+      map((templates: IInventoryTransactionTemplatePopulated[]) => templates.sort((a, b) => a.inventoryGroup.name.localeCompare(b.inventoryGroup.name)))
     );
   }
 

@@ -32,7 +32,6 @@ export class FinancialUnitsComponent {
 
   financialUnits$: Observable<IFinancialUnit[]> = this.financialUnitService.reloadFinancialUnits$.pipe(
     tap(() => (this.isLoadingData = true)),
-    tap(v => console.log(v)),
     switchMap(() => this.financialUnitService.getFinancialUnits$())
   );
 

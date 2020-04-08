@@ -15,7 +15,11 @@ import {
   MatTabsModule,
   MatDatepickerModule,
   MatNativeDateModule,
-  MatMenuModule
+  MatMenuModule,
+  MatAutocompleteModule,
+  MAT_DATE_FORMATS,
+  DateAdapter,
+  NativeDateModule
 } from "@angular/material";
 import { AppComponent } from './app.component';
 import { HomeComponent } from './views/home/home.component';
@@ -64,6 +68,9 @@ import { ClickableTileComponent } from './components/clickable-tile/clickable-ti
 import { HeadingComponent } from './components/heading/heading.component';
 import { InventoryTransactionTemplateComponent } from './views/financial-unit-details/inventory-transaction-template/inventory-transaction-template.component';
 import { NewInventoryTransactionTemplateModalComponent } from './views/financial-unit-details/inventory-transaction-template/new-inventory-transaction-template-modal/new-inventory-transaction-template-modal.component';
+import { UsersTabComponent } from './views/financial-unit-details/users-tab/users-tab.component';
+import { AddUserModalComponent } from './views/financial-unit-details/users-tab/add-user-modal/add-user-modal.component';
+import { AppDateAdapter } from './services/date-adapter.service';
 
 export const getBaseUrl = () => {
   if (environment.production) {
@@ -113,7 +120,9 @@ export const getBaseUrl = () => {
     ClickableTileComponent,
     HeadingComponent,
     InventoryTransactionTemplateComponent,
-    NewInventoryTransactionTemplateModalComponent
+    NewInventoryTransactionTemplateModalComponent,
+    UsersTabComponent,
+    AddUserModalComponent
   ],
   imports: [
     BrowserModule,
@@ -136,7 +145,8 @@ export const getBaseUrl = () => {
     MatDatepickerModule,
     MatNativeDateModule,
     BrowserAnimationsModule,
-    MatMenuModule
+    MatMenuModule,
+    MatAutocompleteModule
   ],
   providers: [
     {

@@ -26,6 +26,7 @@ export class TrialBalance {
         Object.keys(trialBalance).forEach((key) => (this[key] = trialBalance[key]));
         this.startDate = new Date(trialBalance.startDate);
         this.endDate = new Date(trialBalance.endDate);
+        this.accounts = trialBalance.accounts.sort((a, b) => a.account.code > b.account.code ? 1 : -1);
     }
 
     financialUnitId: string;

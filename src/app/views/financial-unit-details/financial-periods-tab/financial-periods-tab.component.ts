@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { Observable } from 'rxjs';
 import { IFinancialPeriod } from 'src/app/models/financial-period';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { FormatterService } from 'src/app/services/formatter.service';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType, BasicTableActionItemsPosition } from 'src/app/models/basic-table-models';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
@@ -23,9 +23,11 @@ export class FinancialPeriodsTabComponent {
   ) { }
 
   isNewFinancialPeriodModalOpened: boolean = false;
+  isLoadingData: boolean = true;
 
   tableData$: Observable<BasicTable> = this.financialUnitDetailsService.financialPeriods$.pipe(
-    map((financialPeriods: IFinancialPeriod[]) => this.getTableDataFromInventoryPeriods(financialPeriods))
+    map((financialPeriods: IFinancialPeriod[]) => this.getTableDataFromInventoryPeriods(financialPeriods)),
+    tap(() => (this.isLoadingData = false))
   );
 
   private getTableDataFromInventoryPeriods(
