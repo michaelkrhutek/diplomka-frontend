@@ -10,6 +10,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { IFinancialTransactionsFilteringCriteria } from 'src/app/models/financial-transactions-filtering-criteria';
 import { IFinancialAccount } from 'src/app/models/financial-account';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
+import { PaginatedTable } from 'src/app/models/paginated-table-models';
 
 @Component({
   selector: 'app-financial-transactions-tab',
@@ -40,20 +41,33 @@ export class FinancialTransactionsTabComponent {
     debounceTime(100)
   );
 
-  financialTransactions$: Observable<FinancialTransactionPopulated[]> = combineLatest(
-    this.financialUnitDetailsService.financialUnitId$,
-    this.filteringCriteria$,
-    this.financialUnitDetailsService.reloadTransactions$
-  ).pipe(
-    tap(() => (this.isLoadingData = true)),
-    switchMap(([financialUnitId, filteringCriteria]) => {
-      return this.financialTransactionService.getFiltredFinancialTransactions$(financialUnitId, filteringCriteria);
-    }),
-  );
+  // financialTransactions$: Observable<FinancialTransactionPopulated[]> = combineLatest(
+  //   this.financialUnitDetailsService.financialUnitId$,
+  //   this.filteringCriteria$,
+  //   this.financialUnitDetailsService.reloadTransactions$
+  // ).pipe(
+  //   tap(() => (this.isLoadingData = true)),
+  //   switchMap(([financialUnitId, filteringCriteria]) => {
+  //     return this.financialTransactionService.getFiltredFinancialTransactions$(financialUnitId, filteringCriteria);
+  //   }),
+  // );
 
-  tableData$: Observable<BasicTable> = this.financialTransactions$.pipe(
-    map((transactions: FinancialTransactionPopulated[]) => this.getTableDataFromFinancialTransactions(transactions)),
-    tap(() => (this.isLoadingData = false))
+  // tableData$: Observable<BasicTable> = this.financialTransactions$.pipe(
+  //   map((transactions: FinancialTransactionPopulated[]) => this.getTableDataFromFinancialTransactions(transactions)),
+  //   tap(() => (this.isLoadingData = false))
+  // );
+
+  paginatedTable = new PaginatedTable<FinancialTransactionPopulated, IFinancialTransactionsFilteringCriteria>(
+    this.filteringCriteria$,
+    (fc, pi, ps) => {
+      const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
+      return this.financialTransactionService.getFiltredPaginatedFinancialTransactions$(financialUnitId, fc, pi, ps)
+    },
+    (rs) => this.getTableDataFromFinancialTransactions(rs),
+    (fc) => {
+      const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
+      return this.financialTransactionService.getFiltredFinancialTransactionsCount$(financialUnitId, fc)
+    },    
   );
 
   ngOnInit(): void {

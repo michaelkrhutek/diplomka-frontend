@@ -65,7 +65,7 @@ export class InventoryTransactionService {
       .append('dateFrom', filteringCriteria.dateFrom ? filteringCriteria.dateFrom.toDateString() : '')
       .append('dateTo', filteringCriteria.dateTo ? filteringCriteria.dateTo.toDateString() : '');
     return this.http.get<number>(
-      `${this.baseUrl}api/inventory-transaction/get-filtred-inventory-transactions-total-count`,
+      `${this.baseUrl}api/inventory-transaction/get-filtred-inventory-transactions-count`,
       { params }
     ).pipe(
       catchError((err) => {
@@ -87,8 +87,8 @@ export class InventoryTransactionService {
       .append('transactionType', filteringCriteria.transactionType || '')
       .append('dateFrom', filteringCriteria.dateFrom ? filteringCriteria.dateFrom.toDateString() : '')
       .append('dateTo', filteringCriteria.dateTo ? filteringCriteria.dateTo.toDateString() : '')
-      .append('pageIndex', pageSize.toString())
-      .append('pageSize', pageIndex.toString());
+      .append('pageIndex', pageIndex.toString())
+      .append('pageSize', pageSize.toString());
     return this.http.get<IInventoryTransactionPopulated<any>[]>(
       `${this.baseUrl}api/inventory-transaction/get-filtred-paginated-inventory-transactions`,
       { params }

@@ -9,6 +9,9 @@ import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
+import { PaginatedTable } from 'src/app/models/paginated-table-models';
+import { IInventoryTransactionPopulated } from 'src/app/models/inventory-transaction';
+import { IInventoryTransactionFilteringCriteria } from 'src/app/models/inventory-transaction-filtering-criteria';
 
 @Component({
   selector: 'app-inventory-transaction-template',

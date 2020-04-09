@@ -39,7 +39,8 @@
                 Smazat všechny transakce
             </button>
         </div>
-        <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
+        <app-paginated-table [data]="paginatedTable"></app-paginated-table>
+        <!-- <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table> -->
     </div>
 </div>
 

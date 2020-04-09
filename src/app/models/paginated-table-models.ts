@@ -5,6 +5,15 @@ import { BasicTable } from './basic-table-models';
 
 export class PaginatedTable<DataType, FilteringCriteria> {
 
+    constructor(
+        filteringCriteria$: Observable<FilteringCriteria>,
+        getRecords$: (fc: FilteringCriteria, pageIndex: number, pageSize: number) => Observable<DataType[]>,
+        tableDataMapper: (records: DataType[]) => BasicTable,
+        getTotalItemsCount$: (fc: FilteringCriteria, pageIndex: number, pageSize: number) => Observable<number>
+    ) {
+        this.assignAllObservables(filteringCriteria$, getRecords$, tableDataMapper, getTotalItemsCount$);
+    }
+
     // Page sizes
     pageSizes: number[] = [5, 10, 20];
 
@@ -33,15 +42,6 @@ export class PaginatedTable<DataType, FilteringCriteria> {
 
     lastFilteringCriteria: FilteringCriteria = null;
     lastPageSize: number = null;
-
-    constructor(
-        filteringCriteria$: Observable<FilteringCriteria>,
-        getRecords$: (fc: FilteringCriteria, pageIndex: number, pageSize: number) => Observable<DataType[]>,
-        tableDataMapper: (records: DataType[]) => BasicTable,
-        getTotalItemsCount$: (fc: FilteringCriteria, pageIndex: number, pageSize: number) => Observable<number>
-    ) {
-        this.assignAllObservables(filteringCriteria$, getRecords$, tableDataMapper, getTotalItemsCount$);
-    }
 
     // Get allCriteria$ observable method
     private getAllCriteria$(

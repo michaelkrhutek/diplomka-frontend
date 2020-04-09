@@ -45,4 +45,43 @@ export class FinancialTransactionService {
       })
     );
   }
+
+  getFiltredFinancialTransactionsCount$(
+    financialUnitId: string,
+    filteringCriteria: IFinancialTransactionsFilteringCriteria
+  ): Observable<number> {
+    const params: HttpParams = new HttpParams()
+      .append('financialUnitId', financialUnitId)
+      .append('accountId', filteringCriteria.accountId || '')
+      .append('dateFrom', filteringCriteria.dateFrom ? filteringCriteria.dateFrom.toDateString() : '')
+      .append('dateTo', filteringCriteria.dateTo ? filteringCriteria.dateTo.toDateString() : '');
+    return this.http.get<number>(`${this.baseUrl}api/financial-transaction/get-filtred-financial-transactions-count`, { params }).pipe(
+      catchError((err) => {
+        this.popUpsService.handleApiError(err);
+        return of(0);
+      })
+    );
+  }
+
+  getFiltredPaginatedFinancialTransactions$(
+    financialUnitId: string,
+    filteringCriteria: IFinancialTransactionsFilteringCriteria,
+    pageIndex: number,
+    pageSize: number
+  ): Observable<FinancialTransactionPopulated[]> {
+    const params: HttpParams = new HttpParams()
+      .append('financialUnitId', financialUnitId)
+      .append('accountId', filteringCriteria.accountId || '')
+      .append('dateFrom', filteringCriteria.dateFrom ? filteringCriteria.dateFrom.toDateString() : '')
+      .append('dateTo', filteringCriteria.dateTo ? filteringCriteria.dateTo.toDateString() : '')
+      .append('pageIndex', pageIndex.toString())
+      .append('pageSize', pageSize.toString())
+    return this.http.get<IFinancialTransactionPopulated[]>(`${this.baseUrl}api/financial-transaction/get-filtred-financial-transactions`, { params }).pipe(
+      map((transactions) => transactions.map((transaction) => new FinancialTransactionPopulated(transaction))),
+      catchError((err) => {
+        this.popUpsService.handleApiError(err);
+        return of([]);
+      })
+    );
+  }
 }

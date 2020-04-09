@@ -13,6 +13,7 @@ import { BasicTable, IBasicTableInputData, IBasicTableHeaderInputData, IBasicTab
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 import { StockService } from 'src/app/services/stock.service';
+import { PaginatedTable } from 'src/app/models/paginated-table-models';
 
 @Component({
   selector: 'app-inventory-transactions-tab',
@@ -56,22 +57,35 @@ export class InventoryTransactionsTabComponent {
     debounceTime(100)
   );
 
-  private inventoryTransactions$: Observable<InventoryTransactionPopulated<any>[]> = combineLatest(
-    this.financialUnitDetailsService.financialUnitId$,
-    this.filteringCriteria$,
-    this.financialUnitDetailsService.reloadTransactions$
-  ).pipe(
-    tap(() => (this.isLoadingData = true)),
-    switchMap(([financialUnitId, filteringCriteria]) => {
-      return financialUnitId && filteringCriteria ?
-        this.inventoryTransactionService.getFiltredInventoryTransactions$(financialUnitId, filteringCriteria) :
-        of([]);
-    }),
-  );
+  // private inventoryTransactions$: Observable<InventoryTransactionPopulated<any>[]> = combineLatest(
+  //   this.financialUnitDetailsService.financialUnitId$,
+  //   this.filteringCriteria$,
+  //   this.financialUnitDetailsService.reloadTransactions$
+  // ).pipe(
+  //   tap(() => (this.isLoadingData = true)),
+  //   switchMap(([financialUnitId, filteringCriteria]) => {
+  //     return financialUnitId && filteringCriteria ?
+  //       this.inventoryTransactionService.getFiltredInventoryTransactions$(financialUnitId, filteringCriteria) :
+  //       of([]);
+  //   }),
+  // );
 
-  tableData$: Observable<BasicTable> = this.inventoryTransactions$.pipe(
-    map((transactions: InventoryTransactionPopulated<any>[]) => this.getTableDataFromInventoryTransactions(transactions)),
-    tap(() => (this.isLoadingData = false)),
+  // tableData$: Observable<BasicTable> = this.inventoryTransactions$.pipe(
+  //   map((transactions: InventoryTransactionPopulated<any>[]) => this.getTableDataFromInventoryTransactions(transactions)),
+  //   tap(() => (this.isLoadingData = false)),
+  // );
+
+  paginatedTable = new PaginatedTable<InventoryTransactionPopulated<any>, IInventoryTransactionFilteringCriteria>(
+    this.filteringCriteria$,
+    (fc, pi, ps) => {
+      const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
+      return this.inventoryTransactionService.getFiltredPaginatedInventoryTransactions$(financialUnitId, fc, pi, ps)
+    },
+    (rs) => this.getTableDataFromInventoryTransactions(rs),
+    (fc) => {
+      const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
+      return this.inventoryTransactionService.getFiltredInventoryTransactionsTotalCount$(financialUnitId, fc)
+    },    
   );
 
   ngOnInit(): void {
@@ -82,7 +96,7 @@ export class InventoryTransactionsTabComponent {
       take(1)
     ).subscribe(([dateFrom, dateTo]) => {
       setTimeout(() => this.filteringCriteriaFG.patchValue({ dateFrom, dateTo }));
-    })
+    });
   }
 
   private getTableDataFromInventoryTransactions(

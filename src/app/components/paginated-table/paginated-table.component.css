@@ -1,12 +1,12 @@
 .pagination-bar {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     padding: 0 2rem;
     border-radius: 0.5rem;
     margin-top: 1rem;
-    margin-bottom: 5rem;
   }
   
   .page-index-container {
@@ -78,18 +78,7 @@
   }
   
   .list-items-container {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .list-items-container > * {
-    margin-top: 0.75rem;
-  }
-  
-  .list-items-container > *:first-child {
-    margin-top: 0;
+    overflow: hidden;
   }
   
   .no-record-was-found {
