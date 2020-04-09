@@ -1,5 +1,5 @@
 import { InventoryTransactionType } from './inventory-transaction-type';
-import { IStock, Stock } from './stock';
+import { IStock, Stock, StockDecrementType } from './stock';
 import { IInventoryItem } from './inventory-item';
 
 export interface IIncrementInventoryTransactionSpecificData {
@@ -33,11 +33,14 @@ export interface IInventoryTransactionPopulated<SpecificData> {
     totalTransactionAmount: number;
     stockBeforeTransaction: IStock;
     stockAfterTransaction: IStock;
+    stockDecrementTypeApplied: StockDecrementType;
     financialUnit: string;
     inventoryItemTransactionIndex: number;
     isDerivedTransaction: boolean;
     transactionForcingDerivation: string | null;
     isActive?: boolean;
+    creator: IUser;
+    created: Date;
 }
 
 export class InventoryTransactionPopulated<SpecificData> {
@@ -45,6 +48,7 @@ export class InventoryTransactionPopulated<SpecificData> {
     constructor(transaction: IInventoryTransactionPopulated<any>) {
         Object.keys(transaction).forEach((key) => (this[key] = transaction[key]));
         this.effectiveDate = new Date(transaction.effectiveDate);
+        this.created = new Date(transaction.created);
         this.stockBeforeTransaction = new Stock(transaction.stockBeforeTransaction);
         this.stockAfterTransaction = new Stock(transaction.stockAfterTransaction);
     }
@@ -60,9 +64,12 @@ export class InventoryTransactionPopulated<SpecificData> {
     totalTransactionAmount: number;
     stockBeforeTransaction: Stock;
     stockAfterTransaction: Stock;
+    stockDecrementTypeApplied: StockDecrementType;
     financialUnit: string;
     inventoryItemTransactionIndex: number;
     isDerivedTransaction: boolean;
     transactionForcingDerivation: string | null;
     isActive?: boolean;
+    creator: IUser;
+    created: Date;
 }

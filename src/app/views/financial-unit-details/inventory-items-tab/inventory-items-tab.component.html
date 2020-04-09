@@ -19,5 +19,6 @@
     </div>
 </div>
 
-<app-new-inventory-item-modal *ngIf="isNewInventoryItemModalOpened" (close)="closeNewInventoryItemModal()">
+<app-new-inventory-item-modal *ngIf="updateInventoryItemModalData as data" [data]="data"
+    (close)="closeNewInventoryItemModal()">
 </app-new-inventory-item-modal>

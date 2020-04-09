@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
 import { ISignUpCredentials } from '../models/sign-up-credentials';
-import { catchError, filter, finalize, tap } from 'rxjs/operators';
+import { catchError, filter, finalize, tap, map } from 'rxjs/operators';
 import { of, BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -18,6 +18,9 @@ export class AuthService {
 
   private userSource: BehaviorSubject<IUser> = new BehaviorSubject<IUser>(null);
   user$: Observable<IUser> = this.userSource.asObservable();
+  userId$: Observable<string> = this.user$.pipe(
+    map((user: IUser) => user ? user._id : null)
+  );
 
   getUserFromCookie$(): Observable<IUser> {
     return this.http.get(`${this.baseUrl}auth`).pipe(

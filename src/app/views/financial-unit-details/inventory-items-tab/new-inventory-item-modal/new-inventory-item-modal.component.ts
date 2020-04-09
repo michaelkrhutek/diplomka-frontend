@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Output, EventEmitter, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { InventoryItemsGroup } from 'src/app/models/inventory-items-group';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, tap } from 'rxjs/operators';
 import { FormControl, FormGroup } from '@angular/forms';
+import { INewInventoryItemData } from 'src/app/models/inventory-item';
 
 @Component({
   selector: 'app-new-inventory-item-modal',
@@ -17,16 +18,30 @@ export class NewInventoryItemModalComponent {
     private financialUnitDetailsService: FinancialUnitDetailsService
   ) { }
 
+  @Input() data: INewInventoryItemData;
   @Output() close: EventEmitter<void> = new EventEmitter<void>();
 
-  nameFC: FormControl = new FormControl(null);
-  inventoryItemsGroupIdFC: FormControl = new FormControl(null);
+  headingText: string;
+  buttonText: string;
+
+  ngOnInit(): void {
+    if (this.data._id) {
+      this.headingText = 'Úprava položky zásob'
+      this.buttonText = 'Uložit';
+      console.log(this.data);
+      setTimeout(() => this.inventoryItemFG.patchValue(this.data));
+    } else {
+      this.headingText = 'Nová položka zásob'
+      this.buttonText = 'Vytvořit';
+    }
+  }
 
   inventoryItemFG: FormGroup = new FormGroup({
-    name: this.nameFC,
-    inventoryItemsGroupId: this.inventoryItemsGroupIdFC
+    _id: new FormControl(null),
+    name: new FormControl(null),
+    inventoryGroupId: new FormControl(null)
   });
-  inventoryItemFormData$: Observable<INewInventoryItemFormData> = this.inventoryItemFG.valueChanges.pipe(
+  inventoryItemFormData$: Observable<INewInventoryItemData> = this.inventoryItemFG.valueChanges.pipe(
     startWith(this.inventoryItemFG)
   );
 
@@ -41,7 +56,7 @@ export class NewInventoryItemModalComponent {
   );
 
   isCreateButtonDisabled$: Observable<boolean> = this.inventoryItemFormData$.pipe(
-    map((formData: INewInventoryItemFormData) => !(formData.inventoryItemsGroupId && formData.name))
+    map((formData: INewInventoryItemData) => !(formData.inventoryGroupId && formData.name))
   );
 
   closeModal(): void {
@@ -49,13 +64,17 @@ export class NewInventoryItemModalComponent {
   }
 
   createInventoryItem(): void {
-    const formData: INewInventoryItemFormData = this.inventoryItemFG.value;
-    this.financialUnitDetailsService.createInventoryItem(formData.name, formData.inventoryItemsGroupId);
+    const data: INewInventoryItemData = this.inventoryItemFG.value;
+    if (data._id) {
+      this.financialUnitDetailsService.updateInventoryItem(data);
+    } else {
+      this.financialUnitDetailsService.createInventoryItem(data);
+    }
     this.closeModal();
   }
 
-  areInventoryItemFormDataValid(formData: INewInventoryItemFormData): boolean {
-    if (!formData.name || !formData.inventoryItemsGroupId) {
+  areInventoryItemFormDataValid(formData: INewInventoryItemData): boolean {
+    if (!formData.name || !formData.inventoryGroupId) {
       return false;
     }
     return true;
@@ -65,9 +84,4 @@ export class NewInventoryItemModalComponent {
 interface IInventoryItemsGroupOption {
   id: string;
   name: string;
-}
-
-interface INewInventoryItemFormData {
-  name: string;
-  inventoryItemsGroupId: string;
 }

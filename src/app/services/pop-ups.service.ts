@@ -59,7 +59,7 @@ export class PopUpsService {
 
   handleApiError(err: HttpErrorResponse): void {
     console.log(err);
-    const message: string = (err && err.error && err.error.message) || 'Chyba nastala';
+    const message: string = (err && err.error && err.error.message) || 'Neočekávaná chyba se vyskytla';
     this.showSnackbar({ message, type: SnackbarType.Error });
   }
 }

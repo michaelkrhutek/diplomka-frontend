@@ -1,10 +1,9 @@
-import { Component, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Output, EventEmitter, Input } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { FormControl, FormGroup, AbstractControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
-import { FinancialAccountService } from 'src/app/services/financial-account.service';
-import { FinancialAccountType } from 'src/app/models/financial-account-type';
+import { INewFinancialAccountData } from 'src/app/models/financial-account';
 
 @Component({
   selector: 'app-new-financial-account-modal',
@@ -19,18 +18,33 @@ export class NewFinancialAccountModalComponent {
     // private financialAccountService: FinancialAccountService
   ) { }
 
+  @Input() data: INewFinancialAccountData;
   @Output() close: EventEmitter<void> = new EventEmitter<void>();
 
-  codeFC: FormControl = new FormControl(null, [financialAccountCodeValidator]);
-  nameFC: FormControl = new FormControl(null);
-  
+  headingText: string;
+  buttonText: string;
+
+  ngOnInit(): void {
+    if (this.data._id) {
+      this.headingText = 'Úprava finančního účtu'
+      this.buttonText = 'Uložit';
+      this.financialAccountFG.patchValue(this.data);
+    } else {
+      this.headingText = 'Nový finanční účet'
+      this.buttonText = 'Vytvořit';
+    }
+  }
+
   financialAccountFG: FormGroup = new FormGroup({
-    code: this.codeFC,
-    name: this.nameFC,
+    _id: new FormControl(null),
+    code: new FormControl(null, [financialAccountCodeValidator]),
+    name: new FormControl(null)
   });
-  financialAccountFormData$: Observable<INewFinancialAccountFormData> = this.financialAccountFG.valueChanges.pipe(
+  financialAccountFormData$: Observable<INewFinancialAccountData> = this.financialAccountFG.valueChanges.pipe(
     startWith(this.financialAccountFG)
   );
+
+  codeFC: AbstractControl = this.financialAccountFG.controls['code'];
 
   // financialAccountTypeOptions: IFinancialAccountTypeOption[] = this.financialAccountService.getAllFinancialAccountTypes()
   //   .map((type: FinancialAccountType) => {
@@ -40,13 +54,16 @@ export class NewFinancialAccountModalComponent {
   //   });
 
   isCreateButtonDisabled$: Observable<boolean> = this.financialAccountFormData$.pipe(
-    map((formData: INewFinancialAccountFormData) => !this.getAreFinancialAccountFormDataValid(formData))
+    map((formData: INewFinancialAccountData) => !this.getAreFinancialAccountFormDataValid(formData))
   );
 
   createFinancialAccount(): void {
-    const code: string = this.codeFC.value;
-    const name: string = this.nameFC.value;
-    this.financialUnitDetailsService.createFinancialAccount(name, code);
+    const data: INewFinancialAccountData = this.financialAccountFG.value;
+    if (data._id) {
+      this.financialUnitDetailsService.updateFinancialAccount(data);
+    } else {
+      this.financialUnitDetailsService.createFinancialAccount(data);
+    }
     this.closeModal();
   }
 
@@ -54,11 +71,11 @@ export class NewFinancialAccountModalComponent {
     this.close.emit();
   }
 
-  private getAreFinancialAccountFormDataValid(formData: INewFinancialAccountFormData): boolean {
+  private getAreFinancialAccountFormDataValid(formData: INewFinancialAccountData): boolean {
     if (!formData.code || !formData.name) {
       return false;
     }
-    if (!RegExp('^[0-9]').test(formData.code)) {
+    if (!RegExp('^[0-9]+$').test(formData.code)) {
       return false;
     }
     return true;
@@ -71,15 +88,7 @@ export class NewFinancialAccountModalComponent {
   }
 }
 
-interface INewFinancialAccountFormData {
-  code: string;
-  name: string;
-}
 
-interface IFinancialAccountTypeOption {
-  type: FinancialAccountType,
-  name: string;
-}
 
 const financialAccountCodeValidator = (control: AbstractControl): {[key: string]: string} | null => {
   const errors: {[key: string]: string} = {};

@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { Observable, combineLatest } from 'rxjs';
 import { map, startWith, tap } from 'rxjs/operators';
-import { InventoryItemsGroup, IInventoryItemsGroup } from 'src/app/models/inventory-items-group';
+import { InventoryItemsGroup, IInventoryItemsGroup, INewInventoryGroupData } from 'src/app/models/inventory-items-group';
 import { StockService } from 'src/app/services/stock.service';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
@@ -25,7 +25,7 @@ export class InventoryItemsGroupsTabComponent {
   ) { }
 
   isLoadingData: boolean = true;
-  isNewInventoryItemsGroupModalOpened: boolean = false;
+  isUpdateInventoryItemsGroupModalData: INewInventoryGroupData = null;
 
   filterTextFC: FormControl = new FormControl(null);
   filterText$: Observable<string> = this.filterTextFC.valueChanges.pipe(
@@ -48,7 +48,7 @@ export class InventoryItemsGroupsTabComponent {
   ): BasicTable {
     const header: IBasicTableHeaderInputData = {
       actionItemsPosition: BasicTableActionItemsPosition.Start,
-      actionItemsContainerWidth: 1,
+      actionItemsContainerWidth: 2,
       otherCells: [
         {
           name: 'Název skupiny',
@@ -74,6 +74,11 @@ export class InventoryItemsGroupsTabComponent {
     const row: IBasicTableRowInputData = {
       actionItems: [
         {
+          iconName: 'create',
+          description: 'Upravit',
+          action: () => this.openNewInventoryItemsGroupModal(group)
+        },
+        {
           iconName: 'delete',
           description: 'Smazat',
           action: () => this.deleteGroup(group)
@@ -93,12 +98,22 @@ export class InventoryItemsGroupsTabComponent {
     return row;
   }
 
-  openNewInventoryItemsGroupModal(): void {
-    this.isNewInventoryItemsGroupModalOpened = true;
+  openNewInventoryItemsGroupModal(inventoryGroup?: IInventoryItemsGroup): void {
+    if (inventoryGroup) {
+      const newInventoryItemsGroup: INewInventoryGroupData = {
+        _id: inventoryGroup._id,
+        name: inventoryGroup.name,
+        defaultStockDecrementType: inventoryGroup.defaultStockDecrementType
+      };
+      this.isUpdateInventoryItemsGroupModalData = newInventoryItemsGroup;
+    } else {
+      const newInventoryItemsGroup: INewInventoryGroupData = { _id: null, name: null, defaultStockDecrementType: null };
+      this.isUpdateInventoryItemsGroupModalData = newInventoryItemsGroup;
+    }
   }
 
   closeNewInventoryItemsGroupModal(): void {
-    this.isNewInventoryItemsGroupModalOpened = false;
+    this.isUpdateInventoryItemsGroupModalData = null;
   }
 
   deleteGroup(account: InventoryItemsGroup): void {

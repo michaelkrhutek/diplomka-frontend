@@ -3,7 +3,10 @@ import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-det
 import { UserService } from 'src/app/services/user.service';
 import { Observable, of, combineLatest } from 'rxjs';
 import { map, tap, switchMap } from 'rxjs/operators';
-import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
+import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType, BasicTableActionItemsPosition } from 'src/app/models/basic-table-models';
+import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
+import { PopUpsService } from 'src/app/services/pop-ups.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-users-tab',
@@ -15,11 +18,15 @@ export class UsersTabComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
-    private userService: UserService
+    private userService: UserService,
+    private popUpsService: PopUpsService,
+    private authService: AuthService
   ) { }
 
   isLoadingData: boolean = true;
   isAddUserModalOpened: boolean = false;
+
+  isUserOwner$: Observable<boolean> = this.financialUnitDetailsService.isUserOwner$;
 
   users$: Observable<IUser[]> = combineLatest(
     this.financialUnitDetailsService.financialUnitId$,
@@ -38,6 +45,8 @@ export class UsersTabComponent {
     users: IUser[]
   ): BasicTable {
     const header: IBasicTableHeaderInputData = {
+      actionItemsContainerWidth: 1,
+      actionItemsPosition: BasicTableActionItemsPosition.Start,
       otherCells: [
         {
           name: 'Uživatel',
@@ -56,6 +65,16 @@ export class UsersTabComponent {
     user: IUser
   ): IBasicTableRowInputData {
     const row: IBasicTableRowInputData = {
+      actionItems: combineLatest(
+        this.financialUnitDetailsService.isUserOwner$,
+        this.authService.userId$
+      ).pipe(
+        map(([isUserOwner, userId]) => isUserOwner && user._id != userId ? [{
+          iconName: 'delete',
+          description: 'Odebrat',
+          action: () => this.removeUser(user)
+        }] : [])
+      ),
       otherCells: [
         {
           type: BasicTableRowCellType.Display,
@@ -64,6 +83,14 @@ export class UsersTabComponent {
       ]
     }
     return row;
+  }
+
+  removeUser(user: IUser): void {
+    const data: IConfirmationModalData = {
+      message: `Opravdu chcete odebrat uživateli ${user.displayName} přístup?`,
+      action: () => this.financialUnitDetailsService.removeUser(user._id)
+    }
+    this.popUpsService.openConfirmationModal(data);
   }
 
   openAddUserModal(): void {

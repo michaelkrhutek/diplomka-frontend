@@ -12,6 +12,7 @@ import { IInventoryTransactionFilteringCriteria } from 'src/app/models/inventory
 import { BasicTable, IBasicTableInputData, IBasicTableHeaderInputData, IBasicTableRowInputData, BasicTableRowCellType, BasicTableValueAlign, BasicTableActionItemsPosition } from 'src/app/models/basic-table-models';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
+import { StockService } from 'src/app/services/stock.service';
 
 @Component({
   selector: 'app-inventory-transactions-tab',
@@ -25,7 +26,8 @@ export class InventoryTransactionsTabComponent {
     private financialUnitDetailsService: FinancialUnitDetailsService,
     private inventoryTransactionService: InventoryTransactionService,
     private formatterService: FormatterService,
-    private popUpsService: PopUpsService
+    private popUpsService: PopUpsService,
+    private stockService: StockService
   ) { }
 
   isLoadingData: boolean = true;
@@ -84,7 +86,7 @@ export class InventoryTransactionsTabComponent {
   }
 
   private getTableDataFromInventoryTransactions(
-    transactions: IInventoryTransactionPopulated<any>[]
+    transactions: InventoryTransactionPopulated<any>[]
   ): BasicTable {
     const header: IBasicTableHeaderInputData = {
       actionItemsPosition: BasicTableActionItemsPosition.Start,
@@ -92,7 +94,7 @@ export class InventoryTransactionsTabComponent {
       stickyCells: [
         {
           name: 'ID transakce',
-          width: 8,
+          width: 6,
           align: BasicTableValueAlign.Left
         },
       ],
@@ -104,17 +106,32 @@ export class InventoryTransactionsTabComponent {
         },
         {
           name: 'Druh transakce',
-          width: 8,
+          width: 6,
           align: BasicTableValueAlign.Left
         },
         {
           name: 'Položka',
-          width: 8,
+          width: 6,
           align: BasicTableValueAlign.Left
         },
         {
           name: 'Popisek',
-          width: 12,
+          width: 10,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Vytvořil',
+          width: 6,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Datum vytvoření',
+          width: 6,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Oceňovací metoda',
+          width: 6,
           align: BasicTableValueAlign.Left
         },
         {
@@ -131,7 +148,9 @@ export class InventoryTransactionsTabComponent {
           name: 'Celková hodnota',
           width: 6,
           align: BasicTableValueAlign.Right
-        }
+        },
+
+
       ]
     };
     const rows: IBasicTableRowInputData[] = (transactions || [])
@@ -141,7 +160,7 @@ export class InventoryTransactionsTabComponent {
   }
 
   private getTableRowDataFromInventoryTransaction(
-    transaction: IInventoryTransactionPopulated<any>
+    transaction: InventoryTransactionPopulated<any>
   ): IBasicTableRowInputData {
     const costPerUnit: number = transaction.totalTransactionAmount / (transaction.specificData['quantity'] as number);
     const row: IBasicTableRowInputData = {
@@ -179,6 +198,18 @@ export class InventoryTransactionsTabComponent {
         {
           type: BasicTableRowCellType.Display,
           data:transaction.description
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data:transaction.creator.displayName
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getDayMonthYearString(transaction.created)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.stockService.getStockDecrementTypeDescription(transaction.stockDecrementTypeApplied)
         },
         {
           type: BasicTableRowCellType.Display,

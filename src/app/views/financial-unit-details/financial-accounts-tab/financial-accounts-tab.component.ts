@@ -1,12 +1,13 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { Observable, combineLatest } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
-import { FinancialAccount, IFinancialAccount } from 'src/app/models/financial-account';
+import { map, startWith, tap, switchMap } from 'rxjs/operators';
+import { FinancialAccount, IFinancialAccount, INewFinancialAccountData } from 'src/app/models/financial-account';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
+import { FinancialAccountService } from 'src/app/services/financial-account.service';
 
 @Component({
   selector: 'app-financial-accounts-tab',
@@ -18,11 +19,12 @@ export class FinancialAccountsTabComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
+    private financialAccountService: FinancialAccountService,
     private popUpsService: PopUpsService
   ) { }
 
   isLoadingData: boolean = true;
-  isNewFinancialAccountModalOpened: boolean = false;
+  updateFinancialAccountModalData: INewFinancialAccountData = null;
 
   filterTextFC: FormControl = new FormControl(null);
   filterText$: Observable<string> = this.filterTextFC.valueChanges.pipe(
@@ -30,14 +32,23 @@ export class FinancialAccountsTabComponent {
     map((filterText: string) => filterText || '')
   );
 
-  tableData$: Observable<BasicTable> = combineLatest(
-    this.financialUnitDetailsService.financialAccounts$,
-    this.filterText$
+  financialAccounts$: Observable<FinancialAccount[]> = combineLatest(
+    this.financialUnitDetailsService.financialUnitId$,
+    this.financialUnitDetailsService.reloadFinancialAccounts$
   ).pipe(
-    tap(() => (this.isLoadingData = true)),
-    map(([accounts, filterText]) => this.getFilteredFinancialAccounts(accounts, filterText)),
+    tap(() => this.isLoadingData = true),
+    switchMap(([financialUnitId]) => this.financialAccountService.getFinancialAccounts$(financialUnitId))
+  );
+
+  filtredFinancialAccounts$: Observable<IFinancialAccount[]> = combineLatest(
+    this.financialAccounts$, this.filterText$
+  ).pipe(
+    map(([accounts, filterText]) => this.getFilteredFinancialAccounts(accounts, filterText))
+  )
+
+  tableData$: Observable<BasicTable> = this.filtredFinancialAccounts$.pipe(
     map((accounts: FinancialAccount[]) => this.getTableDataFromFinancialAccounts(accounts)),
-    tap(() => (this.isLoadingData = false)),
+    tap(() => (this.isLoadingData = false))
   );
 
   private getTableDataFromFinancialAccounts(
@@ -45,7 +56,7 @@ export class FinancialAccountsTabComponent {
   ): BasicTable {
     const header: IBasicTableHeaderInputData = {
       actionItemsPosition: BasicTableActionItemsPosition.Start,
-      actionItemsContainerWidth: 1,
+      actionItemsContainerWidth: 2,
       otherCells: [
         {
           name: 'Kód účtu',
@@ -70,6 +81,11 @@ export class FinancialAccountsTabComponent {
   ): IBasicTableRowInputData {
     const row: IBasicTableRowInputData = {
       actionItems: [
+        {
+          iconName: 'create',
+          description: 'Upravit',
+          action: () => this.openNewFinancialAccountModal(account)
+        },
         {
           iconName: 'delete',
           description: 'Smazat',
@@ -106,12 +122,22 @@ export class FinancialAccountsTabComponent {
     this.popUpsService.openConfirmationModal(data);
   }
 
-  openNewFinancialAccountModal(): void {
-    this.isNewFinancialAccountModalOpened = true;
+  openNewFinancialAccountModal(financialAccount: IFinancialAccount): void {
+    if (financialAccount) {
+      const data: INewFinancialAccountData = {
+        _id: financialAccount._id,
+        code: financialAccount.code,
+        name: financialAccount.name
+      };
+      this.updateFinancialAccountModalData = data;
+    } else {
+      const data: INewFinancialAccountData = { _id: null, code: null, name: null };
+      this.updateFinancialAccountModalData = data;
+    }
   }
 
   closeNewFinancialAccountModal(): void {
-    this.isNewFinancialAccountModalOpened = false;
+    this.updateFinancialAccountModalData = null;
   }
 
   private getFilteredFinancialAccounts(

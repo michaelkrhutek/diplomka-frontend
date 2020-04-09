@@ -1,24 +1,25 @@
 <div class="modal-container">
     <div class="modal">
         <div class="modal-header">
-            Nový finanční účet
+            {{ headingText }}
         </div>
-        <div class="modal-content">
+        <div class="modal-content" [formGroup]="financialAccountFG">
             <mat-form-field>
                 <mat-label>Kód finančního účtu</mat-label>
-                <input matInput [formControl]="codeFC">
+                <input matInput formControlName="code">
                 <mat-error *ngIf="codeFC.errors as errors">
                     {{ getErrorMessage(errors) }}
                 </mat-error>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Název finančního účtu</mat-label>
-                <input matInput [formControl]="nameFC">
+                <input matInput formControlName="name">
             </mat-form-field>
         </div>
         <div class="modal-actions">
             <button mat-button color="primary" (click)="closeModal()">Zavřít</button>
-            <button mat-flat-button color="primary" (click)="createFinancialAccount()" [disabled]="isCreateButtonDisabled$ | async">Vytvořit</button>
+            <button mat-flat-button color="primary" (click)="createFinancialAccount()"
+                [disabled]="isCreateButtonDisabled$ | async">{{ buttonText }}</button>
         </div>
-    </div>   
+    </div>
 </div>

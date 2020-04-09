@@ -1,5 +1,11 @@
 import { IInventoryItemsGroup } from './inventory-items-group';
 
+export interface INewInventoryItemData {
+    _id: string | null;
+    name: string;
+    inventoryGroupId: string;    
+}
+
 export interface IInventoryItem {
     _id: string;
     name: string;

@@ -1,5 +1,11 @@
 import { FinancialAccountType } from './financial-account-type';
 
+export interface INewFinancialAccountData {
+    _id: string;
+    name: string;
+    code: string;
+}
+
 export interface IFinancialAccount {
     _id: string;
     name: string;
@@ -18,20 +24,20 @@ export class FinancialAccount {
     name: string;
     code: string;
 
-    private getAccountType(typeAsString: string): FinancialAccountType {
-        switch (typeAsString) {
-            case FinancialAccountType.Assets:
-                return FinancialAccountType.Assets;
-            case FinancialAccountType.Equity:
-                return FinancialAccountType.Equity;
-            case FinancialAccountType.Expenses:
-                return FinancialAccountType.Expenses;
-            case FinancialAccountType.Liabilities:
-                return FinancialAccountType.Liabilities;
-            case FinancialAccountType.Revenues:
-                return FinancialAccountType.Revenues;
-            default:
-                return null;
-        }
-    }
+    // private getAccountType(typeAsString: string): FinancialAccountType {
+    //     switch (typeAsString) {
+    //         case FinancialAccountType.Assets:
+    //             return FinancialAccountType.Assets;
+    //         case FinancialAccountType.Equity:
+    //             return FinancialAccountType.Equity;
+    //         case FinancialAccountType.Expenses:
+    //             return FinancialAccountType.Expenses;
+    //         case FinancialAccountType.Liabilities:
+    //             return FinancialAccountType.Liabilities;
+    //         case FinancialAccountType.Revenues:
+    //             return FinancialAccountType.Revenues;
+    //         default:
+    //             return null;
+    //     }
+    // }
 }

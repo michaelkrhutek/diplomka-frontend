@@ -14,6 +14,8 @@ export interface IFinancialTransactionPopulated {
     inventroryItem: IInventoryItem,
     debitAccount: IFinancialAccount;
     creditAccount: IFinancialAccount;
+    creator: IUser;
+    created: Date;
 }
 
 export class FinancialTransactionPopulated {
@@ -21,6 +23,7 @@ export class FinancialTransactionPopulated {
     constructor(transaction: IFinancialTransactionPopulated) {
         Object.keys(transaction).forEach((key) => (this[key] = transaction[key]));
         this.effectiveDate = new Date(transaction.effectiveDate);
+        this.created = new Date(transaction.created);
     }
 
     _id: string;
@@ -35,4 +38,6 @@ export class FinancialTransactionPopulated {
     inventroryItem: IInventoryItem;
     debitAccount: IFinancialAccount;
     creditAccount: IFinancialAccount;
+    creator: IUser;
+    created: Date;
 }

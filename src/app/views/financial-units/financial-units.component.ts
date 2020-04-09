@@ -1,14 +1,13 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitService } from 'src/app/services/financial-unit.service';
 import { Observable, of } from 'rxjs';
-import { ListItem, IListItem } from 'src/app/models/list-item';
 import { map, tap, switchMap } from 'rxjs/operators';
-import { IIconItem } from 'src/app/models/icon-item';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { SnackbarType } from 'src/app/models/snackbar-data';
 import { Router } from '@angular/router';
 import { BasicTile, IBasicTile, TileType, ClickableTile, IClickableTile } from 'src/app/models/tiles-models';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-financial-units',
@@ -21,10 +20,11 @@ export class FinancialUnitsComponent {
   constructor(
     private financialUnitService: FinancialUnitService,
     private popUpsService: PopUpsService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
-  readonly tileWidth: number = 12;
+  readonly tileWidth: number = 14;
   readonly tileHeight: number = 8;
 
   isNewFinancialUnitModalOpened: boolean = false;
@@ -58,19 +58,23 @@ export class FinancialUnitsComponent {
     const data: IBasicTile = {
       type: TileType.Basic,
       titleText: unit.name,
+      otherTexts: [unit._id],
       width: this.tileWidth,
       height: this.tileHeight,
       mainAction: () => {
         this.popUpsService.openLoadingModal({ message: 'Načítám účetní jednotku' });
         this.router.navigate(['financial-unit', unit._id]).finally(() => this.popUpsService.closeLoadingModal())
       },
-      topRightActionItems$: of([
-        {
-          iconName: 'delete',
-          description: 'Smazat',
-          action: () => this.deleteUnit(unit)
-        }
-      ])
+      topRightActionItems$: this.authService.userId$.pipe(
+        map((userId: string) => {
+          console.log(userId, unit);
+          return unit.owner == userId ? [{
+            iconName: 'delete',
+            description: 'Smazat',
+            action: () => this.deleteUnit(unit)
+          }] : [];
+        })
+      )
     };
     return new BasicTile(data);
   }

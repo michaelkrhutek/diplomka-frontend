@@ -19,4 +19,5 @@
     </div>
 </div>
 
-<app-new-financial-account-modal *ngIf="isNewFinancialAccountModalOpened" (close)="closeNewFinancialAccountModal()"></app-new-financial-account-modal>
+<app-new-financial-account-modal *ngIf="updateFinancialAccountModalData as data" [data]="data"
+    (close)="closeNewFinancialAccountModal()"></app-new-financial-account-modal>

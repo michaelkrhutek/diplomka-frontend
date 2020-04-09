@@ -1,5 +1,11 @@
 import { StockDecrementType } from './stock';
 
+export interface INewInventoryGroupData {
+  _id: string | null;
+  name: string;
+  defaultStockDecrementType: string;
+}
+
 export interface IInventoryItemsGroup {
     _id: string;
     name: string;

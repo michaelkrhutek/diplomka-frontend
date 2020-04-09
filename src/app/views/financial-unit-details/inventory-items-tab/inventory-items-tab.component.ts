@@ -1,10 +1,8 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
-import { IIconItem } from 'src/app/models/icon-item';
 import { Observable, combineLatest } from 'rxjs';
-import { ListItem, IListItem } from 'src/app/models/list-item';
 import { map, startWith, tap } from 'rxjs/operators';
-import { InventoryItem, IInventoryItemPopulated } from 'src/app/models/inventory-item';
+import { IInventoryItemPopulated, INewInventoryItemData } from 'src/app/models/inventory-item';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
@@ -24,7 +22,7 @@ export class InventoryItemsTabComponent {
   ) { }
 
   isLoadingData: boolean = true;
-  isNewInventoryItemModalOpened: boolean = false;
+  updateInventoryItemModalData: INewInventoryItemData = null;
 
   filterTextFC: FormControl = new FormControl(null);
   filterText$: Observable<string> = this.filterTextFC.valueChanges.pipe(
@@ -47,7 +45,7 @@ export class InventoryItemsTabComponent {
   ): BasicTable {
     const header: IBasicTableHeaderInputData = {
       actionItemsPosition: BasicTableActionItemsPosition.Start,
-      actionItemsContainerWidth: 1,
+      actionItemsContainerWidth: 2,
       otherCells: [
         {
           name: 'Název položky',
@@ -73,6 +71,11 @@ export class InventoryItemsTabComponent {
     const row: IBasicTableRowInputData = {
       actionItems: [
         {
+          iconName: 'create',
+          description: 'Upravit',
+          action: () => this.openNewInventoryItemModal(item)
+        },
+        {
           iconName: 'delete',
           description: 'Smazat',
           action: () => this.deleteItem(item)
@@ -92,12 +95,22 @@ export class InventoryItemsTabComponent {
     return row;
   }
 
-  openNewInventoryItemModal(): void {
-    this.isNewInventoryItemModalOpened = true;
+  openNewInventoryItemModal(inventoryItem?: IInventoryItemPopulated): void {
+    if (inventoryItem) {
+      const data: INewInventoryItemData = {
+        _id: inventoryItem._id,
+        name: inventoryItem.name,
+        inventoryGroupId: inventoryItem.inventoryGroup._id
+      };
+      this.updateInventoryItemModalData = data;
+    } else {
+      const data: INewInventoryItemData = { _id: null, name: null, inventoryGroupId: null };
+      this.updateInventoryItemModalData = data;
+    }
   }
 
   closeNewInventoryItemModal(): void {
-    this.isNewInventoryItemModalOpened = false;
+    this.updateInventoryItemModalData = null;
   }
 
   deleteItem(item: IInventoryItemPopulated): void {

@@ -19,5 +19,5 @@
     </div>
 </div>
 
-<app-new-inventory-items-group-modal *ngIf="isNewInventoryItemsGroupModalOpened"
+<app-new-inventory-items-group-modal *ngIf="isUpdateInventoryItemsGroupModalData as data" [data]="data"
     (close)="closeNewInventoryItemsGroupModal()"></app-new-inventory-items-group-modal>

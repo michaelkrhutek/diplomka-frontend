@@ -61,7 +61,7 @@ export class StocksTabComponent {
       actionItemsContainerWidth: 1,
       stickyCells: [
         {
-          name: 'ID transakce',
+          name: 'Položka',
           width: 8,
           align: BasicTableValueAlign.Left
         },

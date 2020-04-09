@@ -24,6 +24,6 @@ input {
     font-weight: var(--table-font-weight);
 }
 
-.action-items-container > mat-icon {
-    cursor: pointer;
+.action-items-container > * {
+    margin: 0 0.25rem;
 }
