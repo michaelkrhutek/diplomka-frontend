@@ -53,7 +53,7 @@ export class NewInventoryItemsGroupModalComponent implements OnInit {
 
   isCreateButtonDisabled$: Observable<boolean> = this.inventoryGroupFG.valueChanges.pipe(
     startWith(this.inventoryGroupFG.value),
-    map((formData: INewInventoryGroupFormData) => {
+    map((formData: INewInventoryGroupData) => {
       return !formData.name || !formData.defaultStockDecrementType ? true : false;
     })
   );
@@ -76,9 +76,4 @@ export class NewInventoryItemsGroupModalComponent implements OnInit {
 interface IStockDecrementTypeOption {
   type: StockDecrementType,
   description: string
-}
-
-interface INewInventoryGroupFormData {
-  name: string;
-  defaultStockDecrementType: StockDecrementType
 }

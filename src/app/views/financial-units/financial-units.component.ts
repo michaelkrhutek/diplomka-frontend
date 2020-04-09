@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitService } from 'src/app/services/financial-unit.service';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, tap, switchMap } from 'rxjs/operators';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { SnackbarType } from 'src/app/models/snackbar-data';
@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { BasicTile, IBasicTile, TileType, ClickableTile, IClickableTile } from 'src/app/models/tiles-models';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 import { AuthService } from 'src/app/services/auth.service';
+import { IFinancialUnit } from 'src/app/models/financial-unit';
 
 @Component({
   selector: 'app-financial-units',
@@ -36,9 +37,7 @@ export class FinancialUnitsComponent {
   );
 
   tileItems$: Observable<(BasicTile | ClickableTile)[]> = this.financialUnits$.pipe(
-    tap(v => console.log(v)),
     map((units: IFinancialUnit[]) => units.map((unit) => this.getTileItemFromUnit(unit))),
-    tap(v => console.log(v)),
     map((tiles: BasicTile[]) => {
       const data: IClickableTile = {
         type: TileType.Clickable,
@@ -67,7 +66,6 @@ export class FinancialUnitsComponent {
       },
       topRightActionItems$: this.authService.userId$.pipe(
         map((userId: string) => {
-          console.log(userId, unit);
           return unit.owner == userId ? [{
             iconName: 'delete',
             description: 'Smazat',

@@ -4,6 +4,7 @@ import { catchError, filter, finalize, map } from 'rxjs/operators';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
 import { SnackbarType } from '../models/snackbar-data';
+import { INewFinancialUnitData, IFinancialUnit } from '../models/financial-unit';
 
 @Injectable({
   providedIn: 'root'
@@ -37,9 +38,12 @@ export class FinancialUnitService {
     );
   }
 
-  createFinancialUnit(name: string): void {
+  createFinancialUnit(data: INewFinancialUnitData): void {
     this.popUpsService.openLoadingModal({ message: 'Vytvářím účetní jednotku' });
-    const params: HttpParams = new HttpParams().append('name', name);
+    const params: HttpParams = new HttpParams()
+      .append('name', data.name)
+      .append('createDefaultData', String(data.createDefaultData))
+      .append('stockDecrementType', data.stockDecrementType)
     this.http.post<any>(`${this.baseUrl}api/financial-unit/create-financial-unit`, null, { params }).pipe(
       catchError((err) => {
         this.popUpsService.handleApiError(err);

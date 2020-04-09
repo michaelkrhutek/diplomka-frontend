@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { FinancialUnitService } from '../services/financial-unit.service';
 import { tap } from 'rxjs/operators';
 import { PopUpsService } from '../services/pop-ups.service';
+import { IFinancialUnit } from '../models/financial-unit';
 
 @Injectable({
     providedIn: 'root'

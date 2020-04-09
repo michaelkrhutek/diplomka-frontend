@@ -54,6 +54,53 @@ export class InventoryTransactionService {
     );
   }
 
+  getFiltredInventoryTransactionsTotalCount$(
+    financialUnitId: string,
+    filteringCriteria: IInventoryTransactionFilteringCriteria
+  ): Observable<number> {
+    const params: HttpParams = new HttpParams()
+      .append('financialUnitId', financialUnitId)
+      .append('inventoryItemId', filteringCriteria.inventoryItemId || '')
+      .append('transactionType', filteringCriteria.transactionType || '')
+      .append('dateFrom', filteringCriteria.dateFrom ? filteringCriteria.dateFrom.toDateString() : '')
+      .append('dateTo', filteringCriteria.dateTo ? filteringCriteria.dateTo.toDateString() : '');
+    return this.http.get<number>(
+      `${this.baseUrl}api/inventory-transaction/get-filtred-inventory-transactions-total-count`,
+      { params }
+    ).pipe(
+      catchError((err) => {
+        this.popUpsService.handleApiError(err);
+        return of(0);
+      })
+    );
+  }
+
+  getFiltredPaginatedInventoryTransactions$(
+    financialUnitId: string,
+    filteringCriteria: IInventoryTransactionFilteringCriteria,
+    pageIndex: number,
+    pageSize: number
+  ): Observable<InventoryTransactionPopulated<any>[]> {
+    const params: HttpParams = new HttpParams()
+      .append('financialUnitId', financialUnitId)
+      .append('inventoryItemId', filteringCriteria.inventoryItemId || '')
+      .append('transactionType', filteringCriteria.transactionType || '')
+      .append('dateFrom', filteringCriteria.dateFrom ? filteringCriteria.dateFrom.toDateString() : '')
+      .append('dateTo', filteringCriteria.dateTo ? filteringCriteria.dateTo.toDateString() : '')
+      .append('pageIndex', pageSize.toString())
+      .append('pageSize', pageIndex.toString());
+    return this.http.get<IInventoryTransactionPopulated<any>[]>(
+      `${this.baseUrl}api/inventory-transaction/get-filtred-paginated-inventory-transactions`,
+      { params }
+    ).pipe(
+      map((transactions) => transactions.map((transaction) => new InventoryTransactionPopulated<any>(transaction))),
+      catchError((err) => {
+        this.popUpsService.handleApiError(err);
+        return of([]);
+      })
+    );
+  }
+
   getAllInventoryTransactionTypes(): InventoryTransactionType[] {
     return [
       InventoryTransactionType.Increment,

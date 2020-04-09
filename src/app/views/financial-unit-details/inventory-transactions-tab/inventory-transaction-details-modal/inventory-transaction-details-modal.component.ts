@@ -31,7 +31,6 @@ export class InventoryTransactionDetailsModalComponent implements OnInit {
     this.stockBeforeTransactionTableData = this.stockService.getTableDataFromStock(this.transaction.stockBeforeTransaction);
     this.transactionTableData = this.getTableDataFromTransaction(this.transaction);
     this.stockAfterTransactionTableData = this.stockService.getTableDataFromStock(this.transaction.stockAfterTransaction);
-    console.log(this.stockBeforeTransactionTableData);
   }
 
   closeModal(): void {

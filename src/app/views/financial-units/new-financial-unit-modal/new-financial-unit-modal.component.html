@@ -3,15 +3,27 @@
         <div class="modal-header">
             Nová účetní jednotka
         </div>
-        <div class="modal-content">
+        <div class="modal-content" [formGroup]="financialUnitFG">
             <mat-form-field>
                 <mat-label>Název účetní jednotky</mat-label>
-                <input matInput [formControl]="nameFC">
+                <input matInput formControlName="name">
+            </mat-form-field>
+            <div style="padding-bottom: 1rem;">
+                <mat-checkbox formControlName="createDefaultData">Vytvořit s výchozími daty</mat-checkbox>
+            </div>
+            <mat-form-field *ngIf="createDefaultData$ | async">
+                <mat-label>Oceňovací metoda</mat-label>
+                <mat-select formControlName="stockDecrementType">
+                    <mat-option *ngFor="let option of stockDecrementTypeOptions" [value]="option.type">
+                        {{ option.description }}
+                    </mat-option>
+                </mat-select>
             </mat-form-field>
         </div>
         <div class="modal-actions">
             <button mat-button color="primary" (click)="closeModal()">Zavřít</button>
-            <button mat-flat-button color="primary" (click)="createFinancialUnit()" [disabled]="isCreateButtonDisabled$ | async">Vytvořit</button>
+            <button mat-flat-button color="primary" (click)="createFinancialUnit()"
+                [disabled]="isCreateButtonDisabled$ | async">Vytvořit</button>
         </div>
-    </div>   
+    </div>
 </div>

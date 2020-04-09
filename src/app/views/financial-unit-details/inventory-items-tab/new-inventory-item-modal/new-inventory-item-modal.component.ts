@@ -28,7 +28,6 @@ export class NewInventoryItemModalComponent {
     if (this.data._id) {
       this.headingText = 'Úprava položky zásob'
       this.buttonText = 'Uložit';
-      console.log(this.data);
       setTimeout(() => this.inventoryItemFG.patchValue(this.data));
     } else {
       this.headingText = 'Nová položka zásob'

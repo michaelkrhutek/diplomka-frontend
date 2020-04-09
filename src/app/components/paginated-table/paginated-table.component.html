@@ -1,0 +1,59 @@
+<div *ngIf="(data.tableData$ | async) as tableData" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+    <div style="width: fit-content; max-width: 100%; overflow-x: hidden; padding: 1rem;">
+  
+      <ng-container *ngIf="data.isLoadingData$ | async; else loaded">
+        <div class="center-content">
+          <mat-spinner></mat-spinner>
+        </div>
+      </ng-container>
+  
+      <ng-template #loaded>
+  
+        <ng-container *ngIf="listItems.length > 0; else noData">
+          <div class="list-items-container">
+            <app-basic-table [data]="tableData"></app-basic-table>
+          </div>
+          <div class="pagination-bar">
+            <div class="page-size-container">
+              <span>Počet záznamů na stránku: </span>
+              <mat-form-field class="page-size">
+                <mat-select [formControl]="data.pageSizeFC">
+                  <mat-option *ngFor="let ps of data.pageSizes" [value]="ps">{{ ps }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div *ngIf="(data.pageIndex$ | async) as pageIndex" class="page-index-container">
+              <div *ngIf="(data.firstLastAndTotalItemIndexes$ | async) as indexes" class="page-selection-container">
+                {{ indexes[0] }} - {{ indexes[1] }} of {{ indexes[2] }}
+              </div>
+              <div class="page-index-container">
+                <div class="change-page-index-container">
+                  <ng-container *ngIf="(data.canBePreviousPageSelected$ | async); else previousPageSelectorDisabled">
+                    <mat-icon class="change-page-index" (click)="data.changePageIndex(pageIndex - 1)" matTooltip="Previous page">keyboard_arrow_left</mat-icon>
+                  </ng-container>
+                  <ng-template #previousPageSelectorDisabled>
+                    <mat-icon class="change-page-index change-page-index-disabled">keyboard_arrow_left</mat-icon>
+                  </ng-template>
+                </div>
+                <div class="change-page-index-container">
+                  <ng-container *ngIf="(data.canBeNextPageSelected$ | async); else nextPageSelectorDisabled">
+                    <mat-icon class="change-page-index" *ngIf="data.canBeNextPageSelected$ | async" (click)="data.changePageIndex(pageIndex + 1)" matTooltip="Next page">keyboard_arrow_right</mat-icon>
+                  </ng-container>
+                  <ng-template #nextPageSelectorDisabled>
+                    <mat-icon class="change-page-index change-page-index-disabled">keyboard_arrow_right</mat-icon>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+  
+        <ng-template #noData>
+          <div class="center-content no-record-was-found">{{ noRecordMessage }}</div>
+        </ng-template>
+  
+      </ng-template>
+  
+    </div>
+  </div>
+  

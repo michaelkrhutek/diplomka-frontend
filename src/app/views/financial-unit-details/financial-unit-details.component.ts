@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
+import { IFinancialUnit } from 'src/app/models/financial-unit';
 
 @Component({
   selector: 'app-financial-unit-details',

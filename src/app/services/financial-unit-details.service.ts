@@ -1,14 +1,13 @@
 import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
-import { FinancialAccount, IFinancialAccount, INewFinancialAccountData } from '../models/financial-account';
-import { switchMap, catchError, map, filter, finalize, shareReplay, tap } from 'rxjs/operators';
+import { FinancialAccount, INewFinancialAccountData } from '../models/financial-account';
+import { switchMap, catchError, map, filter, finalize, shareReplay } from 'rxjs/operators';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
-import { IFinancialPeriod, FinancialPeriod } from '../models/financial-period';
+import { FinancialPeriod } from '../models/financial-period';
 import { SnackbarType } from '../models/snackbar-data';
-import { InventoryItemsGroup, IInventoryItemsGroup, INewInventoryGroupData } from '../models/inventory-items-group';
-import { InventoryItem, IInventoryItem, IInventoryItemPopulated, INewInventoryItemData } from '../models/inventory-item';
-import { StockDecrementType } from '../models/stock';
+import { InventoryItemsGroup, INewInventoryGroupData } from '../models/inventory-items-group';
+import { IInventoryItemPopulated, INewInventoryItemData } from '../models/inventory-item';
 import { InventoryTransactionType } from '../models/inventory-transaction-type';
 import { INewInventoryTransactionRequestData, IIncrementInventoryTransactionSpecificData, IDecrementInventoryTransactionSpecificData } from '../models/inventory-transaction';
 import { InventoryItemService } from './inventory-item.service';
@@ -20,6 +19,7 @@ import { FinancialTransactionService } from './financial-transaction.service';
 import { InventoryTransactionTemplateService } from './inventory-transaction-template.service';
 import { INewInventoryTransactionTemplateRequestData } from '../models/inventory-transaction-template';
 import { AuthService } from './auth.service';
+import { IFinancialUnit } from '../models/financial-unit';
 
 @Injectable({
   providedIn: 'root'
@@ -34,9 +34,6 @@ export class FinancialUnitDetailsService {
     private financialAccountService: FinancialAccountService,
     private inventoryGroupService: InventoryItemsGroupService,
     private inventoryItemService: InventoryItemService,
-    private inventoryTransactionTemplateService: InventoryTransactionTemplateService,
-    private inventoryTransactionService: InventoryTransactionService,
-    private financialTransactionService: FinancialTransactionService,
     private authService: AuthService
   ) { }
 

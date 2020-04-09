@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +10,10 @@ import { ThemeService } from './services/theme.service';
 export class AppComponent {
 
   constructor(
-    private router: Router,
-    private themeService: ThemeService
+    private router: Router
   ) {}
 
-  title = 'diplomka-frontend';
+  title = 'Diplomka';
 
   ngOnInit(): void {
     // document.documentElement.setAttribute('color-theme', 'light');

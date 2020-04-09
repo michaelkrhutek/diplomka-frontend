@@ -1,5 +1,6 @@
 import { IInventoryItem } from './inventory-item';
 import { IFinancialAccount } from './financial-account';
+import { IFinancialUnit } from './financial-unit';
 
 export interface IFinancialTransactionPopulated {
     _id: string;

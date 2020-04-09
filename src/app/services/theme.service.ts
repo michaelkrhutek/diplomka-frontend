@@ -31,7 +31,6 @@ export class ThemeService {
 
   toogleThemeMode(): void {
     const currentThemeMode: ThemeMode = this.activeThemeModeSource.getValue();
-    console.log(currentThemeMode);
     this.setThemeMode(currentThemeMode == ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light);
   }
 }

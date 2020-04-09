@@ -71,6 +71,7 @@ import { NewInventoryTransactionTemplateModalComponent } from './views/financial
 import { UsersTabComponent } from './views/financial-unit-details/users-tab/users-tab.component';
 import { AddUserModalComponent } from './views/financial-unit-details/users-tab/add-user-modal/add-user-modal.component';
 import { AppDateAdapter } from './services/date-adapter.service';
+import { PaginatedTableComponent } from './components/paginated-table/paginated-table.component';
 
 export const getBaseUrl = () => {
   if (environment.production) {
@@ -122,7 +123,8 @@ export const getBaseUrl = () => {
     InventoryTransactionTemplateComponent,
     NewInventoryTransactionTemplateModalComponent,
     UsersTabComponent,
-    AddUserModalComponent
+    AddUserModalComponent,
+    PaginatedTableComponent
   ],
   imports: [
     BrowserModule,
