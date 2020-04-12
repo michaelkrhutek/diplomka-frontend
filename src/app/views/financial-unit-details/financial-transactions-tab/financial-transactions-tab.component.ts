@@ -37,28 +37,13 @@ export class FinancialTransactionsTabComponent {
   });
 
   private filteringCriteria$: Observable<IFinancialTransactionsFilteringCriteria> = this.filteringCriteriaFG.valueChanges.pipe(
-    startWith(this.filteringCriteriaFG.value),
-    debounceTime(100)
+    startWith(this.filteringCriteriaFG.value)
   );
 
-  // financialTransactions$: Observable<FinancialTransactionPopulated[]> = combineLatest(
-  //   this.financialUnitDetailsService.financialUnitId$,
-  //   this.filteringCriteria$,
-  //   this.financialUnitDetailsService.reloadTransactions$
-  // ).pipe(
-  //   tap(() => (this.isLoadingData = true)),
-  //   switchMap(([financialUnitId, filteringCriteria]) => {
-  //     return this.financialTransactionService.getFiltredFinancialTransactions$(financialUnitId, filteringCriteria);
-  //   }),
-  // );
-
-  // tableData$: Observable<BasicTable> = this.financialTransactions$.pipe(
-  //   map((transactions: FinancialTransactionPopulated[]) => this.getTableDataFromFinancialTransactions(transactions)),
-  //   tap(() => (this.isLoadingData = false))
-  // );
-
   paginatedTable = new PaginatedTable<FinancialTransactionPopulated, IFinancialTransactionsFilteringCriteria>(
-    this.filteringCriteria$,
+    combineLatest(this.filteringCriteria$, this.financialUnitDetailsService.reloadTransactions$).pipe(
+      map(([fc]) => fc)
+    ),
     (fc, pi, ps) => {
       const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
       return this.financialTransactionService.getFiltredPaginatedFinancialTransactions$(financialUnitId, fc, pi, ps)

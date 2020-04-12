@@ -5,15 +5,15 @@ import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { StockDecrementType } from 'src/app/models/stock';
 import { StockService } from 'src/app/services/stock.service';
-import { INewInventoryGroupData } from 'src/app/models/inventory-items-group';
+import { INewInventoryGroupData } from 'src/app/models/inventory-group';
 
 @Component({
-  selector: 'app-new-inventory-items-group-modal',
-  templateUrl: './new-inventory-items-group-modal.component.html',
-  styleUrls: ['./new-inventory-items-group-modal.component.css'],
+  selector: 'app-new-inventory-group-modal',
+  templateUrl: './new-inventory-group-modal.component.html',
+  styleUrls: ['./new-inventory-group-modal.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NewInventoryItemsGroupModalComponent implements OnInit {
+export class NewInventoryGroupModalComponent implements OnInit {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
@@ -58,12 +58,12 @@ export class NewInventoryItemsGroupModalComponent implements OnInit {
     })
   );
 
-  createInventoryItemsGroup(): void {
+  createInventoryGroup(): void {
     const data: INewInventoryGroupData = this.inventoryGroupFG.value;
     if (data._id) {
-      this.financialUnitDetailsService.updateInventoryItemsGroup(data);
+      this.financialUnitDetailsService.updateInventoryGroup(data);
     } else {
-      this.financialUnitDetailsService.createInventoryItemsGroup(data);
+      this.financialUnitDetailsService.createInventoryGroup(data);
     }
     this.closeModal();
   }

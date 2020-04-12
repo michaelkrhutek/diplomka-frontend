@@ -5,7 +5,7 @@ import { IFinancialAccount } from 'src/app/models/financial-account';
 import { INewInventoryTransactionTemplateRequestData } from 'src/app/models/inventory-transaction-template';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { startWith, map } from 'rxjs/operators';
-import { IInventoryItemsGroup } from 'src/app/models/inventory-items-group';
+import { IInventoryGroup } from 'src/app/models/inventory-group';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
 import { InventoryTransactionType } from 'src/app/models/inventory-transaction-type';
 
@@ -42,7 +42,7 @@ export class NewInventoryTransactionTemplateModalComponent {
       description: this.inventoryTransactionService.getTransactionTypeDescription(type)
     };
   });
-  inventoryGroups$: Observable<IInventoryItemsGroup[]> = this.financialUnitDetailsService.inventoryItemsGroups$;
+  inventoryGroups$: Observable<IInventoryGroup[]> = this.financialUnitDetailsService.InventoryGroups$;
   financialAccounts$: Observable<IFinancialAccount[]> = this.financialUnitDetailsService.financialAccounts$;
 
   isCreateButtonDisabled$: Observable<boolean> = this.transactionTemplateFormData$.pipe(

@@ -1,4 +1,4 @@
-import { IInventoryItemsGroup } from './inventory-items-group';
+import { IInventoryGroup } from './inventory-group';
 
 export interface INewInventoryItemData {
     _id: string | null;
@@ -15,7 +15,7 @@ export interface IInventoryItem {
 export interface IInventoryItemPopulated {
     _id: string;
     name: string;
-    inventoryGroup: IInventoryItemsGroup;    
+    inventoryGroup: IInventoryGroup;    
 }
 
 export class InventoryItem {
@@ -28,5 +28,5 @@ export class InventoryItem {
 
     _id: string;
     name: string;
-    inventoryGroup: IInventoryItemsGroup;
+    inventoryGroup: IInventoryGroup;
 }

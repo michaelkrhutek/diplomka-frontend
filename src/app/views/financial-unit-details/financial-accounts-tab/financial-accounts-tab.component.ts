@@ -122,7 +122,7 @@ export class FinancialAccountsTabComponent {
     this.popUpsService.openConfirmationModal(data);
   }
 
-  openNewFinancialAccountModal(financialAccount: IFinancialAccount): void {
+  openNewFinancialAccountModal(financialAccount?: IFinancialAccount): void {
     if (financialAccount) {
       const data: INewFinancialAccountData = {
         _id: financialAccount._id,

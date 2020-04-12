@@ -6,15 +6,15 @@ export interface INewInventoryGroupData {
   defaultStockDecrementType: string;
 }
 
-export interface IInventoryItemsGroup {
+export interface IInventoryGroup {
     _id: string;
     name: string;
     defaultStockDecrementType: string;
 }
 
-export class InventoryItemsGroup {
+export class InventoryGroup {
 
-    constructor(data: IInventoryItemsGroup) {
+    constructor(data: IInventoryGroup) {
         this._id = data._id;
         this.name = data.name;
         this.defaultStockDecrementType = this.parseStockDecrementTypeString(data.defaultStockDecrementType);

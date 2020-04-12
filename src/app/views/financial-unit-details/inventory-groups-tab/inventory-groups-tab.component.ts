@@ -1,31 +1,33 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
-import { Observable, combineLatest } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
-import { InventoryItemsGroup, IInventoryItemsGroup, INewInventoryGroupData } from 'src/app/models/inventory-items-group';
+import { Observable, combineLatest, of } from 'rxjs';
+import { map, startWith, tap, switchMap } from 'rxjs/operators';
+import { InventoryGroup, IInventoryGroup, INewInventoryGroupData } from 'src/app/models/inventory-group';
 import { StockService } from 'src/app/services/stock.service';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 import { StockDecrementType } from 'src/app/models/stock';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
+import { InventoryGroupService } from 'src/app/services/inventory-group.service';
 
 @Component({
-  selector: 'app-inventory-items-groups-tab',
-  templateUrl: './inventory-items-groups-tab.component.html',
-  styleUrls: ['./inventory-items-groups-tab.component.css'],
+  selector: 'app-inventory-groups-tab',
+  templateUrl: './inventory-groups-tab.component.html',
+  styleUrls: ['./inventory-groups-tab.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InventoryItemsGroupsTabComponent {
+export class InventoryGroupsTabComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
     private stockService: StockService,
-    private popUpsService: PopUpsService
+    private popUpsService: PopUpsService,
+    private inventoryGroupService: InventoryGroupService
   ) { }
 
   isLoadingData: boolean = true;
-  isUpdateInventoryItemsGroupModalData: INewInventoryGroupData = null;
+  isUpdateInventoryGroupModalData: INewInventoryGroupData = null;
 
   filterTextFC: FormControl = new FormControl(null);
   filterText$: Observable<string> = this.filterTextFC.valueChanges.pipe(
@@ -33,18 +35,27 @@ export class InventoryItemsGroupsTabComponent {
     map((filterText: string) => filterText || '')
   );
 
-  tableData$: Observable<BasicTable> = combineLatest(
-    this.financialUnitDetailsService.inventoryItemsGroups$,
-    this.filterText$
+  inventoryGroups$: Observable<InventoryGroup[]> = combineLatest(
+    this.financialUnitDetailsService.financialUnitId$,
+    this.financialUnitDetailsService.reloadInventoryGroups$
   ).pipe(
     tap(() => (this.isLoadingData = true)),
-    map(([groups, filterText]) => this.getFilteredInventoryGroups(groups, filterText)),
-    map((groups: InventoryItemsGroup[]) => this.getTableDataFromInventoryGroups(groups)),
+    switchMap(([financialUnitId]) => financialUnitId ? this.inventoryGroupService.getInventoryGroups$(financialUnitId) : of([])),
+  );
+
+  filtredInventoryGroups$: Observable<IInventoryGroup[]> = combineLatest(
+    this.inventoryGroups$, this.filterText$
+  ).pipe(
+    map(([groups, filterText]) => this.getFilteredInventoryGroups(groups, filterText))
+  );
+
+  tableData$: Observable<BasicTable> = this.filtredInventoryGroups$.pipe(
+    map((groups: InventoryGroup[]) => this.getTableDataFromInventoryGroups(groups)),
     tap(() => (this.isLoadingData = false)),
   );
 
   private getTableDataFromInventoryGroups(
-    groups: InventoryItemsGroup[]
+    groups: InventoryGroup[]
   ): BasicTable {
     const header: IBasicTableHeaderInputData = {
       actionItemsPosition: BasicTableActionItemsPosition.Start,
@@ -69,14 +80,14 @@ export class InventoryItemsGroupsTabComponent {
   }
 
   private getTableRowDataFromInventoryGroup(
-    group: InventoryItemsGroup
+    group: InventoryGroup
   ): IBasicTableRowInputData {
     const row: IBasicTableRowInputData = {
       actionItems: [
         {
           iconName: 'create',
           description: 'Upravit',
-          action: () => this.openNewInventoryItemsGroupModal(group)
+          action: () => this.openNewInventoryGroupModal(group)
         },
         {
           iconName: 'delete',
@@ -98,28 +109,28 @@ export class InventoryItemsGroupsTabComponent {
     return row;
   }
 
-  openNewInventoryItemsGroupModal(inventoryGroup?: IInventoryItemsGroup): void {
+  openNewInventoryGroupModal(inventoryGroup?: IInventoryGroup): void {
     if (inventoryGroup) {
-      const newInventoryItemsGroup: INewInventoryGroupData = {
+      const newInventoryGroup: INewInventoryGroupData = {
         _id: inventoryGroup._id,
         name: inventoryGroup.name,
         defaultStockDecrementType: inventoryGroup.defaultStockDecrementType
       };
-      this.isUpdateInventoryItemsGroupModalData = newInventoryItemsGroup;
+      this.isUpdateInventoryGroupModalData = newInventoryGroup;
     } else {
-      const newInventoryItemsGroup: INewInventoryGroupData = { _id: null, name: null, defaultStockDecrementType: null };
-      this.isUpdateInventoryItemsGroupModalData = newInventoryItemsGroup;
+      const newInventoryGroup: INewInventoryGroupData = { _id: null, name: null, defaultStockDecrementType: null };
+      this.isUpdateInventoryGroupModalData = newInventoryGroup;
     }
   }
 
-  closeNewInventoryItemsGroupModal(): void {
-    this.isUpdateInventoryItemsGroupModalData = null;
+  closeNewInventoryGroupModal(): void {
+    this.isUpdateInventoryGroupModalData = null;
   }
 
-  deleteGroup(account: InventoryItemsGroup): void {
+  deleteGroup(account: InventoryGroup): void {
     const data: IConfirmationModalData = {
       message: 'Smazáním skupiny se i smažou všechny její, položky, transakce a účetní zápisy. Opravdu chcete smazat skupinu?',
-      action: () => this.financialUnitDetailsService.deleteInventoryItemsGroup(account._id)
+      action: () => this.financialUnitDetailsService.deleteInventoryGroup(account._id)
     };
     this.popUpsService.openConfirmationModal(data);
   }
@@ -127,15 +138,15 @@ export class InventoryItemsGroupsTabComponent {
   deleteAllGroups(): void {
     const data: IConfirmationModalData = {
       message: 'Smazáním všech skupin se i smažou všechny položky, transakce a účetní zápisy. Opravdu chcete smazat všechny skupiny?',
-      action: () => this.financialUnitDetailsService.deleteAllInventoryItemsGroups()
+      action: () => this.financialUnitDetailsService.deleteAllInventoryGroups()
     };
     this.popUpsService.openConfirmationModal(data);
   }
 
   private getFilteredInventoryGroups(
-    inventoryGroups: IInventoryItemsGroup[],
+    inventoryGroups: IInventoryGroup[],
     filterText: string
-  ): IInventoryItemsGroup[] {
+  ): IInventoryGroup[] {
     return inventoryGroups.filter((item) => item.name.toLowerCase().includes(filterText.toLowerCase()));
   }
 }

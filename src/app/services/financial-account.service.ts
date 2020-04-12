@@ -1,10 +1,10 @@
 import { Injectable, Inject } from '@angular/core';
 import { FinancialAccountType } from '../models/financial-account-type';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
 import { Observable, of } from 'rxjs';
-import { FinancialAccount, IFinancialAccount } from '../models/financial-account';
-import { catchError, map, tap } from 'rxjs/operators';
+import { FinancialAccount, IFinancialAccount, INewFinancialAccountData } from '../models/financial-account';
+import { catchError, map, tap, filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -29,30 +29,56 @@ export class FinancialAccountService {
     );
   }
 
-  // getAllFinancialAccountTypes(): FinancialAccountType[] {
-  //   return [
-  //     FinancialAccountType.Assets,
-  //     FinancialAccountType.Liabilities,
-  //     FinancialAccountType.Equity,
-  //     FinancialAccountType.Revenues,
-  //     FinancialAccountType.Expenses
-  //   ];
-  // }
+  getCreateFinancialAccount$(financialUnitId: string, data: INewFinancialAccountData): Observable<any> {
+    const params: HttpParams = new HttpParams()
+      .append('name', data.name)
+      .append('code', data.code)
+      .append('financialUnitId', financialUnitId)
+    return this.http.post<any>(`${this.baseUrl}api/financial-account/create-financial-account`, null, { params }).pipe(
+      catchError((err) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res)
+    );
+  }
 
-  // getFinancialAccountTypeName(type: FinancialAccountType): string {
-  //   switch (type) {
-  //     case FinancialAccountType.Assets:
-  //       return 'Assets';
-  //     case FinancialAccountType.Equity:
-  //       return 'Equity';
-  //     case FinancialAccountType.Liabilities:
-  //       return 'Liabilities';
-  //     case FinancialAccountType.Revenues:
-  //       return 'Revenues';
-  //     case FinancialAccountType.Expenses:
-  //       return 'Expenses';
-  //     default:
-  //       return 'N/A';
-  //   }
-  // }
+  getUpdateFinancialAccount$(data: INewFinancialAccountData): Observable<'OK'> {
+    const params: HttpParams = new HttpParams()
+      .append('id', data._id)
+      .append('name', data.name)
+      .append('code', data.code)
+    return this.http.post<any>(`${this.baseUrl}api/financial-account/update-financial-account`, null, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res)
+    );
+  }
+
+  getDeleteFinancialAccount$(id: string): Observable<'OK'> {
+    const params: HttpParams = new HttpParams().append('id', id);
+    return this.http.delete<any>(`${this.baseUrl}api/financial-account/delete-financial-account`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err: HttpErrorResponse) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res)
+    );
+  }
+
+  getDeleteAllFinancialAccounts$(financialUnitId: string): Observable<'OK'> {
+    const params: HttpParams = new HttpParams().append('financialUnitId', financialUnitId);
+    return this.http.delete<any>(`${this.baseUrl}api/financial-account/delete-all-financial-accounts`, { params }).pipe(
+      map(() => 'OK'),
+      catchError((err) => {
+        this.popUpsService.handleApiError(err);
+        return of(null);
+      }),
+      filter((res: any) => !!res)
+    );
+  }
 }

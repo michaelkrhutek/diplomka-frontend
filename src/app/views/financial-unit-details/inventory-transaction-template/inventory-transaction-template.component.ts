@@ -41,6 +41,7 @@ export class InventoryTransactionTemplateComponent {
     this.financialUnitDetailsService.financialUnitId$,
     this.financialUnitDetailsService.reloadTransactionTemplates$
   ).pipe(
+    tap(() => (this.isLoadingData = true)),
     switchMap(([financialUnitId]) => {
       return financialUnitId ? this.inventoryTransactionTemplateService.getAllInventoryTransactionTemplates$(financialUnitId) : of([]);
     })
@@ -50,7 +51,6 @@ export class InventoryTransactionTemplateComponent {
     this.transactionTemplates$,
     this.filterText$
   ).pipe(
-    tap(() => (this.isLoadingData = true)),
     map(([templates, filterText]) => this.getFilteredTemplates(templates, filterText)),
     map((items: IInventoryTransactionTemplatePopulated[]) => this.getTableDataFromInventoryItems(items)),
     tap(() => (this.isLoadingData = false)),

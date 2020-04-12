@@ -22,7 +22,7 @@ export class PaginatedTable<DataType, FilteringCriteria> {
     pageIndex$: Observable<number> = this.pageIndexSource.asObservable();
 
     // Page size stream
-    private pageSizeFC: FormControl = new FormControl(this.pageSizes[1]);
+    pageSizeFC: FormControl = new FormControl(this.pageSizes[1]);
     pageSize$: Observable<number> = this.pageSizeFC.valueChanges.pipe(startWith(this.pageSizeFC.value));
 
     // Is loading stream

@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, Output, EventEmitter, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
-import { InventoryItemsGroup } from 'src/app/models/inventory-items-group';
+import { InventoryGroup } from 'src/app/models/inventory-group';
 import { map, startWith, tap } from 'rxjs/operators';
 import { FormControl, FormGroup } from '@angular/forms';
 import { INewInventoryItemData } from 'src/app/models/inventory-item';
@@ -44,9 +44,9 @@ export class NewInventoryItemModalComponent {
     startWith(this.inventoryItemFG)
   );
 
-  inventoryItemsGroupOptions$: Observable<IInventoryItemsGroupOption[]> = this.financialUnitDetailsService.inventoryItemsGroups$.pipe(
-    map((groups: InventoryItemsGroup[]) => groups.map((group: InventoryItemsGroup) => {
-      const option: IInventoryItemsGroupOption = {
+  InventoryGroupOptions$: Observable<IInventoryGroupOption[]> = this.financialUnitDetailsService.InventoryGroups$.pipe(
+    map((groups: InventoryGroup[]) => groups.map((group: InventoryGroup) => {
+      const option: IInventoryGroupOption = {
         id: group._id,
         name: group.name
       };
@@ -80,7 +80,7 @@ export class NewInventoryItemModalComponent {
   }
 }
 
-interface IInventoryItemsGroupOption {
+interface IInventoryGroupOption {
   id: string;
   name: string;
 }

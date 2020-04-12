@@ -61,6 +61,7 @@ export class StockService {
       ]
     };
     const rows: IBasicTableRowInputData[] = (stock.batches || [])
+      .sort((a, b) => a.transactionIndex - b.transactionIndex)
       .map(batch => this.getTableRowDataFromStockBatch(batch));
     const costPerUnit: number = stock.totalStockQuantity ? stock.totalStockCost / stock.totalStockQuantity : 0;
     const totalRow: IBasicTableRowInputData = {

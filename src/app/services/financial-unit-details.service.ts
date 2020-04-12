@@ -6,14 +6,14 @@ import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular
 import { PopUpsService } from './pop-ups.service';
 import { FinancialPeriod } from '../models/financial-period';
 import { SnackbarType } from '../models/snackbar-data';
-import { InventoryItemsGroup, INewInventoryGroupData } from '../models/inventory-items-group';
+import { InventoryGroup, INewInventoryGroupData } from '../models/inventory-group';
 import { IInventoryItemPopulated, INewInventoryItemData } from '../models/inventory-item';
 import { InventoryTransactionType } from '../models/inventory-transaction-type';
 import { INewInventoryTransactionRequestData, IIncrementInventoryTransactionSpecificData, IDecrementInventoryTransactionSpecificData } from '../models/inventory-transaction';
 import { InventoryItemService } from './inventory-item.service';
 import { FinancialPeriodService } from './financial-period.service';
 import { FinancialAccountService } from './financial-account.service';
-import { InventoryItemsGroupService } from './inventory-items-group.service';
+import { InventoryGroupService } from './inventory-group.service';
 import { InventoryTransactionService } from './inventory-transaction.service';
 import { FinancialTransactionService } from './financial-transaction.service';
 import { InventoryTransactionTemplateService } from './inventory-transaction-template.service';
@@ -32,7 +32,7 @@ export class FinancialUnitDetailsService {
     private popUpsService: PopUpsService,
     private financialPeriodService: FinancialPeriodService,
     private financialAccountService: FinancialAccountService,
-    private inventoryGroupService: InventoryItemsGroupService,
+    private inventoryGroupService: InventoryGroupService,
     private inventoryItemService: InventoryItemService,
     private authService: AuthService
   ) { }
@@ -82,16 +82,7 @@ export class FinancialUnitDetailsService {
       return null;
     }
     this.popUpsService.openLoadingModal({ message: 'Vytvářím finanční účet' });
-    const params: HttpParams = new HttpParams()
-      .append('name', data.name)
-      .append('code', data.code)
-      .append('financialUnitId', financialUnitId)
-    this.http.post<any>(`${this.baseUrl}api/financial-account/create-financial-account`, null, { params }).pipe(
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.financialAccountService.getCreateFinancialAccount$(financialUnitId, data).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Finanční účet byl vytvořen', type: SnackbarType.Success });
@@ -105,17 +96,7 @@ export class FinancialUnitDetailsService {
       return null;
     }
     this.popUpsService.openLoadingModal({ message: 'Upravuji finanční účet' });
-    const params: HttpParams = new HttpParams()
-      .append('id', data._id)
-      .append('name', data.name)
-      .append('code', data.code)
-    this.http.post<any>(`${this.baseUrl}api/financial-account/update-financial-account`, null, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.financialAccountService.getUpdateFinancialAccount$(data).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Finanční účet byl upraven', type: SnackbarType.Success });
@@ -126,17 +107,11 @@ export class FinancialUnitDetailsService {
 
   deleteFinancialAccount(id: string): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji účet' });
-    const params: HttpParams = new HttpParams().append('id', id);
-    this.http.delete<any>(`${this.baseUrl}api/financial-account/delete-financial-account`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.financialAccountService.getDeleteFinancialAccount$(id).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Účet byl odstraněn', type: SnackbarType.Success });
+      this.reloadFinancialAccountsSource.next();
       this.reloadTransactionsSource.next();
       this.reloadTransactionTemplatesSource.next();
     });
@@ -144,17 +119,11 @@ export class FinancialUnitDetailsService {
 
   deleteAllFinancialAccounts(): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji účty' });
-    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
-    this.http.delete<any>(`${this.baseUrl}api/financial-account/delete-all-financial-accounts`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.financialAccountService.getDeleteAllFinancialAccounts$(this.getFinancialUnitId()).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Účty byly odstraněny', type: SnackbarType.Success });
+      this.reloadFinancialAccountsSource.next();
       this.reloadTransactionsSource.next();
       this.reloadTransactionTemplatesSource.next();
     });
@@ -253,96 +222,58 @@ export class FinancialUnitDetailsService {
   Inventory groups
   */
 
-  reloadInventoryItemsGroupsSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
-  reloadInventoryItemsGroups$: Observable<void> = this.reloadInventoryItemsGroupsSource.asObservable();
+  reloadInventoryGroupsSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
+  reloadInventoryGroups$: Observable<void> = this.reloadInventoryGroupsSource.asObservable();
 
-  inventoryItemsGroups$: Observable<InventoryItemsGroup[]> = combineLatest(this.financialUnitId$, this.reloadInventoryItemsGroups$).pipe(
-    switchMap(([financialUnitId]) => financialUnitId ? this.inventoryGroupService.getInventoryItemsGroups$(financialUnitId) : of([])),
+  InventoryGroups$: Observable<InventoryGroup[]> = combineLatest(this.financialUnitId$, this.reloadInventoryGroups$).pipe(
+    switchMap(([financialUnitId]) => financialUnitId ? this.inventoryGroupService.getInventoryGroups$(financialUnitId) : of([])),
     shareReplay(1)
   );
 
-  createInventoryItemsGroup(data: INewInventoryGroupData): void {
+  createInventoryGroup(data: INewInventoryGroupData): void {
     const financialUnitId: string = this.getFinancialUnitId();
     if (!financialUnitId) {
       return null;
     }
     this.popUpsService.openLoadingModal({ message: 'Vytvářím skupinu zásob' });
-    const params: HttpParams = new HttpParams()
-      .append('financialUnitId', financialUnitId)
-      .append('name', data.name)
-      .append('defaultStockDecrementType', data.defaultStockDecrementType)
-    this.http.post<any>(`${this.baseUrl}api/inventory-group/create-inventory-group`, null, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryGroupService.getCreateInventoryGroup$(financialUnitId, data).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Skupina zásob byla vytvořena', type: SnackbarType.Success });
-      this.reloadInventoryItemsGroupsSource.next();
+      this.reloadInventoryGroupsSource.next();
     });
   }
 
-  updateInventoryItemsGroup(data: INewInventoryGroupData): void {
-    const financialUnitId: string = this.getFinancialUnitId();
-    if (!financialUnitId) {
-      return null;
-    }
+  updateInventoryGroup(data: INewInventoryGroupData): void {
     this.popUpsService.openLoadingModal({ message: 'Upravuji skupinu zásob' });
-    const params: HttpParams = new HttpParams()
-      .append('id', data._id)
-      .append('name', data.name)
-      .append('defaultStockDecrementType', data.defaultStockDecrementType)
-    this.http.post<any>(`${this.baseUrl}api/inventory-group/update-inventory-group`, null, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryGroupService.getUpdateInventoryGroup$(data).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Skupina zásob byla upravena', type: SnackbarType.Success });
-      this.reloadInventoryItemsGroupsSource.next();
+      this.reloadInventoryGroupsSource.next();
       this.reloadInventoryItemsSource.next();
       this.reloadTransactionTemplatesSource.next();
     });
   }
 
-  deleteInventoryItemsGroup(id: string): void {
+  deleteInventoryGroup(id: string): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji skupinu' });
-    const params: HttpParams = new HttpParams().append('financialUnitId', id);
-    this.http.delete<any>(`${this.baseUrl}api/inventory-group/delete-inventory-group`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryGroupService.getDeleteInventoryGroup$(id).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Skupina byla odstraněna', type: SnackbarType.Success });
-      this.reloadInventoryItemsGroupsSource.next();
+      this.reloadInventoryGroupsSource.next();
       this.reloadInventoryItemsSource.next();
       this.reloadTransactionTemplatesSource.next();
     });
   }
 
-  deleteAllInventoryItemsGroups(): void {
+  deleteAllInventoryGroups(): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji skupinu' });
-    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
-    this.http.delete<any>(`${this.baseUrl}api/inventory-group/delete-all-inventory-groups`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryGroupService.deleteAllInventoryGroups$(this.getFinancialUnitId()).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
-      this.reloadInventoryItemsGroupsSource.next();
+      this.reloadInventoryGroupsSource.next();
       this.reloadInventoryItemsSource.next();
       this.reloadTransactionTemplatesSource.next();
       this.popUpsService.showSnackbar({ message: 'Skupiny byly odstraněny', type: SnackbarType.Success });
@@ -367,16 +298,7 @@ export class FinancialUnitDetailsService {
       return null;
     }
     this.popUpsService.openLoadingModal({ message: 'Vytvářím položku zásob' });
-    const params: HttpParams = new HttpParams()
-      .append('financialUnitId', financialUnitId)
-      .append('name', data.name)
-      .append('inventoryGroupId', data.inventoryGroupId)
-    this.http.post<any>(`${this.baseUrl}api/inventory-item/create-inventory-item`, null, { params }).pipe(
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryItemService.getCreateInventoryItem$(financialUnitId, data).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Položka zásob byla vytvořena', type: SnackbarType.Success });
@@ -390,17 +312,7 @@ export class FinancialUnitDetailsService {
       return null;
     }
     this.popUpsService.openLoadingModal({ message: 'Upravuji položku zásob' });
-    const params: HttpParams = new HttpParams()
-      .append('id', data._id)
-      .append('name', data.name)
-      .append('inventoryGroupId', data.inventoryGroupId)
-    this.http.post<any>(`${this.baseUrl}api/inventory-item/update-inventory-item`, null, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryItemService.getUpdateInventoryItem$(data).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Položka zásob byla upravena', type: SnackbarType.Success });
@@ -410,14 +322,7 @@ export class FinancialUnitDetailsService {
 
   deleteInventoryItem(id: string): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji položku' });
-    const params: HttpParams = new HttpParams().append('id', id);
-    this.http.delete<any>(`${this.baseUrl}api/inventory-item/delete-inventory-item`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryItemService.getDeleteInventoryItem$(id).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.reloadInventoryItemsSource.next();
@@ -427,14 +332,7 @@ export class FinancialUnitDetailsService {
 
   deleteAllInventoryItems(): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji položky' });
-    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
-    this.http.delete<any>(`${this.baseUrl}api/inventory-item/delete-all-inventory-items`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryItemService.getDeleteAllInventoryItems$(this.getFinancialUnitId()).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.reloadInventoryItemsSource.next();

@@ -1,12 +1,13 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
-import { Observable, combineLatest } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
+import { Observable, combineLatest, of } from 'rxjs';
+import { map, startWith, tap, switchMap } from 'rxjs/operators';
 import { IInventoryItemPopulated, INewInventoryItemData } from 'src/app/models/inventory-item';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
+import { InventoryItemService } from 'src/app/services/inventory-item.service';
 
 @Component({
   selector: 'app-inventory-items-tab',
@@ -18,7 +19,8 @@ export class InventoryItemsTabComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
-    private popUpsService: PopUpsService
+    private popUpsService: PopUpsService,
+    private inventoryItemService: InventoryItemService
   ) { }
 
   isLoadingData: boolean = true;
@@ -30,14 +32,24 @@ export class InventoryItemsTabComponent {
     map((filterText: string) => filterText || '')
   );
 
-  tableData$: Observable<BasicTable> = combineLatest(
-    this.financialUnitDetailsService.inventoryItems$,
-    this.filterText$
+  inventoryItems$: Observable<IInventoryItemPopulated[]> = combineLatest(
+    this.financialUnitDetailsService.financialUnitId$,
+    this.financialUnitDetailsService.reloadInventoryItems$
   ).pipe(
     tap(() => (this.isLoadingData = true)),
-    map(([items, filterText]) => this.getFilteredInventoryItems(items, filterText)),
+    switchMap(([financialUnitId]) => financialUnitId ? this.inventoryItemService.getInventoryItems$(financialUnitId) : of([]))
+  );
+
+  filtredInventoryItems$: Observable<IInventoryItemPopulated[]> = combineLatest(
+    this.inventoryItems$,
+    this.filterText$
+  ).pipe(
+    map(([items, filterText]) => this.getFilteredInventoryItems(items, filterText))
+  )
+
+  tableData$: Observable<BasicTable> = this.filtredInventoryItems$.pipe(
     map((items: IInventoryItemPopulated[]) => this.getTableDataFromInventoryItems(items)),
-    tap(() => (this.isLoadingData = false)),
+    tap(() => (this.isLoadingData = false))
   );
 
   private getTableDataFromInventoryItems(

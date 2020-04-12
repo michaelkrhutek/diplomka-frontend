@@ -16,10 +16,7 @@ import {
   MatDatepickerModule,
   MatNativeDateModule,
   MatMenuModule,
-  MatAutocompleteModule,
-  MAT_DATE_FORMATS,
-  DateAdapter,
-  NativeDateModule
+  MatAutocompleteModule
 } from "@angular/material";
 import { AppComponent } from './app.component';
 import { HomeComponent } from './views/home/home.component';
@@ -42,8 +39,8 @@ import { FinancialAccountsTabComponent } from './views/financial-unit-details/fi
 import { FinancialPeriodsTabComponent } from './views/financial-unit-details/financial-periods-tab/financial-periods-tab.component';
 import { NewFinancialPeriodModalComponent } from './views/financial-unit-details/financial-periods-tab/new-financial-period-modal/new-financial-period-modal.component';
 import { NewFinancialAccountModalComponent } from './views/financial-unit-details/financial-accounts-tab/new-financial-account-modal/new-financial-account-modal.component';
-import { InventoryItemsGroupsTabComponent } from './views/financial-unit-details/inventory-items-groups-tab/inventory-items-groups-tab.component';
-import { NewInventoryItemsGroupModalComponent } from './views/financial-unit-details/inventory-items-groups-tab/new-inventory-items-group-modal/new-inventory-items-group-modal.component';
+import { InventoryGroupsTabComponent } from './views/financial-unit-details/inventory-groups-tab/inventory-groups-tab.component';
+import { NewInventoryGroupModalComponent } from './views/financial-unit-details/inventory-groups-tab/new-inventory-group-modal/new-inventory-group-modal.component';
 import { InventoryItemsTabComponent } from './views/financial-unit-details/inventory-items-tab/inventory-items-tab.component';
 import { NewInventoryItemModalComponent } from './views/financial-unit-details/inventory-items-tab/new-inventory-item-modal/new-inventory-item-modal.component';
 import { InventoryTransactionsTabComponent } from './views/financial-unit-details/inventory-transactions-tab/inventory-transactions-tab.component';
@@ -58,7 +55,6 @@ import { AuthService } from './services/auth.service';
 import { InventoryTransactionDetailsModalComponent } from './views/financial-unit-details/inventory-transactions-tab/inventory-transaction-details-modal/inventory-transaction-details-modal.component';
 import { BasicTableComponent } from './components/basic-table/basic-table.component';
 import { BasicTableHeaderComponent } from './components/basic-table/basic-table-header/basic-table-header.component';
-import { BasicTableRow } from './models/basic-table-models';
 import { BasicTableRowComponent } from './components/basic-table/basic-table-row/basic-table-row.component';
 import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
 import { StockDetailsModalComponent } from './views/financial-unit-details/stocks-tab/stock-details-modal/stock-details-modal.component';
@@ -70,7 +66,6 @@ import { InventoryTransactionTemplateComponent } from './views/financial-unit-de
 import { NewInventoryTransactionTemplateModalComponent } from './views/financial-unit-details/inventory-transaction-template/new-inventory-transaction-template-modal/new-inventory-transaction-template-modal.component';
 import { UsersTabComponent } from './views/financial-unit-details/users-tab/users-tab.component';
 import { AddUserModalComponent } from './views/financial-unit-details/users-tab/add-user-modal/add-user-modal.component';
-import { AppDateAdapter } from './services/date-adapter.service';
 import { PaginatedTableComponent } from './components/paginated-table/paginated-table.component';
 
 export const getBaseUrl = () => {
@@ -99,8 +94,8 @@ export const getBaseUrl = () => {
     FinancialPeriodsTabComponent,
     NewFinancialPeriodModalComponent,
     NewFinancialAccountModalComponent,
-    InventoryItemsGroupsTabComponent,
-    NewInventoryItemsGroupModalComponent,
+    InventoryGroupsTabComponent,
+    NewInventoryGroupModalComponent,
     InventoryItemsTabComponent,
     NewInventoryItemModalComponent,
     InventoryTransactionsTabComponent,

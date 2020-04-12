@@ -1,6 +1,6 @@
 import { InventoryTransactionType } from './inventory-transaction-type';
 import { IFinancialAccount } from './financial-account';
-import { IInventoryItemsGroup } from './inventory-items-group';
+import { IInventoryGroup } from './inventory-group';
 
 export interface INewInventoryTransactionTemplateRequestData {
     description: string;
@@ -25,7 +25,7 @@ export interface IInventoryTransactionTemplatePopulated {
     description: string;
     transactionType: InventoryTransactionType;
     financialUnit: string;
-    inventoryGroup: IInventoryItemsGroup;
+    inventoryGroup: IInventoryGroup;
     debitAccount: IFinancialAccount;
     creditAccount: IFinancialAccount;
 }

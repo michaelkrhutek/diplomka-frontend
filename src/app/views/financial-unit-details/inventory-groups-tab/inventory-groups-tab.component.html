@@ -8,8 +8,8 @@
     </div>
     <div class="card">
         <div class="flex-container">
-            <button mat-flat-button color="primary" (click)="openNewInventoryItemsGroupModal()">
-                Nová skupina
+            <button mat-flat-button color="primary" (click)="openNewInventoryGroupModal()">
+                Nová skupina    
             </button>
             <button mat-flat-button color="primary" (click)="deleteAllGroups()">
                 Smazat všechny skupiny
@@ -19,5 +19,5 @@
     </div>
 </div>
 
-<app-new-inventory-items-group-modal *ngIf="isUpdateInventoryItemsGroupModalData as data" [data]="data"
-    (close)="closeNewInventoryItemsGroupModal()"></app-new-inventory-items-group-modal>
+<app-new-inventory-group-modal *ngIf="isUpdateInventoryGroupModalData as data" [data]="data"
+    (close)="closeNewInventoryGroupModal()"></app-new-inventory-group-modal>

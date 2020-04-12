@@ -53,30 +53,13 @@ export class InventoryTransactionsTabComponent {
   });
 
   private filteringCriteria$: Observable<IInventoryTransactionFilteringCriteria> = this.filteringCriteriaFG.valueChanges.pipe(
-    startWith(this.filteringCriteriaFG.value),
-    debounceTime(100)
+    startWith(this.filteringCriteriaFG.value)
   );
 
-  // private inventoryTransactions$: Observable<InventoryTransactionPopulated<any>[]> = combineLatest(
-  //   this.financialUnitDetailsService.financialUnitId$,
-  //   this.filteringCriteria$,
-  //   this.financialUnitDetailsService.reloadTransactions$
-  // ).pipe(
-  //   tap(() => (this.isLoadingData = true)),
-  //   switchMap(([financialUnitId, filteringCriteria]) => {
-  //     return financialUnitId && filteringCriteria ?
-  //       this.inventoryTransactionService.getFiltredInventoryTransactions$(financialUnitId, filteringCriteria) :
-  //       of([]);
-  //   }),
-  // );
-
-  // tableData$: Observable<BasicTable> = this.inventoryTransactions$.pipe(
-  //   map((transactions: InventoryTransactionPopulated<any>[]) => this.getTableDataFromInventoryTransactions(transactions)),
-  //   tap(() => (this.isLoadingData = false)),
-  // );
-
   paginatedTable = new PaginatedTable<InventoryTransactionPopulated<any>, IInventoryTransactionFilteringCriteria>(
-    this.filteringCriteria$,
+    combineLatest(this.filteringCriteria$, this.financialUnitDetailsService.reloadTransactions$).pipe(
+      map(([fc]) => fc)
+    ),
     (fc, pi, ps) => {
       const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
       return this.inventoryTransactionService.getFiltredPaginatedInventoryTransactions$(financialUnitId, fc, pi, ps)
