@@ -3,7 +3,7 @@ import { TrialBalanceService } from 'src/app/services/trial-balance.service';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { FormatterService } from 'src/app/services/formatter.service';
 import { Observable, of, combineLatest } from 'rxjs';
-import { tap, switchMap, map, startWith, combineAll, take } from 'rxjs/operators';
+import { tap, switchMap, map, startWith, combineAll, take, shareReplay } from 'rxjs/operators';
 import { ListItem, IListItem } from 'src/app/models/list-item';
 import { TrialBalance, ITrialBalanceAccount } from 'src/app/models/trial-balance';
 import { FormControl } from '@angular/forms';
@@ -45,13 +45,23 @@ export class TrialBalanceTabComponent {
   );
 
   trialBalance$: Observable<TrialBalance> = this.selectedFinancialPeriodId$.pipe(
-    tap(() => (this.isLoadingData = true)),
+    tap(() => this.isLoadingData = true),
     switchMap((financialPeriodId) => financialPeriodId ? this.trialBalanceService.getFinancialPeriodTrialBalance$(financialPeriodId) : of(null)),
+    shareReplay(1)
+  );
+
+  profitOrLoss$: Observable<string> = this.trialBalance$.pipe(
+    map((trialBalance) => {
+      if (!trialBalance) {
+        return '-';
+      }
+      return this.formatterService.getRoundedNumberStringWithSign(trialBalance.profitOrLoss, 2);
+    })
   );
 
   tableData$: Observable<BasicTable> = this.trialBalance$.pipe(
     map((trialBalance) => trialBalance ? this.getTableDataFromTrialBalance(trialBalance) : null),
-    tap(() => (this.isLoadingData = false))
+    tap(() => this.isLoadingData = false)
   );
 
   ngOnInit(): void {
@@ -76,16 +86,11 @@ export class TrialBalanceTabComponent {
         },
         {
           name: 'Název účtu',
-          width: 12,
+          width: 16,
           align: BasicTableValueAlign.Left
         },
         {
           name: 'Debetní zápisy',
-          width: 6,
-          align: BasicTableValueAlign.Right
-        },
-        {
-          name: 'Debetní obrat',
           width: 6,
           align: BasicTableValueAlign.Right
         },
@@ -95,7 +100,17 @@ export class TrialBalanceTabComponent {
           align: BasicTableValueAlign.Right
         },
         {
+          name: 'Debetní obrat',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
           name: 'Kreditní obrat',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
+          name: 'Celková změna',
           width: 6,
           align: BasicTableValueAlign.Right
         },
@@ -119,15 +134,19 @@ export class TrialBalanceTabComponent {
         },
         {
           type: BasicTableRowCellType.Display,
-          data: this.formatterService.getRoundedNumberString(trialBalance.totalDebitAmount, 2)
-        },
-        {
-          type: BasicTableRowCellType.Display,
           data: this.formatterService.getRoundedNumberString(trialBalance.totalCreditEntries)
         },
         {
           type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(trialBalance.totalDebitAmount, 2)
+        },
+        {
+          type: BasicTableRowCellType.Display,
           data: this.formatterService.getRoundedNumberString(trialBalance.totalCreditAmount, 2)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberStringWithSign(trialBalance.totalDebitAmount - trialBalance.totalCreditAmount, 2)
         }
       ]
     };
@@ -154,15 +173,19 @@ export class TrialBalanceTabComponent {
         },
         {
           type: BasicTableRowCellType.Display,
-          data: this.formatterService.getRoundedNumberString(account.debitAmount, 2)
-        },
-        {
-          type: BasicTableRowCellType.Display,
           data: this.formatterService.getRoundedNumberString(account.creditEntriesCount)
         },
         {
           type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberString(account.debitAmount, 2)
+        },
+        {
+          type: BasicTableRowCellType.Display,
           data: this.formatterService.getRoundedNumberString(account.creditAmount, 2)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.formatterService.getRoundedNumberStringWithSign(account.debitAmount - account.creditAmount, 2)
         }
       ]
     }

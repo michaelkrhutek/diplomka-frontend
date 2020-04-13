@@ -2,20 +2,19 @@ import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
 import { FinancialAccount, INewFinancialAccountData } from '../models/financial-account';
 import { switchMap, catchError, map, filter, finalize, shareReplay } from 'rxjs/operators';
-import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { PopUpsService } from './pop-ups.service';
 import { FinancialPeriod } from '../models/financial-period';
 import { SnackbarType } from '../models/snackbar-data';
 import { InventoryGroup, INewInventoryGroupData } from '../models/inventory-group';
 import { IInventoryItemPopulated, INewInventoryItemData } from '../models/inventory-item';
 import { InventoryTransactionType } from '../models/inventory-transaction-type';
-import { INewInventoryTransactionRequestData, IIncrementInventoryTransactionSpecificData, IDecrementInventoryTransactionSpecificData } from '../models/inventory-transaction';
+import { INewInventoryTransactionRequestData, IIncrementInventoryTransactionSpecificData, IDecrementInventoryTransactionSpecificData, ISaleInventoryTransactionSpecificData } from '../models/inventory-transaction';
 import { InventoryItemService } from './inventory-item.service';
 import { FinancialPeriodService } from './financial-period.service';
 import { FinancialAccountService } from './financial-account.service';
 import { InventoryGroupService } from './inventory-group.service';
 import { InventoryTransactionService } from './inventory-transaction.service';
-import { FinancialTransactionService } from './financial-transaction.service';
 import { InventoryTransactionTemplateService } from './inventory-transaction-template.service';
 import { INewInventoryTransactionTemplateRequestData } from '../models/inventory-transaction-template';
 import { AuthService } from './auth.service';
@@ -34,6 +33,8 @@ export class FinancialUnitDetailsService {
     private financialAccountService: FinancialAccountService,
     private inventoryGroupService: InventoryGroupService,
     private inventoryItemService: InventoryItemService,
+    private inventoryTransactionTemplateService: InventoryTransactionTemplateService, 
+    private inventoryTransactionService: InventoryTransactionService,
     private authService: AuthService
   ) { }
 
@@ -167,16 +168,7 @@ export class FinancialUnitDetailsService {
       return null;
     }
     this.popUpsService.openLoadingModal({ message: 'Vytvářím účetní období' });
-    const params: HttpParams = new HttpParams()
-      .append('startDate', startDate.toDateString())
-      .append('endDate', endDate.toDateString())
-      .append('financialUnitId', financialUnitId)
-    this.http.post<any>(`${this.baseUrl}api/financial-period/create-financial-period`, null, { params }).pipe(
-      catchError((err) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.financialPeriodService.getCreateFinancialPeriod$(financialUnitId, startDate, endDate).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.popUpsService.showSnackbar({ message: 'Účetní období bylo vytvořeno', type: SnackbarType.Success });
@@ -185,15 +177,12 @@ export class FinancialUnitDetailsService {
   }
 
   deleteLastFinancialPeriod(): void {
-    this.popUpsService.openLoadingModal({ message: 'Odstraňuji položku' });
-    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
-    this.http.delete<any>(`${this.baseUrl}api/financial-period/delete-last-financial-period`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    const financialUnitId: string = this.getFinancialUnitId();
+    if (!financialUnitId) {
+      return null;
+    }
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji období' });
+    this.financialPeriodService.getDeleteLastFinancialPeriod$(financialUnitId).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.reloadFinancialPeriodsSource.next();
@@ -202,19 +191,16 @@ export class FinancialUnitDetailsService {
   }
 
   deleteAllFinancialPeriods(): void {
-    this.popUpsService.openLoadingModal({ message: 'Odstraňuji položky' });
-    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
-    this.http.delete<any>(`${this.baseUrl}api/financial-period/delete-all-financial-periods`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    const financialUnitId: string = this.getFinancialUnitId();
+    if (!financialUnitId) {
+      return null;
+    }
+    this.popUpsService.openLoadingModal({ message: 'Odstraňuji období' });
+    this.financialPeriodService.getDeleteAllFinancialPeriods$(financialUnitId).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.reloadFinancialPeriodsSource.next();
-      this.popUpsService.showSnackbar({ message: 'Období byly odstraněny', type: SnackbarType.Success });
+      this.popUpsService.showSnackbar({ message: 'Období byla odstraněna', type: SnackbarType.Success });
     });
   }
 
@@ -353,17 +339,7 @@ export class FinancialUnitDetailsService {
       return null;
     }
     this.popUpsService.openLoadingModal({ message: 'Vytvářím šablonu transakce' });
-    const headers: HttpHeaders = new HttpHeaders().append('Content-Type', 'application/json');
-    const params: HttpParams = new HttpParams().append('financialUnitId', financialUnitId)
-    this.http.post<any>(
-      `${this.baseUrl}api/inventory-transaction-template/create-inventory-transaction-template`, JSON.stringify(requestData),
-      { headers, params }
-    ).pipe(
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryTransactionTemplateService.getCreateTransactionTemplate$(financialUnitId, requestData).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.reloadTransactionTemplatesSource.next();
@@ -373,14 +349,7 @@ export class FinancialUnitDetailsService {
 
   deleteTransactionTemplate(id: string): void {
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji šablonu' });
-    const params: HttpParams = new HttpParams().append('id', id);
-    this.http.delete<any>(`${this.baseUrl}api/inventory-transaction-template/delete-inventory-transaction-template`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryTransactionTemplateService.getDeleteTransactionTemplate$(id).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.reloadTransactionTemplatesSource.next();
@@ -389,15 +358,12 @@ export class FinancialUnitDetailsService {
   }
 
   deleteAllTransactionTemplates(): void {
+    const financialUnitId: string = this.getFinancialUnitId();
+    if (!financialUnitId) {
+      return null;
+    }
     this.popUpsService.openLoadingModal({ message: 'Odstraňuji šablony' });
-    const params: HttpParams = new HttpParams().append('financialUnitId', this.getFinancialUnitId());
-    this.http.delete<any>(`${this.baseUrl}api/inventory-transaction-template/delete-all-inventory-transaction-templates`, { params }).pipe(
-      map(() => 'OK'),
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
+    this.inventoryTransactionTemplateService.getDeleteAllTransactionTemplates$(financialUnitId).pipe(
       finalize(() => this.popUpsService.closeLoadingModal())
     ).subscribe(() => {
       this.reloadTransactionTemplatesSource.next();
@@ -412,35 +378,43 @@ export class FinancialUnitDetailsService {
   private reloadTransactionsSource: BehaviorSubject<void> = new BehaviorSubject<void>(null);
   reloadTransactions$: Observable<void> = this.reloadTransactionsSource.asObservable();
 
-  private getCreateInventoryTransaction$(
-    transactionType: InventoryTransactionType,
-    requestData: INewInventoryTransactionRequestData<any>
-  ): Observable<any> {
+  createIncrementInventoryTransaction(
+    requestData: INewInventoryTransactionRequestData<IIncrementInventoryTransactionSpecificData>
+  ): void {
     this.popUpsService.openLoadingModal({ message: 'Vytvářím transakci' });
-    const headers: HttpHeaders = new HttpHeaders().append('Content-Type', 'application/json');
-    const params: HttpParams = new HttpParams().append('type', transactionType);
-    return this.http.post<any>(
-      `${this.baseUrl}api/inventory-transaction/create-inventory-transaction`, JSON.stringify(requestData),
-      { headers, params }
+    this.inventoryTransactionService.getCreateInventoryTransaction$(
+      InventoryTransactionType.Increment, requestData
     ).pipe(
-      catchError((err: HttpErrorResponse) => {
-        this.popUpsService.handleApiError(err);
-        return of(null);
-      }),
-      filter((res: any) => !!res),
       finalize(() => this.popUpsService.closeLoadingModal())
-    );
-  }
-
-  createIncrementInventoryTransaction(requestData: INewInventoryTransactionRequestData<IIncrementInventoryTransactionSpecificData>): void {
-    this.getCreateInventoryTransaction$(InventoryTransactionType.Increment, requestData).subscribe(() => {
+    ).subscribe(() => {
       this.reloadTransactionsSource.next();
       this.popUpsService.showSnackbar({ message: 'Transakce byla vytvořena', type: SnackbarType.Success });
     });
   }
 
-  createDecrementInventoryTransaction(requestData: INewInventoryTransactionRequestData<IDecrementInventoryTransactionSpecificData>): void {
-    this.getCreateInventoryTransaction$(InventoryTransactionType.Decrement, requestData).subscribe(() => {
+  createDecrementInventoryTransaction(
+    requestData: INewInventoryTransactionRequestData<IDecrementInventoryTransactionSpecificData>
+    ): void {
+    this.popUpsService.openLoadingModal({ message: 'Vytvářím transakci' });
+    this.inventoryTransactionService.getCreateInventoryTransaction$(
+      InventoryTransactionType.Decrement, requestData
+    ).pipe(
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
+      this.reloadTransactionsSource.next();
+      this.popUpsService.showSnackbar({ message: 'Transakce byla vytvořena', type: SnackbarType.Success });
+    });
+  }
+
+  createSaleInventoryTransaction(
+    requestData: INewInventoryTransactionRequestData<ISaleInventoryTransactionSpecificData>
+    ): void {
+    this.popUpsService.openLoadingModal({ message: 'Vytvářím transakci' });
+    this.inventoryTransactionService.getCreateInventoryTransaction$(
+      InventoryTransactionType.Sale, requestData
+    ).pipe(
+      finalize(() => this.popUpsService.closeLoadingModal())
+    ).subscribe(() => {
       this.reloadTransactionsSource.next();
       this.popUpsService.showSnackbar({ message: 'Transakce byla vytvořena', type: SnackbarType.Success });
     });

@@ -11,15 +11,16 @@
             <mat-form-field>
                 <mat-label>Skupina</mat-label>
                 <mat-select formControlName="inventoryGroupId">
-                  <mat-option *ngFor="let option of (InventoryGroupOptions$ | async)" [value]="option.id">
-                    {{ option.name }}
-                  </mat-option>
+                    <mat-option *ngFor="let option of (inventoryGroupOptions$ | async)" [value]="option.id">
+                        {{ option.name }}
+                    </mat-option>
                 </mat-select>
-              </mat-form-field>
+            </mat-form-field>
         </div>
         <div class="modal-actions">
             <button mat-button color="primary" (click)="closeModal()">Zavřít</button>
-            <button mat-flat-button color="primary" (click)="createInventoryItem()" [disabled]="isCreateButtonDisabled$ | async">{{ buttonText }}</button>
+            <button mat-flat-button color="primary" (click)="createInventoryItem()"
+                [disabled]="isCreateButtonDisabled$ | async">{{ buttonText }}</button>
         </div>
-    </div>   
+    </div>
 </div>

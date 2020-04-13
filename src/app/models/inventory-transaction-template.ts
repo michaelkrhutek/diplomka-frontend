@@ -8,6 +8,8 @@ export interface INewInventoryTransactionTemplateRequestData {
     transactionType: string;
     debitAccountId: string;
     creditAccountId: string;
+    saleDebitAccount?: string;
+    saleCreditAccount?: string;
 }
 
 export interface IInventoryTransactionTemplate {
@@ -18,6 +20,8 @@ export interface IInventoryTransactionTemplate {
     inventoryGroup: string;
     debitAccount: string;
     creditAccount: string;
+    saleDebitAccount?: string;
+    saleCreditAccount?: string;
 }
 
 export interface IInventoryTransactionTemplatePopulated {
@@ -28,4 +32,6 @@ export interface IInventoryTransactionTemplatePopulated {
     inventoryGroup: IInventoryGroup;
     debitAccount: IFinancialAccount;
     creditAccount: IFinancialAccount;
+    saleDebitAccount?: IFinancialAccount;
+    saleCreditAccount?: IFinancialAccount;
 }

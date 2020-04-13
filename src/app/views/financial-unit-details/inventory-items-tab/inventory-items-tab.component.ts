@@ -3,11 +3,13 @@ import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-det
 import { Observable, combineLatest, of } from 'rxjs';
 import { map, startWith, tap, switchMap } from 'rxjs/operators';
 import { IInventoryItemPopulated, INewInventoryItemData } from 'src/app/models/inventory-item';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 import { InventoryItemService } from 'src/app/services/inventory-item.service';
+import { IInventoryItemFilteringCriteria } from 'src/app/models/inventory-item-filtering-criteria';
+import { InventoryGroup } from 'src/app/models/inventory-group';
 
 @Component({
   selector: 'app-inventory-items-tab',
@@ -32,6 +34,24 @@ export class InventoryItemsTabComponent {
     map((filterText: string) => filterText || '')
   );
 
+  inventoryGroupOptions$: Observable<IInventoryGroupOption[]> = this.financialUnitDetailsService.InventoryGroups$.pipe(
+    map((groups: InventoryGroup[]) => groups.map((group: InventoryGroup) => {
+      const option: IInventoryGroupOption = {
+        id: group._id,
+        name: group.name
+      };
+      return option;
+    }))
+  );
+
+  filteringCriteriaFG: FormGroup = new FormGroup({
+    filterText: new FormControl(''),
+    inventoryGroupId: new FormControl(0)
+  });
+  filteringCriteria$: Observable<IInventoryItemFilteringCriteria> = this.filteringCriteriaFG.valueChanges.pipe(
+    startWith(this.filteringCriteriaFG.value)
+  );
+
   inventoryItems$: Observable<IInventoryItemPopulated[]> = combineLatest(
     this.financialUnitDetailsService.financialUnitId$,
     this.financialUnitDetailsService.reloadInventoryItems$
@@ -42,9 +62,9 @@ export class InventoryItemsTabComponent {
 
   filtredInventoryItems$: Observable<IInventoryItemPopulated[]> = combineLatest(
     this.inventoryItems$,
-    this.filterText$
+    this.filteringCriteria$
   ).pipe(
-    map(([items, filterText]) => this.getFilteredInventoryItems(items, filterText))
+    map(([items, filteringCriteria]) => this.getFilteredInventoryItems(items, filteringCriteria))
   )
 
   tableData$: Observable<BasicTable> = this.filtredInventoryItems$.pipe(
@@ -143,8 +163,23 @@ export class InventoryItemsTabComponent {
 
   private getFilteredInventoryItems(
     inventoryItems: IInventoryItemPopulated[],
-    filterText: string
+    filteringCriteria: IInventoryItemFilteringCriteria
   ): IInventoryItemPopulated[] {
-    return inventoryItems.filter((item) => item.name.toLowerCase().includes(filterText.toLowerCase()));
+    return inventoryItems.filter((item) => {
+      if (filteringCriteria.inventoryGroupId && filteringCriteria.inventoryGroupId != item.inventoryGroup._id) {
+        return false;
+      }
+      if (!filteringCriteria.filterText) {
+        return true;
+      }
+      return item.name.toLowerCase().includes(filteringCriteria.filterText.toLowerCase());
+    });
   }
+}
+
+
+
+interface IInventoryGroupOption {
+  id: string;
+  name: string;
 }

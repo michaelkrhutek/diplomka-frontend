@@ -1,7 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, Output, EventEmitter, Input } from '@angular/core';
 import { IInventoryTransactionPopulated } from 'src/app/models/inventory-transaction';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
-import { IStockBatch, IStock } from 'src/app/models/stock';
 import { FormatterService } from 'src/app/services/formatter.service';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
 import { StockService } from 'src/app/services/stock.service';

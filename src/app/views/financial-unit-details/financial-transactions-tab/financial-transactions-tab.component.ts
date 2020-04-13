@@ -46,12 +46,12 @@ export class FinancialTransactionsTabComponent {
     ),
     (fc, pi, ps) => {
       const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
-      return this.financialTransactionService.getFiltredPaginatedFinancialTransactions$(financialUnitId, fc, pi, ps)
+      return this.financialTransactionService.getFiltredPaginatedFinancialTransactions$(financialUnitId, fc, pi, ps);
     },
     (rs) => this.getTableDataFromFinancialTransactions(rs),
     (fc) => {
       const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
-      return this.financialTransactionService.getFiltredFinancialTransactionsCount$(financialUnitId, fc)
+      return this.financialTransactionService.getFiltredFinancialTransactionsCount$(financialUnitId, fc);
     },    
   );
 

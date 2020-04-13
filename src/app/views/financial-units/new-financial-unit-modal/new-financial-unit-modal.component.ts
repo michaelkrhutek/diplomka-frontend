@@ -3,7 +3,7 @@ import { FinancialUnitService } from 'src/app/services/financial-unit.service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
-import { StockDecrementType } from 'src/app/models/stock';
+import { StockValuationMethod } from 'src/app/models/stock';
 import { INewFinancialUnitData } from 'src/app/models/financial-unit';
 import { StockService } from 'src/app/services/stock.service';
 
@@ -25,7 +25,7 @@ export class NewFinancialUnitModalComponent {
   financialUnitFG: FormGroup = new FormGroup({
     name: new FormControl(null),
     createDefaultData: new FormControl(false),
-    stockDecrementType: new FormControl(null)
+    stockValuationMethod: new FormControl(null)
   });
   financialUnitFormData$: Observable<INewFinancialUnitData> = this.financialUnitFG.valueChanges.pipe(
     startWith(this.financialUnitFG.value)
@@ -35,11 +35,11 @@ export class NewFinancialUnitModalComponent {
     startWith(this.financialUnitFG.controls['createDefaultData'].value)
   );
 
-  stockDecrementTypeOptions: IStockDecrementTypeOption[] = this.stockService.getAllStockDecrementType()
+  stockValuationMethodOptions: IStockValuationMethodOption[] = this.stockService.getAllStockValuationMethod()
   .map(type => {
     return {
       type,
-      description: this.stockService.getStockDecrementTypeDescription(type)
+      description: this.stockService.getStockValuationMethodDescription(type)
     }
   });
 
@@ -48,7 +48,7 @@ export class NewFinancialUnitModalComponent {
       if (!formData.name) {
         return true;
       } 
-      if (formData.createDefaultData && !formData.stockDecrementType) {
+      if (formData.createDefaultData && !formData.stockValuationMethod) {
         return true;
       }
       return false;
@@ -68,7 +68,7 @@ export class NewFinancialUnitModalComponent {
 
 
 
-interface IStockDecrementTypeOption {
-  type: StockDecrementType,
+interface IStockValuationMethodOption {
+  type: StockValuationMethod,
   description: string
 }

@@ -1,4 +1,5 @@
 export enum InventoryTransactionType {
     Increment = 'increment',
-    Decrement = 'decrement'
+    Decrement = 'decrement',
+    Sale = 'sale'
 }

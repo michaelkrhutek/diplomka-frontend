@@ -76,7 +76,7 @@ export class FinancialTransactionService {
       .append('dateTo', filteringCriteria.dateTo ? filteringCriteria.dateTo.toDateString() : '')
       .append('pageIndex', pageIndex.toString())
       .append('pageSize', pageSize.toString())
-    return this.http.get<IFinancialTransactionPopulated[]>(`${this.baseUrl}api/financial-transaction/get-filtred-financial-transactions`, { params }).pipe(
+    return this.http.get<IFinancialTransactionPopulated[]>(`${this.baseUrl}api/financial-transaction/get-filtred-paginated-financial-transactions`, { params }).pipe(
       map((transactions) => transactions.map((transaction) => new FinancialTransactionPopulated(transaction))),
       catchError((err) => {
         this.popUpsService.handleApiError(err);

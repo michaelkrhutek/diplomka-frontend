@@ -32,7 +32,7 @@ export class InventoryGroupService {
     const params: HttpParams = new HttpParams()
       .append('financialUnitId', financialUnitId)
       .append('name', data.name)
-      .append('defaultStockDecrementType', data.defaultStockDecrementType)
+      .append('defaultStockValuationMethod', data.defaultStockValuationMethod)
     return this.http.post<any>(`${this.baseUrl}api/inventory-group/create-inventory-group`, null, { params }).pipe(
       map(() => 'OK'),
       catchError((err) => {
@@ -48,7 +48,7 @@ export class InventoryGroupService {
     const params: HttpParams = new HttpParams()
       .append('id', data._id)
       .append('name', data.name)
-      .append('defaultStockDecrementType', data.defaultStockDecrementType)
+      .append('defaultStockValuationMethod', data.defaultStockValuationMethod)
     return this.http.post<any>(`${this.baseUrl}api/inventory-group/update-inventory-group`, null, { params }).pipe(
       map(() => 'OK'),
       catchError((err) => {

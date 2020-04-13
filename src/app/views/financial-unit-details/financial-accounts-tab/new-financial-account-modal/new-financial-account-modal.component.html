@@ -5,6 +5,14 @@
         </div>
         <div class="modal-content" [formGroup]="financialAccountFG">
             <mat-form-field>
+                <mat-label>Typ účtu</mat-label>
+                <mat-select formControlName="type">
+                  <mat-option *ngFor="let option of accountTypeOptions" [value]="option.type">
+                    {{ option.description }}
+                  </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
                 <mat-label>Kód finančního účtu</mat-label>
                 <input matInput formControlName="code">
                 <mat-error *ngIf="codeFC.errors as errors">

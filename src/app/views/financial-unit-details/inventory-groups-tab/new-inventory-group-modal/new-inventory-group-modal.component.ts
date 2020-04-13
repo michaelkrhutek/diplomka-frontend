@@ -3,7 +3,7 @@ import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-det
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
-import { StockDecrementType } from 'src/app/models/stock';
+import { StockValuationMethod } from 'src/app/models/stock';
 import { StockService } from 'src/app/services/stock.service';
 import { INewInventoryGroupData } from 'src/app/models/inventory-group';
 
@@ -37,24 +37,24 @@ export class NewInventoryGroupModalComponent implements OnInit {
     }
   }
 
-  stockDecrementTypeOptions: IStockDecrementTypeOption[] = this.stockService.getAllStockDecrementType()
+  stockValuationMethodOptions: IStockValuationMethodOption[] = this.stockService.getAllStockValuationMethod()
     .map(type => {
       return {
         type,
-        description: this.stockService.getStockDecrementTypeDescription(type)
+        description: this.stockService.getStockValuationMethodDescription(type)
       }
     });
 
   inventoryGroupFG: FormGroup = new FormGroup({
     _id: new FormControl(null),
     name: new FormControl(null),
-    defaultStockDecrementType: new FormControl(null)
+    defaultStockValuationMethod: new FormControl(null)
   });
 
   isCreateButtonDisabled$: Observable<boolean> = this.inventoryGroupFG.valueChanges.pipe(
     startWith(this.inventoryGroupFG.value),
     map((formData: INewInventoryGroupData) => {
-      return !formData.name || !formData.defaultStockDecrementType ? true : false;
+      return !formData.name || !formData.defaultStockValuationMethod ? true : false;
     })
   );
 
@@ -73,7 +73,7 @@ export class NewInventoryGroupModalComponent implements OnInit {
   }
 }
 
-interface IStockDecrementTypeOption {
-  type: StockDecrementType,
+interface IStockValuationMethodOption {
+  type: StockValuationMethod,
   description: string
 }

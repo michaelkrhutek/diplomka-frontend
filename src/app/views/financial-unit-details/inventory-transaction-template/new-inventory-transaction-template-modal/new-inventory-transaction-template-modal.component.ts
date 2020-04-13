@@ -30,6 +30,8 @@ export class NewInventoryTransactionTemplateModalComponent {
     transactionType: new FormControl(null),
     debitAccountId: new FormControl(null),
     creditAccountId: new FormControl(null),
+    saleDebitAccountId: new FormControl(null),
+    saleCreditAccountId: new FormControl(null),
   });
   transactionTemplateFormData$: Observable<INewInventoryTransactionTemplateRequestData> = this.transactionTemplateFG.valueChanges.pipe(
     startWith(this.transactionTemplateFG)
@@ -42,6 +44,9 @@ export class NewInventoryTransactionTemplateModalComponent {
       description: this.inventoryTransactionService.getTransactionTypeDescription(type)
     };
   });
+  transactionType$: Observable<InventoryTransactionType> = this.transactionTemplateFG.controls['transactionType'].valueChanges.pipe(
+    startWith(this.transactionTemplateFG.controls['transactionType'].value)
+  )
   inventoryGroups$: Observable<IInventoryGroup[]> = this.financialUnitDetailsService.InventoryGroups$;
   financialAccounts$: Observable<IFinancialAccount[]> = this.financialUnitDetailsService.financialAccounts$;
 
@@ -67,6 +72,9 @@ export class NewInventoryTransactionTemplateModalComponent {
       !formData.debitAccountId ||
       !formData.creditAccountId
     ) {
+      return false;
+    }
+    if (formData.transactionType == InventoryTransactionType.Sale && (!formData.debitAccountId || !formData.creditAccountId)) {
       return false;
     }
     return true;

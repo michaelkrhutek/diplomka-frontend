@@ -81,4 +81,28 @@ export class FinancialAccountService {
       filter((res: any) => !!res)
     );
   }
+
+  getAllInventoryTransactionTypes(): FinancialAccountType[] {
+    return [
+      FinancialAccountType.Assets,
+      FinancialAccountType.Liabilities,
+      FinancialAccountType.Expenses,
+      FinancialAccountType.Revenues
+    ];
+  }
+
+  getFinancialAccountTypeDescription(type: FinancialAccountType): string {
+    switch (type) {
+      case FinancialAccountType.Assets:
+        return 'Majetek';
+      case FinancialAccountType.Liabilities:
+        return 'Závazky';
+      case FinancialAccountType.Expenses:
+        return 'Náklady';
+      case FinancialAccountType.Revenues:
+        return 'Výnosy';
+      default:
+        return 'N/A';
+    }
+  }
 }

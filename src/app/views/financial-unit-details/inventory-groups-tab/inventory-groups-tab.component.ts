@@ -6,7 +6,7 @@ import { InventoryGroup, IInventoryGroup, INewInventoryGroupData } from 'src/app
 import { StockService } from 'src/app/services/stock.service';
 import { FormControl } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
-import { StockDecrementType } from 'src/app/models/stock';
+import { StockValuationMethod } from 'src/app/models/stock';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 import { InventoryGroupService } from 'src/app/services/inventory-group.service';
@@ -102,7 +102,7 @@ export class InventoryGroupsTabComponent {
         },
         {
           type: BasicTableRowCellType.Display,
-          data: this.stockService.getStockDecrementTypeDescription(group.defaultStockDecrementType as StockDecrementType)
+          data: this.stockService.getStockValuationMethodDescription(group.defaultStockValuationMethod as StockValuationMethod)
         }
       ]
     }
@@ -114,11 +114,11 @@ export class InventoryGroupsTabComponent {
       const newInventoryGroup: INewInventoryGroupData = {
         _id: inventoryGroup._id,
         name: inventoryGroup.name,
-        defaultStockDecrementType: inventoryGroup.defaultStockDecrementType
+        defaultStockValuationMethod: inventoryGroup.defaultStockValuationMethod
       };
       this.isUpdateInventoryGroupModalData = newInventoryGroup;
     } else {
-      const newInventoryGroup: INewInventoryGroupData = { _id: null, name: null, defaultStockDecrementType: null };
+      const newInventoryGroup: INewInventoryGroupData = { _id: null, name: null, defaultStockValuationMethod: null };
       this.isUpdateInventoryGroupModalData = newInventoryGroup;
     }
   }

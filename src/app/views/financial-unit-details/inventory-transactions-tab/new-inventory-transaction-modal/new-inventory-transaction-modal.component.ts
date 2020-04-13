@@ -9,7 +9,7 @@ import { InventoryTransactionTemplateService } from 'src/app/services/inventory-
 import { InventoryTransactionType } from 'src/app/models/inventory-transaction-type';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
 import { IFinancialAccount } from 'src/app/models/financial-account';
-import { INewInventoryTransactionRequestData, IIncrementInventoryTransactionSpecificData, IDecrementInventoryTransactionSpecificData } from 'src/app/models/inventory-transaction';
+import { INewInventoryTransactionRequestData, IIncrementInventoryTransactionSpecificData, IDecrementInventoryTransactionSpecificData, ISaleInventoryTransactionSpecificData } from 'src/app/models/inventory-transaction';
 
 @Component({
   selector: 'app-new-inventory-transaction-modal',
@@ -38,7 +38,7 @@ export class NewInventoryTransactionModalComponent {
 
   inventoryTransactionTemplates$: Observable<IInventoryTransactionTemplatePopulated[]> = this.selectedInventoryItem$.pipe(
     switchMap((inventoryItem: IInventoryItemPopulated) => {
-      return inventoryItem ? 
+      return inventoryItem ?
         this.inventoryTransactionTemplateService.getInventoryGroupTransactionTemplates$(inventoryItem.inventoryGroup._id) :
         of([]);
     })
@@ -48,10 +48,16 @@ export class NewInventoryTransactionModalComponent {
     startWith(this.inventoryTransactionTemplateFC.value),
     tap((template: IInventoryTransactionTemplatePopulated) => {
       if (template) {
-        this.transactionTypeFC.patchValue(template.transactionType)
-        this.descriptionFC.patchValue(template.description)
-        this.debitAccountIdFC.patchValue(template.debitAccount._id)
-        this.creditAccountIdFC.patchValue(template.creditAccount._id)
+        this.transactionTypeFC.patchValue(template.transactionType);
+        this.descriptionFC.patchValue(template.description);
+        this.debitAccountIdFC.patchValue(template.debitAccount._id);
+        this.creditAccountIdFC.patchValue(template.creditAccount._id);
+      }
+      if (template && template.transactionType == InventoryTransactionType.Sale) {
+        this.saleTransactionSpecificDataFG.patchValue({
+          saleDebitAccountId: template.saleDebitAccount._id || null,
+          saleCreditAccountId: template.saleCreditAccount._id || null
+        });
       }
     })
   );
@@ -75,7 +81,7 @@ export class NewInventoryTransactionModalComponent {
   isEffectiveDateDisabled$: Observable<boolean> = combineLatest(
     this.minimalEffectiveDate$, this.maximalEffectiveDate$).pipe(
       map(([minDate, maxDate]) => !(minDate && maxDate))
-  );
+    );
   effectiveDateFC: FormControl = new FormControl(null);
 
   financialAccounts$: Observable<IFinancialAccount[]> = this.financialUnitDetailsService.financialAccounts$;
@@ -108,6 +114,16 @@ export class NewInventoryTransactionModalComponent {
     startWith(this.decrementTransactionSpecificDataFG.value)
   )
 
+  saleTransactionSpecificDataFG: FormGroup = new FormGroup({
+    quantity: new FormControl(0),
+    pricePerUnit: new FormControl(0),
+    saleDebitAccountId: new FormControl(null),
+    saleCreditAccountId: new FormControl(null)
+  });
+  saleTransactionSpecificData$: Observable<ISaleInventoryTransactionSpecificData> = this.saleTransactionSpecificDataFG.valueChanges.pipe(
+    startWith(this.saleTransactionSpecificDataFG.value)
+  )
+
   transactionSpecificData$: Observable<any> = this.selectedTransactionType$.pipe(
     switchMap((transactionType) => {
       switch (transactionType) {
@@ -115,6 +131,8 @@ export class NewInventoryTransactionModalComponent {
           return this.incrementTransactionSpecificData$;
         case InventoryTransactionType.Decrement:
           return this.decrementTransactionSpecificData$;
+        case InventoryTransactionType.Sale:
+          return this.saleTransactionSpecificData$;
         default:
           return of(null);
       }
@@ -144,7 +162,7 @@ export class NewInventoryTransactionModalComponent {
 
   ngOnDestroy(): void {
     this.isEffectiveDateDisabledSubscription && this.isEffectiveDateDisabledSubscription.unsubscribe();
-    this.selectedTemplateSubscription && this.selectedTemplateSubscription.unsubscribe();    
+    this.selectedTemplateSubscription && this.selectedTemplateSubscription.unsubscribe();
   }
 
   closeModal(): void {
@@ -176,6 +194,17 @@ export class NewInventoryTransactionModalComponent {
         specificData
       };
       this.financialUnitDetailsService.createDecrementInventoryTransaction(requestData);
+    } else if (transactionType == InventoryTransactionType.Sale) {
+      const specificData: ISaleInventoryTransactionSpecificData = this.saleTransactionSpecificDataFG.value;
+      const requestData: INewInventoryTransactionRequestData<ISaleInventoryTransactionSpecificData> = {
+        inventoryItemId: formData.inventoryItem._id,
+        effectiveDate: formData.effectiveDate,
+        description: formData.description,
+        debitAccountId: formData.debitAccountId,
+        creditAccountId: formData.creditAccountId,
+        specificData
+      };
+      this.financialUnitDetailsService.createSaleInventoryTransaction(requestData);
     }
     this.closeModal();
   }
@@ -199,13 +228,26 @@ export class NewInventoryTransactionModalComponent {
     }
     if (type == InventoryTransactionType.Increment) {
       const data: IIncrementInventoryTransactionSpecificData = specificData;
-      if (!data.quantity || (data.quantity <= 0) || !data.costPerUnit || (data.costPerUnit <= 0)) {
+      if (
+        !data.quantity || (data.quantity <= 0) ||
+        !data.costPerUnit || (data.costPerUnit <= 0)
+      ) {
         return false;
       }
     }
     if (type == InventoryTransactionType.Decrement) {
       const data: IDecrementInventoryTransactionSpecificData = specificData;
       if (!data.quantity || (data.quantity <= 0)) {
+        return false;
+      }
+    }
+    if (type == InventoryTransactionType.Sale) {
+      const data: ISaleInventoryTransactionSpecificData = specificData;
+      if (
+        !data.quantity || (data.quantity <= 0) ||
+        !data.pricePerUnit || (data.pricePerUnit <= 0) ||
+        !data.saleDebitAccountId || !data.saleCreditAccountId
+      ) {
         return false;
       }
     }

@@ -1,4 +1,4 @@
-import { StockDecrementType } from "./stock";
+import { StockValuationMethod } from "./stock";
 
 export interface IFinancialUnit {
     _id: string;
@@ -9,5 +9,5 @@ export interface IFinancialUnit {
 export interface INewFinancialUnitData {
     name: string;
     createDefaultData: boolean;
-    stockDecrementType: StockDecrementType
+    stockValuationMethod: StockValuationMethod
 }

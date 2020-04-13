@@ -1,3 +1,13 @@
 .financial-period-fc {
     width: 14rem;
 }
+
+.profit-or-loss-container {
+    padding: 0.5rem 0.5rem 1.5rem 0.5rem;
+}
+
+.profit-or-loss-container > span:first-child {
+    font-weight: lighter;
+    color: var(--font-color-light);
+    margin-right: 0.5rem;
+}

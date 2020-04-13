@@ -13,8 +13,8 @@
             </div>
             <mat-form-field *ngIf="createDefaultData$ | async">
                 <mat-label>Oceňovací metoda</mat-label>
-                <mat-select formControlName="stockDecrementType">
-                    <mat-option *ngFor="let option of stockDecrementTypeOptions" [value]="option.type">
+                <mat-select formControlName="stockValuationMethod">
+                    <mat-option *ngFor="let option of stockValuationMethodOptions" [value]="option.type">
                         {{ option.description }}
                     </mat-option>
                 </mat-select>

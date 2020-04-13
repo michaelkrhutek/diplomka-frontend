@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { Observable, combineLatest, of } from 'rxjs';
 import { map, switchMap, tap, startWith, take, debounceTime } from 'rxjs/operators';
-import { IInventoryTransactionPopulated, InventoryTransactionPopulated } from 'src/app/models/inventory-transaction';
+import { IInventoryTransactionPopulated, InventoryTransactionPopulated, ISaleInventoryTransactionSpecificData } from 'src/app/models/inventory-transaction';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
 import { FormatterService } from 'src/app/services/formatter.service';
 import { IInventoryItemPopulated } from 'src/app/models/inventory-item';
@@ -62,12 +62,12 @@ export class InventoryTransactionsTabComponent {
     ),
     (fc, pi, ps) => {
       const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
-      return this.inventoryTransactionService.getFiltredPaginatedInventoryTransactions$(financialUnitId, fc, pi, ps)
+      return this.inventoryTransactionService.getFiltredPaginatedInventoryTransactions$(financialUnitId, fc, pi, ps);
     },
     (rs) => this.getTableDataFromInventoryTransactions(rs),
     (fc) => {
       const financialUnitId: string = this.financialUnitDetailsService.getFinancialUnitId();
-      return this.inventoryTransactionService.getFiltredInventoryTransactionsTotalCount$(financialUnitId, fc)
+      return this.inventoryTransactionService.getFiltredInventoryTransactionsTotalCount$(financialUnitId, fc);
     },    
   );
 
@@ -137,17 +137,25 @@ export class InventoryTransactionsTabComponent {
           align: BasicTableValueAlign.Right
         },
         {
-          name: 'Hodnota na jednotku',
+          name: 'Náklady na jednotku',
           width: 6,
           align: BasicTableValueAlign.Right
         },
         {
-          name: 'Celková hodnota',
+          name: 'Celkové náklady',
           width: 6,
           align: BasicTableValueAlign.Right
         },
-
-
+        {
+          name: 'Cena za jednotku',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
+        {
+          name: 'Celková cena',
+          width: 6,
+          align: BasicTableValueAlign.Right
+        },
       ]
     };
     const rows: IBasicTableRowInputData[] = (transactions || [])
@@ -206,7 +214,7 @@ export class InventoryTransactionsTabComponent {
         },
         {
           type: BasicTableRowCellType.Display,
-          data: this.stockService.getStockDecrementTypeDescription(transaction.stockDecrementTypeApplied)
+          data: this.stockService.getStockValuationMethodDescription(transaction.stockValuationMethodApplied)
         },
         {
           type: BasicTableRowCellType.Display,
@@ -219,6 +227,18 @@ export class InventoryTransactionsTabComponent {
         {
           type: BasicTableRowCellType.Display,
           data: this.formatterService.getRoundedNumberString(transaction.totalTransactionAmount, 2)
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: transaction.type == InventoryTransactionType.Sale ?
+            this.formatterService.getRoundedNumberString(transaction.specificData['pricePerUnit'], 2) :
+            '-'
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: transaction.type == InventoryTransactionType.Sale ?
+            this.formatterService.getRoundedNumberString(transaction.specificData['pricePerUnit'] * transaction.specificData['quantity'], 2) :
+            '-'
         }
       ]
     }

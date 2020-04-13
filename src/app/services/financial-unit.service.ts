@@ -43,7 +43,7 @@ export class FinancialUnitService {
     const params: HttpParams = new HttpParams()
       .append('name', data.name)
       .append('createDefaultData', String(data.createDefaultData))
-      .append('stockDecrementType', data.stockDecrementType)
+      .append('stockValuationMethod', data.stockValuationMethod)
     this.http.post<any>(`${this.baseUrl}api/financial-unit/create-financial-unit`, null, { params }).pipe(
       catchError((err) => {
         this.popUpsService.handleApiError(err);

@@ -1,5 +1,5 @@
 import { InventoryTransactionType } from './inventory-transaction-type';
-import { IStock, Stock, StockDecrementType } from './stock';
+import { IStock, Stock, StockValuationMethod } from './stock';
 import { IInventoryItem } from './inventory-item';
 
 export interface IIncrementInventoryTransactionSpecificData {
@@ -9,6 +9,13 @@ export interface IIncrementInventoryTransactionSpecificData {
 
 export interface IDecrementInventoryTransactionSpecificData {
     quantity: number;
+}
+
+export interface ISaleInventoryTransactionSpecificData {
+    quantity: number;
+    pricePerUnit: number;
+    saleDebitAccountId: string;
+    saleCreditAccountId: string;
 }
 
 export interface INewInventoryTransactionRequestData<SpecificData> {
@@ -33,7 +40,7 @@ export interface IInventoryTransactionPopulated<SpecificData> {
     totalTransactionAmount: number;
     stockBeforeTransaction: IStock;
     stockAfterTransaction: IStock;
-    stockDecrementTypeApplied: StockDecrementType;
+    stockValuationMethodApplied: StockValuationMethod;
     financialUnit: string;
     inventoryItemTransactionIndex: number;
     isDerivedTransaction: boolean;
@@ -64,7 +71,7 @@ export class InventoryTransactionPopulated<SpecificData> {
     totalTransactionAmount: number;
     stockBeforeTransaction: Stock;
     stockAfterTransaction: Stock;
-    stockDecrementTypeApplied: StockDecrementType;
+    stockValuationMethodApplied: StockValuationMethod;
     financialUnit: string;
     inventoryItemTransactionIndex: number;
     isDerivedTransaction: boolean;

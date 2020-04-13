@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { StockDecrementType, IStock, IStockBatch } from '../models/stock';
+import { StockValuationMethod, IStock, IStockBatch } from '../models/stock';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableValueAlign, IBasicTableRowInputData, BasicTableRowCellType, IBasicTableInputData } from '../models/basic-table-models';
 import { FormatterService } from './formatter.service';
 
@@ -12,21 +12,21 @@ export class StockService {
     private formatterService: FormatterService
   ) { }
 
-  getAllStockDecrementType(): StockDecrementType[] {
+  getAllStockValuationMethod(): StockValuationMethod[] {
     return [
-      StockDecrementType.FIFO,
-      StockDecrementType.LIFO,
-      StockDecrementType.Average
+      StockValuationMethod.FIFO,
+      StockValuationMethod.LIFO,
+      StockValuationMethod.Average
     ];
   }
 
-  getStockDecrementTypeDescription(type: StockDecrementType): string {
+  getStockValuationMethodDescription(type: StockValuationMethod): string {
     switch (type) {
-      case StockDecrementType.FIFO:
+      case StockValuationMethod.FIFO:
         return 'FIFO';
-      case StockDecrementType.LIFO:
+      case StockValuationMethod.LIFO:
         return 'LIFO';
-      case StockDecrementType.Average:
+      case StockValuationMethod.Average:
         return 'Vážený průměr';
       default:
         return 'N/A';

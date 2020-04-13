@@ -5,13 +5,16 @@ import { IInventoryTransactionTemplatePopulated } from 'src/app/models/inventory
 import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-details.service';
 import { switchMap, startWith, map, tap } from 'rxjs/operators';
 import { InventoryTransactionService } from 'src/app/services/inventory-transaction.service';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 import { PaginatedTable } from 'src/app/models/paginated-table-models';
 import { IInventoryTransactionPopulated } from 'src/app/models/inventory-transaction';
 import { IInventoryTransactionFilteringCriteria } from 'src/app/models/inventory-transaction-filtering-criteria';
+import { InventoryTransactionType } from 'src/app/models/inventory-transaction-type';
+import { InventoryGroup } from 'src/app/models/inventory-group';
+import { IInventoryTransactionTemplateFilteringCriteria } from 'src/app/models/inventory-transaction-template-filtering-criteria';
 
 @Component({
   selector: 'app-inventory-transaction-template',
@@ -31,10 +34,31 @@ export class InventoryTransactionTemplateComponent {
   isLoadingData: boolean = true;
   isNewTransactionTemplateModalOpened: boolean = false;
 
-  filterTextFC: FormControl = new FormControl(null);
-  filterText$: Observable<string> = this.filterTextFC.valueChanges.pipe(
-    startWith(this.filterTextFC.value),
-    map((filterText: string) => filterText || '')
+  transactionTypeOptions: ITransactionTypeOption[] = this.inventoryTransactionService.getAllInventoryTransactionTypes()
+  .map(type => {
+    return {
+      type,
+      description: this.inventoryTransactionService.getTransactionTypeDescription(type)
+    };
+  });
+
+  inventoryGroupOptions$: Observable<IInventoryGroupOption[]> = this.financialUnitDetailsService.InventoryGroups$.pipe(
+    map((groups: InventoryGroup[]) => groups.map((group: InventoryGroup) => {
+      const option: IInventoryGroupOption = {
+        id: group._id,
+        name: group.name
+      };
+      return option;
+    }))
+  );
+
+  filteringCriteriaFG: FormGroup = new FormGroup({
+    filterText: new FormControl(''),
+    inventoryGroupId: new FormControl(0),
+    transactionType: new FormControl(0)
+  });
+  filteringCriteria$: Observable<IInventoryTransactionTemplateFilteringCriteria> = this.filteringCriteriaFG.valueChanges.pipe(
+    startWith(this.filteringCriteriaFG.value)
   );
 
   transactionTemplates$: Observable<IInventoryTransactionTemplatePopulated[]> = combineLatest(
@@ -49,9 +73,9 @@ export class InventoryTransactionTemplateComponent {
 
   tableData$: Observable<BasicTable> = combineLatest(
     this.transactionTemplates$,
-    this.filterText$
+    this.filteringCriteria$
   ).pipe(
-    map(([templates, filterText]) => this.getFilteredTemplates(templates, filterText)),
+    map(([templates, filteringCriteria]) => this.getFilteredTemplates(templates, filteringCriteria)),
     map((items: IInventoryTransactionTemplatePopulated[]) => this.getTableDataFromInventoryItems(items)),
     tap(() => (this.isLoadingData = false)),
   );
@@ -85,6 +109,16 @@ export class InventoryTransactionTemplateComponent {
         },
         {
           name: 'Kreditní účet',
+          width: 16,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Debetní účet prodeje',
+          width: 16,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Kreditní účet prodeje',
           width: 16,
           align: BasicTableValueAlign.Left
         },
@@ -127,6 +161,14 @@ export class InventoryTransactionTemplateComponent {
         {
           type: BasicTableRowCellType.Display,
           data: template.creditAccount.code + ' - ' + template.creditAccount.name 
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: template.saleDebitAccount ? template.saleDebitAccount.code + ' - ' + template.saleDebitAccount.name : '-'
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: template.saleCreditAccount ? template.saleCreditAccount.code + ' - ' + template.saleCreditAccount.name : '-'
         }
       ]
     }
@@ -159,8 +201,31 @@ export class InventoryTransactionTemplateComponent {
 
   private getFilteredTemplates(
     templates: IInventoryTransactionTemplatePopulated[],
-    filterText: string
+    filteringCriteria: IInventoryTransactionTemplateFilteringCriteria
   ): IInventoryTransactionTemplatePopulated[] {
-    return templates.filter((template) => template.description.toLowerCase().includes(filterText.toLowerCase()));
+    return templates.filter((template) => {
+      if (filteringCriteria.transactionType && filteringCriteria.transactionType != template.transactionType) {
+        return false;
+      }
+      if (filteringCriteria.inventoryGroupId && filteringCriteria.inventoryGroupId != template.inventoryGroup._id) {
+        return false;
+      }
+      if (!filteringCriteria.filterText) {
+        return true;
+      }
+      return template.description.toLowerCase().includes(filteringCriteria.filterText.toLowerCase());
+    });
   }
+}
+
+
+
+interface ITransactionTypeOption {
+  type: InventoryTransactionType,
+  description: string
+}
+
+interface IInventoryGroupOption {
+  id: string;
+  name: string;
 }

@@ -3,11 +3,13 @@ import { FinancialUnitDetailsService } from 'src/app/services/financial-unit-det
 import { Observable, combineLatest } from 'rxjs';
 import { map, startWith, tap, switchMap } from 'rxjs/operators';
 import { FinancialAccount, IFinancialAccount, INewFinancialAccountData } from 'src/app/models/financial-account';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { BasicTable, IBasicTableHeaderInputData, BasicTableActionItemsPosition, BasicTableValueAlign, IBasicTableRowInputData, IBasicTableInputData, BasicTableRowCellType } from 'src/app/models/basic-table-models';
 import { PopUpsService } from 'src/app/services/pop-ups.service';
 import { IConfirmationModalData } from 'src/app/models/confirmation-modal-data';
 import { FinancialAccountService } from 'src/app/services/financial-account.service';
+import { FinancialAccountType } from 'src/app/models/financial-account-type';
+import { IFinancialAccountFilteringCriteria } from 'src/app/models/financial-account-filtering-criteria';
 
 @Component({
   selector: 'app-financial-accounts-tab',
@@ -32,6 +34,26 @@ export class FinancialAccountsTabComponent {
     map((filterText: string) => filterText || '')
   );
 
+  accountTypeFC: FormControl = new FormControl(0);
+  accountType$: Observable<FinancialAccountType> = this.accountTypeFC.valueChanges.pipe(
+    startWith(this.accountTypeFC.value)
+  );
+  accountTypeOptions: IAccountTypeOption[] = this.financialAccountService.getAllInventoryTransactionTypes()
+  .map(type => {
+    return {
+      type,
+      description: this.financialAccountService.getFinancialAccountTypeDescription(type)
+    };
+  });
+
+  filteringCriteriaFG: FormGroup = new FormGroup({
+    filterText: new FormControl(''),
+    type: new FormControl(0)
+  });
+  filteringCriteria$: Observable<IFinancialAccountFilteringCriteria> = this.filteringCriteriaFG.valueChanges.pipe(
+    startWith(this.filteringCriteriaFG.value)
+  );
+
   financialAccounts$: Observable<FinancialAccount[]> = combineLatest(
     this.financialUnitDetailsService.financialUnitId$,
     this.financialUnitDetailsService.reloadFinancialAccounts$
@@ -41,9 +63,9 @@ export class FinancialAccountsTabComponent {
   );
 
   filtredFinancialAccounts$: Observable<IFinancialAccount[]> = combineLatest(
-    this.financialAccounts$, this.filterText$
+    this.financialAccounts$, this.filteringCriteria$
   ).pipe(
-    map(([accounts, filterText]) => this.getFilteredFinancialAccounts(accounts, filterText))
+    map(([accounts, filteringCriteria]) => this.getFilteredFinancialAccounts(accounts, filteringCriteria))
   )
 
   tableData$: Observable<BasicTable> = this.filtredFinancialAccounts$.pipe(
@@ -65,6 +87,11 @@ export class FinancialAccountsTabComponent {
         },
         {
           name: 'Název účtu',
+          width: 16,
+          align: BasicTableValueAlign.Left
+        },
+        {
+          name: 'Typ účtu',
           width: 16,
           align: BasicTableValueAlign.Left
         }
@@ -100,6 +127,10 @@ export class FinancialAccountsTabComponent {
         {
           type: BasicTableRowCellType.Display,
           data: account.name
+        },
+        {
+          type: BasicTableRowCellType.Display,
+          data: this.financialAccountService.getFinancialAccountTypeDescription(account.type)
         }
       ]
     }
@@ -127,11 +158,12 @@ export class FinancialAccountsTabComponent {
       const data: INewFinancialAccountData = {
         _id: financialAccount._id,
         code: financialAccount.code,
-        name: financialAccount.name
+        name: financialAccount.name,
+        type: financialAccount.type
       };
       this.updateFinancialAccountModalData = data;
     } else {
-      const data: INewFinancialAccountData = { _id: null, code: null, name: null };
+      const data: INewFinancialAccountData = { _id: null, code: null, name: null, type: null };
       this.updateFinancialAccountModalData = data;
     }
   }
@@ -142,11 +174,24 @@ export class FinancialAccountsTabComponent {
 
   private getFilteredFinancialAccounts(
     accounts: FinancialAccount[],
-    filterText: string
+    filteringCriteria: IFinancialAccountFilteringCriteria
   ): FinancialAccount[] {
     return accounts.filter((account) => {
-      return account.name.toLowerCase().includes(filterText.toLowerCase()) ||
-        account.code.toLowerCase().includes(filterText.toLowerCase());
+      if (filteringCriteria.type && filteringCriteria.type != account.type) {
+        return false;
+      }
+      if (!filteringCriteria.filterText) {
+        return true;
+      }
+      return account.name.toLowerCase().includes(filteringCriteria.filterText.toLowerCase()) ||
+        account.code.toLowerCase().includes(filteringCriteria.filterText.toLowerCase());
     });
   }
+}
+
+
+
+interface IAccountTypeOption {
+  type: FinancialAccountType,
+  description: string
 }

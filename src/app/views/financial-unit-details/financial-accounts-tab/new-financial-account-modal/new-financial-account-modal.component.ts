@@ -4,6 +4,8 @@ import { FormControl, FormGroup, AbstractControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { INewFinancialAccountData } from 'src/app/models/financial-account';
+import { FinancialAccountType } from 'src/app/models/financial-account-type';
+import { FinancialAccountService } from 'src/app/services/financial-account.service';
 
 @Component({
   selector: 'app-new-financial-account-modal',
@@ -15,7 +17,7 @@ export class NewFinancialAccountModalComponent {
 
   constructor(
     private financialUnitDetailsService: FinancialUnitDetailsService,
-    // private financialAccountService: FinancialAccountService
+    private financialAccountService: FinancialAccountService
   ) { }
 
   @Input() data: INewFinancialAccountData;
@@ -29,16 +31,26 @@ export class NewFinancialAccountModalComponent {
       this.headingText = 'Úprava finančního účtu'
       this.buttonText = 'Uložit';
       this.financialAccountFG.patchValue(this.data);
+      this.financialAccountFG.controls['type'].disable();
     } else {
       this.headingText = 'Nový finanční účet'
       this.buttonText = 'Vytvořit';
     }
   }
 
+  accountTypeOptions: IAccountTypeOption[] = this.financialAccountService.getAllInventoryTransactionTypes()
+  .map(type => {
+    return {
+      type,
+      description: this.financialAccountService.getFinancialAccountTypeDescription(type)
+    };
+  });
+
   financialAccountFG: FormGroup = new FormGroup({
     _id: new FormControl(null),
     code: new FormControl(null, [financialAccountCodeValidator]),
-    name: new FormControl(null)
+    name: new FormControl(null),
+    type: new FormControl(null)
   });
   financialAccountFormData$: Observable<INewFinancialAccountData> = this.financialAccountFG.valueChanges.pipe(
     startWith(this.financialAccountFG)
@@ -46,19 +58,12 @@ export class NewFinancialAccountModalComponent {
 
   codeFC: AbstractControl = this.financialAccountFG.controls['code'];
 
-  // financialAccountTypeOptions: IFinancialAccountTypeOption[] = this.financialAccountService.getAllFinancialAccountTypes()
-  //   .map((type: FinancialAccountType) => {
-  //       const name: string = this.financialAccountService.getFinancialAccountTypeName(type);
-  //       const option: IFinancialAccountTypeOption = { type, name };
-  //       return option;
-  //   });
-
   isCreateButtonDisabled$: Observable<boolean> = this.financialAccountFormData$.pipe(
     map((formData: INewFinancialAccountData) => !this.getAreFinancialAccountFormDataValid(formData))
   );
 
   createFinancialAccount(): void {
-    const data: INewFinancialAccountData = this.financialAccountFG.value;
+    const data: INewFinancialAccountData = this.financialAccountFG.getRawValue();
     if (data._id) {
       this.financialUnitDetailsService.updateFinancialAccount(data);
     } else {
@@ -72,7 +77,7 @@ export class NewFinancialAccountModalComponent {
   }
 
   private getAreFinancialAccountFormDataValid(formData: INewFinancialAccountData): boolean {
-    if (!formData.code || !formData.name) {
+    if (!formData.code || !formData.name || !formData.type) {
       return false;
     }
     if (!RegExp('^[0-9]+$').test(formData.code)) {
@@ -104,3 +109,10 @@ const financialAccountCodeValidator = (control: AbstractControl): {[key: string]
   // }
   return Object.keys(errors).length > 0 ? errors : null;
 };
+
+
+
+interface IAccountTypeOption {
+  type: FinancialAccountType,
+  description: string
+}

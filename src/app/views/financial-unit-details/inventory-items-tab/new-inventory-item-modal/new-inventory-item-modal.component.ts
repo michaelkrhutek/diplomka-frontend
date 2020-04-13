@@ -44,7 +44,7 @@ export class NewInventoryItemModalComponent {
     startWith(this.inventoryItemFG)
   );
 
-  InventoryGroupOptions$: Observable<IInventoryGroupOption[]> = this.financialUnitDetailsService.InventoryGroups$.pipe(
+  inventoryGroupOptions$: Observable<IInventoryGroupOption[]> = this.financialUnitDetailsService.InventoryGroups$.pipe(
     map((groups: InventoryGroup[]) => groups.map((group: InventoryGroup) => {
       const option: IInventoryGroupOption = {
         id: group._id,

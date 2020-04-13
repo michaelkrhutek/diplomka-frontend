@@ -10,8 +10,8 @@
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Oceňovací metoda</mat-label>
-                <mat-select formControlName="defaultStockDecrementType">
-                    <mat-option *ngFor="let option of stockDecrementTypeOptions" [value]="option.type">
+                <mat-select formControlName="defaultStockValuationMethod">
+                    <mat-option *ngFor="let option of stockValuationMethodOptions" [value]="option.type">
                         {{ option.description }}
                     </mat-option>
                 </mat-select>

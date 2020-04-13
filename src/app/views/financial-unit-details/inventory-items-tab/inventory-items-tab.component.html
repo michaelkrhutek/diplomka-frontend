@@ -1,9 +1,18 @@
 <div class="tab-container">
     <app-heading headingText="Položky zásob" iconName="shopping_basket"></app-heading>
-    <div class="filters-container">
+    <div class="filters-container" [formGroup]="filteringCriteriaFG">
         <mat-form-field>
             <mat-label>Hledat položku zásob</mat-label>
-            <input matInput [formControl]="filterTextFC">
+            <input matInput formControlName="filterText">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Skupina</mat-label>
+            <mat-select formControlName="inventoryGroupId">
+                <mat-option [value]="0">Všechny</mat-option>
+                <mat-option *ngFor="let option of (inventoryGroupOptions$ | async)" [value]="option.id">
+                    {{ option.name }}
+                </mat-option>
+            </mat-select>
         </mat-form-field>
     </div>
     <div class="card">

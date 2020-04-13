@@ -25,12 +25,31 @@ export class FormatterService {
     if (isNaN(n)) {
       return 'N/A';
     }
-    
     const roundedNumber: number = Math.round(n * (10 ** precision)) / (10 ** precision);
     const beforeDecimal: string = roundedNumber.toString().split('.')[0].replace(/\B(?=(\d{3})+(?!\d))/g, this.defaultNumberSeparator);
     const afterDecimal: string = roundedNumber.toString().split('.')[1] || '';
     const updatedAfterDecimal: string = this.addZeroesToStringToMatchLength(afterDecimal, precision);
     return `${beforeDecimal}${updatedAfterDecimal ? this.defaultDecimalSeparator + updatedAfterDecimal : ''}`;
+  }
+
+  getRoundedNumberStringWithSign(n: number, precision = 0): string {
+    if (isNaN(n)) {
+      return 'N/A';
+    }
+    const getSymbol = (n: number) => {
+      if (n > 0) {
+        return '+';
+      } else if (n < 0) {
+        return '−';
+      } else {
+        return '';
+      }
+    }
+    const roundedNumber: number = Math.round(Math.abs(n) * (10 ** precision)) / (10 ** precision);
+    const beforeDecimal: string = roundedNumber.toString().split('.')[0].replace(/\B(?=(\d{3})+(?!\d))/g, this.defaultNumberSeparator);
+    const afterDecimal: string = roundedNumber.toString().split('.')[1] || '';
+    const updatedAfterDecimal: string = this.addZeroesToStringToMatchLength(afterDecimal, precision);
+    return `${getSymbol(n)}${beforeDecimal}${updatedAfterDecimal ? this.defaultDecimalSeparator + updatedAfterDecimal : ''}`;
   }
 
   getPercentageString(n: number): string {

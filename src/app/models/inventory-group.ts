@@ -1,15 +1,15 @@
-import { StockDecrementType } from './stock';
+import { StockValuationMethod } from './stock';
 
 export interface INewInventoryGroupData {
   _id: string | null;
   name: string;
-  defaultStockDecrementType: string;
+  defaultStockValuationMethod: string;
 }
 
 export interface IInventoryGroup {
     _id: string;
     name: string;
-    defaultStockDecrementType: string;
+    defaultStockValuationMethod: string;
 }
 
 export class InventoryGroup {
@@ -17,21 +17,21 @@ export class InventoryGroup {
     constructor(data: IInventoryGroup) {
         this._id = data._id;
         this.name = data.name;
-        this.defaultStockDecrementType = this.parseStockDecrementTypeString(data.defaultStockDecrementType);
+        this.defaultStockValuationMethod = this.parseStockValuationMethodString(data.defaultStockValuationMethod);
     }
 
     _id: string;
     name: string;
-    defaultStockDecrementType: StockDecrementType;
+    defaultStockValuationMethod: StockValuationMethod;
 
-    private parseStockDecrementTypeString(typeAsString: string): StockDecrementType {
+    private parseStockValuationMethodString(typeAsString: string): StockValuationMethod {
         switch (typeAsString) {
-            case StockDecrementType.FIFO.toString():
-              return StockDecrementType.FIFO;
-            case StockDecrementType.LIFO.toString():
-              return StockDecrementType.LIFO;
-            case StockDecrementType.Average.toString():
-              return StockDecrementType.Average;
+            case StockValuationMethod.FIFO.toString():
+              return StockValuationMethod.FIFO;
+            case StockValuationMethod.LIFO.toString():
+              return StockValuationMethod.LIFO;
+            case StockValuationMethod.Average.toString():
+              return StockValuationMethod.Average;
             default:
               return null;
           }

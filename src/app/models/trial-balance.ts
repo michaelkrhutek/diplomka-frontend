@@ -1,4 +1,5 @@
 import { IFinancialAccount } from './financial-account';
+import { FinancialAccountType } from './financial-account-type';
 
 export interface ITrialBalanceAccount {
     _id: string;
@@ -27,6 +28,13 @@ export class TrialBalance {
         this.startDate = new Date(trialBalance.startDate);
         this.endDate = new Date(trialBalance.endDate);
         this.accounts = trialBalance.accounts.sort((a, b) => a.account.code > b.account.code ? 1 : -1);
+        this.profitOrLoss = 0;
+        this.accounts.forEach((account) => {
+            if ([FinancialAccountType.Expenses, FinancialAccountType.Revenues].includes(account.account.type)) {
+                this.profitOrLoss += account.creditAmount;
+                this.profitOrLoss -= account.debitAmount;
+            }
+        });
     }
 
     financialUnitId: string;
@@ -36,5 +44,6 @@ export class TrialBalance {
     totalDebitEntries: number;
     totalCreditAmount: number;
     totalCreditEntries: number;
+    profitOrLoss: number;
     accounts: ITrialBalanceAccount[];
 }

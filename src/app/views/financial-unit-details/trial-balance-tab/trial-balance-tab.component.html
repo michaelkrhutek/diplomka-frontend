@@ -9,6 +9,10 @@
     </mat-form-field>
   </div>
   <div class="card">
+    <div *ngIf="!isLoadingData" class="profit-or-loss-container">
+      <span>Výsledek hospodaření:</span>
+      <span>{{ profitOrLoss$ | async }}</span>
+    </div>
     <app-basic-table [data]="tableData$ | async" [isLoadingData]="isLoadingData"></app-basic-table>
   </div>
 </div>
