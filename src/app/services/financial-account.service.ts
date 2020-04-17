@@ -33,6 +33,7 @@ export class FinancialAccountService {
     const params: HttpParams = new HttpParams()
       .append('name', data.name)
       .append('code', data.code)
+      .append('type', data.type)
       .append('financialUnitId', financialUnitId)
     return this.http.post<any>(`${this.baseUrl}api/financial-account/create-financial-account`, null, { params }).pipe(
       catchError((err) => {
@@ -102,7 +103,7 @@ export class FinancialAccountService {
       case FinancialAccountType.Revenues:
         return 'Výnosy';
       default:
-        return 'N/A';
+        return 'Neznámý typ';
     }
   }
 }
